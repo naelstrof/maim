@@ -16,4 +16,4 @@ clean:
 
 install: all
 	mkdir -p $(DESTDIR)/$(BINDIR)
-	cp $(CURDIR)/slop $(DESTDIR)/$(BINDIR)
+	cp $(CURDIR)/$(EXECUTABLE) $(DESTDIR)/$(BINDIR)
