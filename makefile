@@ -9,7 +9,7 @@ BINDIR="usr/bin"
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
 
 clean:
 	rm -rf $(OBJECTS) $(EXECUTABLE)
