@@ -20,6 +20,7 @@ public:
     int         m_h;
     std::string m_xdisplay;
     std::string m_file;
+    std::string m_slopoptions;
 private:
     int         parseInt( std::string arg, int* returnInt );
     int         parseFloat( std::string arg, float* returnFloat );

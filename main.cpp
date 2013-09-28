@@ -54,9 +54,11 @@ int main( int argc, char** argv ) {
     }
     // Check if we were asked to prompt for selection:
     if ( options->m_select ) {
-        // Execute slop
+        // Execute slop with any options given.
         std::string result;
-        err = exec( "slop", &result );
+        std::string cmd = "slop ";
+        cmd += options->m_slopoptions;
+        err = exec( cmd, &result );
         if ( err ) {
             fprintf( stderr, "slop failed to run, canceling screenshot. Is slop installed?\n" );
             return 1;

@@ -27,6 +27,12 @@ void maim::Options::printHelp() {
     printf( "    -y=INT                             set the y coordinate for taking an image\n" );
     printf( "    -w=INT                             set the width for taking an image\n" );
     printf( "    -h=INT                             set the height for taking an image\n" );
+    printf( "slop options\n" );
+    printf( "    -nkb, --nokeyboard                 don't try to grab the keyboard. This may fix problems with certain window managers.\n" );
+    printf( "    -c=COLOR, --color=COLOR            set selection rectangle color, COLOR is in format FLOAT,FLOAT,FLOAT\n" );
+    printf( "    -b=INT, --bordersize=INT           set selection rectangle border size.\n" );
+    printf( "    -p=INT, --padding=INT              set m_padding size for selection.\n" );
+    printf( "    -t=INT, --tolerance=INT            if you have a shaky mouse, increasing this value will make slop detect single clicks better. Rather than interpreting your shaky clicks as region selections.\n" );
     printf( "examples\n" );
     printf( "    maim -g=1920x1080+0+30\n" );
 }
@@ -47,6 +53,16 @@ int maim::Options::parseOptions( int argc, char** argv ) {
             if ( err ) {
                 return 1;
             }
+        } else if ( matches( arg, "-nkb", "--nokeyboard" ) ) {
+            m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-c=", "--color=" ) ) {
+            m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-b=", "--bordersize=" ) ) {
+            m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-p=", "--padding=" ) ) {
+            m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-t=", "--tolerance=" ) ) {
+            m_slopoptions += arg + " ";
         } else if ( matches( arg, "-x=" ) ) {
             m_gotGeometry = true;
             int err = parseInt( arg, &m_x );
@@ -98,6 +114,7 @@ int maim::Options::parseOptions( int argc, char** argv ) {
             return 1;
         }
     }
+    m_slopoptions += "--xdisplay=" + m_xdisplay;
     return 0;
 }
 
@@ -145,10 +162,14 @@ int maim::Options::parseFloat( std::string arg, float* returnFloat ) {
 
 bool maim::Options::matches( std::string arg, std::string shorthand, std::string longhand ) {
     if ( arg.substr( 0, shorthand.size() ) == shorthand ) {
-        return true;
+        if ( arg == shorthand || shorthand[shorthand.length()-1] == '=' ) {
+            return true;
+        }
     }
     if ( longhand.size() && arg.substr( 0, longhand.size() ) == longhand ) {
-        return true;
+        if ( arg == longhand || longhand[longhand.length()-1] == '=' ) {
+            return true;
+        }
     }
     return false;
 }
