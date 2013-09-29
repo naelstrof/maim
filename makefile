@@ -4,7 +4,7 @@ LDFLAGS=$(shell imlib2-config --libs)
 SOURCES=main.cpp x.cpp options.cpp im.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=maim
-BINDIR="usr/bin"
+BINDIR="/usr/bin"
 
 all: $(SOURCES) $(EXECUTABLE)
 
@@ -15,5 +15,5 @@ clean:
 	rm -rf $(OBJECTS) $(EXECUTABLE)
 
 install: all
-	mkdir -p $(DESTDIR)/$(BINDIR)
-	cp $(CURDIR)/$(EXECUTABLE) $(DESTDIR)/$(BINDIR)
+	mkdir -p $(DESTDIR)$(BINDIR)
+	cp $(CURDIR)/$(EXECUTABLE) $(DESTDIR)$(BINDIR)
