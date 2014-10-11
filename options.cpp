@@ -3,7 +3,7 @@
 maim::Options* options = new maim::Options();
 
 maim::Options::Options() {
-    m_version = "v1.1.4";
+    m_version = "v1.1.5";
     m_xdisplay = ":0";
     m_file = "";
     m_select = false;
@@ -56,7 +56,7 @@ void maim::Options::printHelp() {
     printf( "    $ sleep 5; maim ~/delayed.png\n" );
     printf( "\n" );
     printf( "    $ # Save a dated screenshot.\n" );
-    printf( "    $ maim \"~/$(date +%F-%T).gif\"\n" );
+    printf( "    $ maim \"~/$(date +%%F-%%T).gif\"\n" );
     printf( "\n" );
     printf( "    $ # Save a .jpg\n" );
     printf( "    $ maim ~/myscreen.jpg\n" );

@@ -1,18 +1,21 @@
-CC=g++
-CFLAGS=$(shell imlib2-config --cflags)
-LDFLAGS=-L/usr/lib -lImlib2 -lX11
-SOURCES=main.cpp x.cpp options.cpp im.cpp
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=maim
-BINDIR="/usr/bin"
+CXX ?= g++
+CXXFLAGS ?= $(shell imlib2-config --cflags) -O2 -g
+LDFLAGS += -lImlib2 -lX11
+SOURCES = main.cpp x.cpp options.cpp im.cpp
+OBJECTS = $(SOURCES:.cpp=.o)
+EXECUTABLE = maim
+BINDIR = "/usr/bin"
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 
 clean:
-	rm -rf $(OBJECTS) $(EXECUTABLE)
+	$(RM) $(OBJECTS)
+
+dist-clean: clean
+	$(RM) $(EXECUTABLE)
 
 install: all
 	mkdir -p $(DESTDIR)$(BINDIR)
