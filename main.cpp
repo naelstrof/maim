@@ -70,7 +70,7 @@ int main( int argc, char** argv ) {
             result.at( find ) = ' ';
             find = result.find( "=" );
         }
-        int num = sscanf( result.c_str(), "X %d\n Y %d\n W %d\n H %d\n",
+        int num = sscanf( result.c_str(), "X %d\n Y %d\n W %d\n H %d\n%*s",
                           &options->m_x,
                           &options->m_y,
                           &options->m_w,
@@ -84,7 +84,7 @@ int main( int argc, char** argv ) {
             }
             return 0;
         }
-        fprintf( stderr, "Either the user canceled the query for selection, or slop failed to run properly. Canceling screenshot. Is slop installed?\n" );
+        fprintf( stderr, "Either the user canceled the query for selection, or slop failed to run properly. Canceling screenshot.\n" );
         return 1;
     }
     // Just take a full screen shot if we didn't get any geometry.

@@ -3,6 +3,7 @@
 maim::Options* options = new maim::Options();
 
 maim::Options::Options() {
+    m_version = "v1.1.4";
     m_xdisplay = ":0";
     m_file = "";
     m_select = false;
@@ -27,14 +28,38 @@ void maim::Options::printHelp() {
     printf( "    -y=INT                             set the y coordinate for taking an image\n" );
     printf( "    -w=INT                             set the width for taking an image\n" );
     printf( "    -h=INT                             set the height for taking an image\n" );
+    printf( "    -v, --version                      prints version.\n" );
     printf( "slop options\n" );
-    printf( "    -nkb, --nokeyboard                 don't try to grab the keyboard. This may fix problems with certain window managers.\n" );
-    printf( "    -c=COLOR, --color=COLOR            set selection rectangle color, COLOR is in format FLOAT,FLOAT,FLOAT\n" );
-    printf( "    -b=INT, --bordersize=INT           set selection rectangle border size.\n" );
-    printf( "    -p=INT, --padding=INT              set m_padding size for selection.\n" );
-    printf( "    -t=INT, --tolerance=INT            if you have a shaky mouse, increasing this value will make slop detect single clicks better. Rather than interpreting your shaky clicks as region selections.\n" );
+    printf( "    -nkb, --nokeyboard                 Disables the ability to cancel selections with the keyboard.\n" );
+    printf( "    -b=INT, --bordersize=INT           Set selection rectangle border size.\n" );
+    printf( "    -p=INT, --padding=INT              Set padding size for selection.\n" );
+    printf( "    -t=INT, --tolerance=INT            How far in pixels the mouse can move after clicking and still be detected\n" );
+    printf( "                                       as a normal click. Setting to zero will disable window selections.\n" );
+    printf( "    -c=COLOR, --color=COLOR            Set selection rectangle color, COLOR is in format FLOAT,FLOAT,FLOAT,FLOAT.\n" );
+    printf( "                                       takes RGBA or RGB.\n" );
+    printf( "    -w=FLOAT, --gracetime=FLOAT        Set the amount of time before slop will check for keyboard cancellations\n" );
+    printf( "                                       in seconds.\n" );
+    printf( "    -nd, --nodecorations               Attempts to remove decorations from window selections.\n" );
+    printf( "    -min=INT, --minimumsize=INT        Sets the minimum output of width or height values, useful to avoid outputting 0\n" );
+    printf( "                                       widths or heights.\n" );
+    printf( "    -max=INT, --maximumsize=INT        Sets the maximum output of width or height values.\n" );
+    printf( "    -hi, --highlight                   Instead of outlining the selection, slop highlights it. Only useful when\n" );
+    printf( "                                       used with a --color with an alpha under 1.\n" );
     printf( "examples\n" );
-    printf( "    maim -g=1920x1080+0+30\n" );
+    printf( "    $ # Screenshot the entire screen besides the top 30 pixels.\n" );
+    printf( "    $ maim -g=1920x1060+0+30\n" );
+    printf( "\n" );
+    printf( "    $ # Prompt a selection to screenshot.\n" );
+    printf( "    $ maim -s\n" );
+    printf( "\n" );
+    printf( "    $ # Wait 5 seconds before saving a screenshot to ~/delayed.png\n" );
+    printf( "    $ sleep 5; maim ~/delayed.png\n" );
+    printf( "\n" );
+    printf( "    $ # Save a dated screenshot.\n" );
+    printf( "    $ maim \"~/$(date +%F-%T).gif\"\n" );
+    printf( "\n" );
+    printf( "    $ # Save a .jpg\n" );
+    printf( "    $ maim ~/myscreen.jpg\n" );
 }
 
 int maim::Options::parseOptions( int argc, char** argv ) {
@@ -59,9 +84,25 @@ int maim::Options::parseOptions( int argc, char** argv ) {
             m_slopoptions += arg + " ";
         } else if ( matches( arg, "-b=", "--bordersize=" ) ) {
             m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-w=", "--gracetime=" ) ) {
+            // Replace w with g, since slop uses g as gracetime.
+            for ( int i=0;i<arg.length();i++ ) {
+                if ( arg[i] == 'w' ) {
+                    arg[i] = 'g';
+                }
+            }
+            m_slopoptions += arg + " ";
         } else if ( matches( arg, "-p=", "--padding=" ) ) {
             m_slopoptions += arg + " ";
         } else if ( matches( arg, "-t=", "--tolerance=" ) ) {
+            m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-min=", "--minimumsize=" ) ) {
+            m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-max=", "--maximumsize=" ) ) {
+            m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-hi", "--highlight" ) ) {
+            m_slopoptions += arg + " ";
+        } else if ( matches( arg, "-nd", "--nodecorations" ) ) {
             m_slopoptions += arg + " ";
         } else if ( matches( arg, "-x=" ) ) {
             m_gotGeometry = true;
@@ -95,7 +136,11 @@ int maim::Options::parseOptions( int argc, char** argv ) {
         } else {
             // If nothing matched, and we're at the end of the argument list. Parse the last arg as the file name.
             if ( i == argc-1 ) {
-                m_file = argv[i];
+                // We're responsible for expanding ~, so we use wordexp to do everything for us.
+                wordexp_t p;
+                wordexp( argv[i], &p, 0 );
+                m_file = p.we_wordv[0];
+                wordfree( &p );
                 m_gotFile = true;
                 return 0;
             }

@@ -1,7 +1,9 @@
 #ifndef MAIM_OPTIONS_H_
 
 #include <string>
+#include <cstring>
 #include <cstdio>
+#include <wordexp.h>
 
 namespace maim {
 
@@ -18,6 +20,7 @@ public:
     int         m_y;
     int         m_w;
     int         m_h;
+    std::string m_version;
     std::string m_xdisplay;
     std::string m_file;
     std::string m_slopoptions;

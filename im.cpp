@@ -20,34 +20,44 @@ int maim::IMEngine::init() {
     return 0;
 }
 
-std::string maim::IMEngine::guessFormat( std::string file ) {
-    // Try to guess image format.
-    std::string format;
-    int find = file.find_last_of( '.' );
-    if ( find == std::string::npos ) {
-        return "png";
-    }
-    format = file.substr( find );
-    if ( format.length() > 3 && format != "jpeg" ) {
-        return "png";
-    }
-    return format;
-}
-
 int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h ) {
     Imlib_Image buffer = imlib_create_image( w, h );
     imlib_context_set_image( buffer );
     imlib_copy_drawable_to_image( 0, x, y, w, h, 0, 0, 1 );
-    imlib_image_set_format( guessFormat( file ).c_str() );
     Imlib_Load_Error err;
     imlib_save_image_with_error_return( file.c_str(), &err );
     if ( err != IMLIB_LOAD_ERROR_NONE ) {
         fprintf( stderr, "Failed to save image %s: ", file.c_str() );
         switch( err ) {
+            case IMLIB_LOAD_ERROR_UNKNOWN:
             default: {
                 fprintf( stderr, "unknown error %d\n", (int)err );
                 break;
             }
+            case IMLIB_LOAD_ERROR_OUT_OF_FILE_DESCRIPTORS:
+                fprintf( stderr, "out of file descriptors\n" );
+                break;
+            case IMLIB_LOAD_ERROR_OUT_OF_MEMORY:
+                fprintf( stderr, "out of memory\n" );
+                break;
+            case IMLIB_LOAD_ERROR_TOO_MANY_SYMBOLIC_LINKS:
+                fprintf( stderr, "path contains too many symbolic links\n" );
+                break;
+            case IMLIB_LOAD_ERROR_PATH_POINTS_OUTSIDE_ADDRESS_SPACE:
+                fprintf( stderr, "path points outside address space\n" );
+                break;
+            case IMLIB_LOAD_ERROR_PATH_COMPONENT_NOT_DIRECTORY:
+                fprintf( stderr, "path component is not a directory\n" );
+                break;
+            case IMLIB_LOAD_ERROR_PATH_COMPONENT_NON_EXISTANT:
+                fprintf( stderr, "path component is non-existant\n" );
+                break;
+            case IMLIB_LOAD_ERROR_PATH_TOO_LONG:
+                fprintf( stderr, "path is too long\n" );
+                break;
+            case IMLIB_LOAD_ERROR_NO_LOADER_FOR_FILE_FORMAT:
+                fprintf( stderr, "no loader for file format (unsupported format)\n" );
+                break;
             case IMLIB_LOAD_ERROR_OUT_OF_DISK_SPACE: {
                 fprintf( stderr, "not enough disk space\n" );
                 break;
