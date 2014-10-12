@@ -3,7 +3,7 @@
 maim::Options* options = new maim::Options();
 
 maim::Options::Options() {
-    m_version = "v1.1.6";
+    m_version = "v1.1.7";
     m_xdisplay = ":0";
     m_file = "";
     m_select = false;
@@ -13,6 +13,7 @@ maim::Options::Options() {
     m_y = 0;
     m_w = 0;
     m_h = 0;
+    m_delay = 0;
 }
 
 void maim::Options::printHelp() {
@@ -20,15 +21,16 @@ void maim::Options::printHelp() {
     printf( "maim (make image) makes an image out of the given area on the given X screen. Defaults to the whole screen.\n" );
     printf( "\n" );
     printf( "options\n" );
-    printf( "    -h, --help                         show this message.\n" );
-    printf( "    -s, --select                       manually select screenshot location. Only works when slop is installed.\n" );
-    printf( "    -d=STRING, --display=STRING        set x display (STRING must be hostname:number.screen_number format)\n" );
-    printf( "    -g=GEOMETRY, --geometry=GEOMETRY   set the region to capture. GEOMETRY is in format WxH+X+Y\n" );
-    printf( "    -x=INT                             set the x coordinate for taking an image\n" );
-    printf( "    -y=INT                             set the y coordinate for taking an image\n" );
-    printf( "    -w=INT                             set the width for taking an image\n" );
-    printf( "    -h=INT                             set the height for taking an image\n" );
-    printf( "    -v, --version                      prints version.\n" );
+    printf( "    -h, --help                         Show this message.\n" );
+    printf( "    -s, --select                       Manually select screenshot location. Only works when slop is installed.\n" );
+    printf( "    -xd=STRING, --xdisplay=STRING      Set x display (STRING must be hostname:number.screen_number format)\n" );
+    printf( "    -g=GEOMETRY, --geometry=GEOMETRY   Set the region to capture. GEOMETRY is in format WxH+X+Y\n" );
+    printf( "    -x=INT                             Set the x coordinate for taking an image\n" );
+    printf( "    -y=INT                             Set the y coordinate for taking an image\n" );
+    printf( "    -w=INT                             Set the width for taking an image\n" );
+    printf( "    -h=INT                             Set the height for taking an image\n" );
+    printf( "    -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.\n" );
+    printf( "    -v, --version                      Prints version.\n" );
     printf( "\n" );
     printf( "slop options\n" );
     printf( "    -nkb, --nokeyboard                 Disables the ability to cancel selections with the keyboard.\n" );
@@ -47,20 +49,14 @@ void maim::Options::printHelp() {
     printf( "    -hi, --highlight                   Instead of outlining the selection, slop highlights it. Only useful when\n" );
     printf( "                                       used with a --color with an alpha under 1.\n" );
     printf( "examples\n" );
-    printf( "    $ # Screenshot the entire screen besides the top 30 pixels.\n" );
-    printf( "    $ maim -g=1920x1060+0+30\n" );
+    printf( "    $ # Screenshot the active window\n" );
+    printf( "    $ maim -g=$(xwininfo -id $(xdotool getactivewindow) | awk '/geometry/ {print $2}')\n" );
     printf( "\n" );
-    printf( "    $ # Prompt a selection to screenshot.\n" );
-    printf( "    $ maim -s\n" );
-    printf( "\n" );
-    printf( "    $ # Wait 5 seconds before saving a screenshot to ~/delayed.png\n" );
-    printf( "    $ sleep 5; maim ~/delayed.png\n" );
+    printf( "    $ # Prompt a transparent red selection to screenshot.\n" );
+    printf( "    $ maim -s -c=1,0,0,0.6\n" );
     printf( "\n" );
     printf( "    $ # Save a dated screenshot.\n" );
-    printf( "    $ maim \"~/$(date +%%F-%%T).gif\"\n" );
-    printf( "\n" );
-    printf( "    $ # Save a .jpg\n" );
-    printf( "    $ maim ~/myscreen.jpg\n" );
+    printf( "    $ maim \"~/$(date +%%F-%%T).png\"\n" );
 }
 
 int maim::Options::parseOptions( int argc, char** argv ) {
@@ -68,7 +64,7 @@ int maim::Options::parseOptions( int argc, char** argv ) {
     // It looks complicated because you have to have spaces for delimiters for sscanf.
     for ( int i=1; i<argc; i++ ) {
         std::string arg = argv[i];
-        if ( matches( arg, "-d=", "--display=" ) ) {
+        if ( matches( arg, "-xd=", "--xdisplay=" ) ) {
             int err = parseString( arg, &m_xdisplay );
             if ( err ) {
                 return 1;
@@ -108,6 +104,11 @@ int maim::Options::parseOptions( int argc, char** argv ) {
         } else if ( matches( arg, "-x=" ) ) {
             m_gotGeometry = true;
             int err = parseInt( arg, &m_x );
+            if ( err ) {
+                return 1;
+            }
+        } else if ( matches( arg, "-d=", "--delay=" ) ) {
+            int err = parseFloat( arg, &m_delay );
             if ( err ) {
                 return 1;
             }

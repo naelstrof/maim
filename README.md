@@ -11,36 +11,43 @@ features
 
 why use maim over import or scrot?
 --------------------
-maim's design philosophy is "do one thing and do it well". Unlike scrot, maim doesn't have fancy options like --delay or --exec. It also doesn't have any advanced naming capabilities either, and this is by design. Your shell is supposed to take care of these features, a delay can easily be done with
-```bash
-$ sleep 5; maim
-```
-and if you want your files to have timestamps for names, your shell is capable of that too!
+* Compared to scrot
+    - maim has no --exec or naming features. This is because maim follows the unix philosophy of "do one thing and do it well". These features are things that should be handled by your shell.
+    - scrot has no way to screenshot a predefined region. maim comes equipped with --geometry features that allow for specified region capture.
+    - With [slop](https://github.com/naelstrof/slop) installed, maim's --select option is far superior to scrot's -s option in many ways. See [slop](https://github.com/naelstrof/slop) for more details.
+* Compared to ImageMagick's import
+    - import doesn't play nicely with compositors; making effects like transparent windows not render properly in the screenshot. maim, like scrot, uses imlib2 which isn't inflicted with this problem.
+
+examples
+-------------------
+I'm including this section because some people don't see how powerful and flexible their shell can be with simple tools like maim. Remember you can always bind keys to shell commands!
+The following can be executed in any bash-like shells:
+
+* Set the screenshot's name to the current time and date:
 ```bash
 $ maim "~/Pictures/$(date +%F-%T).png"
 ```
-Also unlike scrot, maim has capabilities to take a screenshot of a region of the screen. Gnome users can execute this to only screenshot the section of the screen below the top bar.
-```bash
-$ maim -g=1920x1050+0+30
-```
-This also allows advanced users to take screenshots of the active window by using a combination of xwininfo, xdotool, and awk. Especially useful when bound to a key.
+
+* Take a screenshot of the active window: (Requires xwininfo, xdotool, and awk.)
 ```bash
 $ maim -g=$(xwininfo -id $(xdotool getactivewindow) | awk '/geometry/ {print $2}')
-$ # Note: Some programs misreport their actual pixel geometry (mostly terminals). For the sake of keeping this one liner example simple this is ok for me.
+$ # Note: Some programs misreport their actual pixel geometry (mostly terminals).
+$ # This can be fixed by using their absolute X/Y/Width/Height values instead;
+$ # which is much more difficult and confusing to parse in one line from xwininfo,
+$ # and as such won't be included in this example.
 ```
-As for why maim is better than ImageMagick's import: import doesn't play well with compositors. So transparent windows and other special effects don't work well with it.
-maim uses imlib2 so it doesn't have this problem!
 
-If you install [slop](https://github.com/naelstrof/slop) with maim, you unlock the --select option and the plethora of options that come with it.
-This not only allows you to click and drag selections, but also lets you click on individual windows!
+* Custom transparent red selection with 10 pixel padding: (Requires [slop](https://github.com/naelstrof/slop))
+```bash
+$ maim -s -c=1,0,0,0.6 -p=10
+```
 ![Image of maim selecting a window](http://farmpolice.com/content/images/window_selection.png)
 
-Combining the --select option with an image uploading utility like [Bart's Bash Script Imgur Uploader](http://imgur.com/tools/imgurbash.sh) gives you a great and easy image uploading utility.
+* Automatically upload selected region to Imgur: (Requires [Bart's Bash Script Imgur Uploader](http://imgur.com/tools/imgurbash.sh), xclip is optional)
 ```bash
-$ maim -s /tmp/screen.png; imgurbash.sh /tmp/screen.png
-$ # The image URL should now be in your clipboard assuming you have xclip installed!
+$ maim -s /tmp/screenshot.png; imgurbash.sh /tmp/screenshot.png
+$ # If xclip is installed, your clipboard should have the online screenshot's URL in it!
 ```
-Check out [slop](https://github.com/naelstrof/slop) for more details about the --select option.
 
 In review, maim does one thing and does it well: it takes a screenshot of what you want. :) What you want is up to you, your programming skills, and your imagination.
 

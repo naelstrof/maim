@@ -48,7 +48,13 @@ int main( int argc, char** argv ) {
     if ( !options->m_gotFile ) {
         struct passwd *pw = getpwuid( getuid() );
         std::string homedir = pw->pw_dir;
-        homedir += "/screenshot.png";
+        std::string result;
+        err = exec( "date +%F-%T", &result );
+        if ( err ) {
+            homedir += "/screenshot.png";
+        } else {
+            homedir += "/" + result.substr( 0, result.length() - 1 ) + ".png";
+        }
         options->m_file = homedir;
         printf( "No file specified, using %s\n", homedir.c_str() );
     }
@@ -76,6 +82,9 @@ int main( int argc, char** argv ) {
                           &options->m_w,
                           &options->m_h );
         if ( num == 4 && ( options->m_w > 0 && options->m_h > 0 ) ) {
+            // Wait the designated amount of time before taking the screenshot.
+            // 1000000 microseconds = 1 second
+            usleep( (unsigned int)(options->m_delay * 1000000.f) );
             err = imengine->screenshot( options->m_file,
                                         options->m_x, options->m_y,
                                         options->m_w, options->m_h );
@@ -89,6 +98,9 @@ int main( int argc, char** argv ) {
     }
     // Just take a full screen shot if we didn't get any geometry.
     if ( !options->m_gotGeometry ) {
+        // Wait the designated amount of time before taking the screenshot.
+        // 1000000 microseconds = 1 second
+        usleep( (unsigned int)(options->m_delay * 1000000.f) );
         err = imengine->screenshot( options->m_file );
         if ( err ) {
             return err;
