@@ -29,7 +29,13 @@ $ maim -g=$(xwininfo -id $(xdotool getactivewindow) | awk '/geometry/ {print $2}
 $ # Note: Some programs misreport their actual pixel geometry (mostly terminals). For the sake of keeping this one liner example simple this is ok for me.
 ```
 As for ImageMagick's import, import doesn't play well with compositors. So transparent windows and other special effects don't work well with it. maim uses imlib2 so it doesn't have this problem!
-maim does one thing and does it well, takes a screenshot of what you want. :) What you want is up to you, your shell programming skills, and your imagination.
+
+If you install [slop](https://github.com/naelstrof/slop) with maim, you unlock the --select option and the plethora of options that come with it.
+This not only allows you to click and drag selections, but also lets you click on individual windows!
+![Image of maim selecting a window](http://farmpolice.com/content/images/window_selection.png)
+Check out [slop](https://github.com/naelstrof/slop) for more details about the --select option.
+
+maim does one thing and does it well: it takes a screenshot of what you want. :) What you want is up to you, your programming skills, and your imagination.
 
 help
 -------------------
