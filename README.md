@@ -12,7 +12,7 @@ features
 why use maim over import or scrot?
 --------------------
 * Compared to scrot
-    - maim has no --exec or naming features. This is because maim follows the unix philosophy of "do one thing and do it well". These features are things that should be handled by your shell.
+    - maim has no --exec or naming features. This is because maim follows the unix philosophy of "do one thing and do it well". These features are things that should be handled by the shell.
     - scrot has no way to screenshot a predefined region. maim comes equipped with --geometry features that allow for specified region capture.
     - With [slop](https://github.com/naelstrof/slop) installed, maim's --select option is far superior to scrot's -s option in many ways. See [slop](https://github.com/naelstrof/slop) for more details.
 * Compared to ImageMagick's import
@@ -58,15 +58,16 @@ Usage: maim [options] [file]
 maim (make image) makes an image out of the given area on the given X screen. Defaults to the whole screen.
 
 options
-    -h, --help                         show this message.
-    -s, --select                       manually select screenshot location. Only works when slop is installed.
-    -d=STRING, --display=STRING        set x display (STRING must be hostname:number.screen_number format)
-    -g=GEOMETRY, --geometry=GEOMETRY   set the region to capture. GEOMETRY is in format WxH+X+Y
-    -x=INT                             set the x coordinate for taking an image
-    -y=INT                             set the y coordinate for taking an image
-    -w=INT                             set the width for taking an image
-    -h=INT                             set the height for taking an image
-    -v, --version                      prints version.
+    -h, --help                         Show this message.
+    -s, --select                       Manually select screenshot location. Only works when slop is installed.
+    -xd=STRING, --xdisplay=STRING      Set x display (STRING must be hostname:number.screen_number format)
+    -g=GEOMETRY, --geometry=GEOMETRY   Set the region to capture. GEOMETRY is in format WxH+X+Y
+    -x=INT                             Set the x coordinate for taking an image
+    -y=INT                             Set the y coordinate for taking an image
+    -w=INT                             Set the width for taking an image
+    -h=INT                             Set the height for taking an image
+    -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.
+    -v, --version                      Prints version.
 
 slop options
     -nkb, --nokeyboard                 Disables the ability to cancel selections with the keyboard.
@@ -84,19 +85,14 @@ slop options
     -max=INT, --maximumsize=INT        Sets the maximum output of width or height values.
     -hi, --highlight                   Instead of outlining the selection, slop highlights it. Only useful when
                                        used with a --color with an alpha under 1.
+
 examples
-    $ # Screenshot the entire screen besides the top 30 pixels.
-    $ maim -g=1920x1060+0+30
+    $ # Screenshot the active window
+    $ maim -g=$(xwininfo -id $(xdotool getactivewindow) | awk '/geometry/ {print $2}')
 
-    $ # Prompt a selection to screenshot.
-    $ maim -s
-
-    $ # Wait 5 seconds before saving a screenshot to ~/delayed.png
-    $ sleep 5; maim ~/delayed.png
+    $ # Prompt a transparent red selection to screenshot.
+    $ maim -s -c=1,0,0,0.6
 
     $ # Save a dated screenshot.
-    $ maim "~/$(date +%F-%T).gif"
-
-    $ # Save a .jpg
-    $ maim ~/myscreen.jpg
+    $ maim "~/$(date +%F-%T).png"
 ```
