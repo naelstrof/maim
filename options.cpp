@@ -3,7 +3,7 @@
 maim::Options* options = new maim::Options();
 
 maim::Options::Options() {
-    m_version = "v1.1.5";
+    m_version = "v1.1.6";
     m_xdisplay = ":0";
     m_file = "";
     m_select = false;
@@ -29,6 +29,7 @@ void maim::Options::printHelp() {
     printf( "    -w=INT                             set the width for taking an image\n" );
     printf( "    -h=INT                             set the height for taking an image\n" );
     printf( "    -v, --version                      prints version.\n" );
+    printf( "\n" );
     printf( "slop options\n" );
     printf( "    -nkb, --nokeyboard                 Disables the ability to cancel selections with the keyboard.\n" );
     printf( "    -b=INT, --bordersize=INT           Set selection rectangle border size.\n" );
@@ -132,6 +133,9 @@ int maim::Options::parseOptions( int argc, char** argv ) {
             m_select = true;
         } else if ( arg ==  "-h" || arg ==  "--help" ) {
             printHelp();
+            return 2;
+        } else if ( matches( arg, "-v", "--version" ) ) {
+            printf( "maim %s\n", m_version.c_str() );
             return 2;
         } else {
             // If nothing matched, and we're at the end of the argument list. Parse the last arg as the file name.

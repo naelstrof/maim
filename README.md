@@ -15,11 +15,21 @@ maim's design philosophy is "do one thing and do it well". Unlike scrot, maim do
 ```bash
 $ sleep 5; maim
 ```
-If you want your files to have timestamps for names, your shell is capable of that too!
+and if you want your files to have timestamps for names, your shell is capable of that too!
 ```bash
-$ maim "~/Pictures/$(date +%D-%r).png"
+$ maim "~/Pictures/$(date +%F-%T).png"
 ```
-
+Also unlike scrot, maim has capabilities to take a screenshot of a region of the screen. Gnome users can execute this to only screenshot the section of the screen below the top bar.
+```bash
+$ maim -g=1920x1050+0+30
+```
+This also allows advanced users to take screenshots of the active window by using a combination of xwininfo, xdotool, and awk. Especially useful when bound to a key.
+```bash
+$ maim -g=$(xwininfo -id $(xdotool getactivewindow) | awk '/geometry/ {print $2}')
+$ # Note: Some programs misreport their actual pixel geometry (mostly terminals). For the sake of keeping this one liner example simple this is ok for me.
+```
+As for ImageMagick's import, import doesn't play well with compositors. So transparent windows and other special effects don't work well with it. maim uses imlib2 so it doesn't have this problem!
+maim does one thing and does it well, takes a screenshot of what you want. :) What you want is up to you, your shell programming skills, and your imagination.
 
 help
 -------------------
@@ -37,6 +47,7 @@ options
     -w=INT                             set the width for taking an image
     -h=INT                             set the height for taking an image
     -v, --version                      prints version.
+
 slop options
     -nkb, --nokeyboard                 Disables the ability to cancel selections with the keyboard.
     -b=INT, --bordersize=INT           Set selection rectangle border size.

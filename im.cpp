@@ -25,6 +25,7 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h ) {
     imlib_context_set_image( buffer );
     imlib_copy_drawable_to_image( 0, x, y, w, h, 0, 0, 1 );
     Imlib_Load_Error err;
+    int find = file.find_last_of( '.' );
     imlib_save_image_with_error_return( file.c_str(), &err );
     if ( err != IMLIB_LOAD_ERROR_NONE ) {
         fprintf( stderr, "Failed to save image %s: ", file.c_str() );
