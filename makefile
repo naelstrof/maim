@@ -1,6 +1,6 @@
 CXX ?= g++
 CXXFLAGS ?= $(shell imlib2-config --cflags) -O2 -g
-LDFLAGS += -lImlib2 -lX11
+LDFLAGS += -lImlib2 -lX11 -lXfixes
 SOURCES = main.cpp x.cpp options.cpp im.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = maim

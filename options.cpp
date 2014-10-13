@@ -3,10 +3,11 @@
 maim::Options* options = new maim::Options();
 
 maim::Options::Options() {
-    m_version = "v1.1.7";
+    m_version = "v1.1.8";
     m_xdisplay = ":0";
     m_file = "";
     m_select = false;
+    m_hidecursor = false;
     m_gotGeometry = false;
     m_gotFile = false;
     m_x = 0;
@@ -30,6 +31,7 @@ void maim::Options::printHelp() {
     printf( "    -w=INT                             Set the width for taking an image\n" );
     printf( "    -h=INT                             Set the height for taking an image\n" );
     printf( "    -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.\n" );
+    printf( "    -hc, --hidecursor                  Prevent the system cursor from appearing in the screenshot.\n" );
     printf( "    -v, --version                      Prints version.\n" );
     printf( "\n" );
     printf( "slop options\n" );
@@ -107,6 +109,8 @@ int maim::Options::parseOptions( int argc, char** argv ) {
             if ( err ) {
                 return 1;
             }
+        } else if ( matches( arg, "-hc", "--hidecursor" ) ) {
+            m_hidecursor = true;
         } else if ( matches( arg, "-d=", "--delay=" ) ) {
             int err = parseFloat( arg, &m_delay );
             if ( err ) {

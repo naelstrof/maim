@@ -7,7 +7,7 @@ features
 --------
 * Allows you to take a screenshot of your desktop and save it in any format.
 * Allows you to take a screenshot of a predetermined region of your desktop and save it in any format.
-* If slop (https://github.com/naelstrof/slop) is installed, it can be used for selecting a region.
+* If slop (https://github.com/naelstrof/slop) is installed, it can be used for selecting a region to screenshot.
 
 why use maim over import or scrot?
 --------------------
@@ -15,8 +15,11 @@ why use maim over import or scrot?
     - maim has no --exec or naming features. This is because maim follows the unix philosophy of "do one thing and do it well". These features are things that should be handled by the shell.
     - scrot has no way to screenshot a predefined region. maim comes equipped with --geometry features that allow for specified region capture.
     - With [slop](https://github.com/naelstrof/slop) installed, maim's --select option is far superior to scrot's -s option in many ways. See [slop](https://github.com/naelstrof/slop) for more details.
+    - maim will never error with `giblib error: couldn't grab keyboard:Resource temporarily unavailable` as it never grabs the keyboard. (slop does, but it has proper error handling that keeps it from crashing.)
 * Compared to ImageMagick's import
     - import doesn't play nicely with compositors; making effects like transparent windows not render properly in the screenshot. maim, like scrot, uses imlib2 which isn't inflicted with this problem.
+* Compared to either
+    - maim can actually take screenshots with your cursor included in them! It does this using the XFixes extension. I don't think there's any other screenshooters that do this.
 
 examples
 -------------------
@@ -67,6 +70,7 @@ options
     -w=INT                             Set the width for taking an image
     -h=INT                             Set the height for taking an image
     -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.
+    -hc, --hidecursor                  Prevent the system cursor from appearing in the screenshot.
     -v, --version                      Prints version.
 
 slop options

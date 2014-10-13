@@ -16,6 +16,7 @@ public:
     bool        m_gotGeometry;
     bool        m_gotFile;
     bool        m_select;
+    bool        m_hidecursor;
     float       m_delay;
     int         m_x;
     int         m_y;

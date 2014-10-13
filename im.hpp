@@ -4,6 +4,7 @@
 #define MAIM_IM_H_
 
 #include <Imlib2.h>
+#include <X11/extensions/Xfixes.h>
 
 #include "x.hpp"
 
@@ -14,10 +15,8 @@ public:
                         IMEngine();
                         ~IMEngine();
     int                 init();
-    int                 screenshot( std::string file, int x, int y, int w, int h );
-    int                 screenshot( std::string file );
-private:
-    std::string         guessFormat( std::string file );
+    int                 screenshot( std::string file, int x, int y, int w, int h, bool hidecursor );
+    int                 screenshot( std::string file, bool hidecursor );
 };
 
 }

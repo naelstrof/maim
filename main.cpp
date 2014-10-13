@@ -87,7 +87,8 @@ int main( int argc, char** argv ) {
             usleep( (unsigned int)(options->m_delay * 1000000.f) );
             err = imengine->screenshot( options->m_file,
                                         options->m_x, options->m_y,
-                                        options->m_w, options->m_h );
+                                        options->m_w, options->m_h,
+                                        options->m_hidecursor );
             if ( err ) {
                 return err;
             }
@@ -101,7 +102,7 @@ int main( int argc, char** argv ) {
         // Wait the designated amount of time before taking the screenshot.
         // 1000000 microseconds = 1 second
         usleep( (unsigned int)(options->m_delay * 1000000.f) );
-        err = imengine->screenshot( options->m_file );
+        err = imengine->screenshot( options->m_file, options->m_hidecursor );
         if ( err ) {
             return err;
         }
@@ -110,7 +111,8 @@ int main( int argc, char** argv ) {
     // Otherwise take a screen shot of the supplied region.
     err = imengine->screenshot( options->m_file,
                                 options->m_x, options->m_y,
-                                options->m_w, options->m_h );
+                                options->m_w, options->m_h,
+                                options->m_hidecursor );
     if ( err ) {
         return err;
     }

@@ -17,15 +17,38 @@ int maim::IMEngine::init() {
     imlib_context_set_visual( xengine->m_visual );
     imlib_context_set_colormap( xengine->m_colormap );
     imlib_context_set_drawable( xengine->m_root );
+    imlib_context_set_blend( 1 );
     return 0;
 }
 
-int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h ) {
+int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bool hidecursor ) {
     Imlib_Image buffer = imlib_create_image( w, h );
     imlib_context_set_image( buffer );
     imlib_copy_drawable_to_image( 0, x, y, w, h, 0, 0, 1 );
     Imlib_Load_Error err;
-    int find = file.find_last_of( '.' );
+    if ( !hidecursor ) {
+        // Grab the cursor image with XFixes
+        XFixesCursorImage* xcursor = XFixesGetCursorImage( xengine->m_display );
+        // For whatever reason, XFixes returns 32 bit ARGB colors with 64 bit longs?
+        // I'm guessing this is because some old AMD cpu's longs are actually 32 bits.
+        // Regardless this is how I convert it to the correct bit length.
+        unsigned int* pixels = new unsigned int[ xcursor->width * xcursor->height ];
+        for ( unsigned int i=0;i<xcursor->width*xcursor->height;i++ ) {
+            pixels[ i ] = (unsigned int)xcursor->pixels[ i ];
+        }
+        Imlib_Image cursor = imlib_create_image_using_data( xcursor->width, xcursor->height, pixels );
+        // Make sure imlib knows that it has alpha
+        imlib_context_set_image( cursor );
+        imlib_image_set_has_alpha( 1 );
+        imlib_context_set_image( buffer );
+        // Finally blend the cursor to the screenshot, we don't have to worry about the cursor not being visible as it would be a non-existant image if it was.
+        imlib_blend_image_onto_image( cursor, 0, 0, 0, xcursor->width, xcursor->height, xcursor->x-x-xcursor->xhot, xcursor->y-y-xcursor->yhot, xcursor->width, xcursor->height );
+        // Free the cursor image and delete its data.
+        imlib_context_set_image( cursor );
+        imlib_free_image();
+        imlib_context_set_image( buffer );
+        delete[] pixels;
+    }
     imlib_save_image_with_error_return( file.c_str(), &err );
     if ( err != IMLIB_LOAD_ERROR_NONE ) {
         fprintf( stderr, "Failed to save image %s: ", file.c_str() );
@@ -78,11 +101,11 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h ) {
             }
         }
     }
-
+    imlib_free_image();
     return 0;
 }
 
-int maim::IMEngine::screenshot( std::string file ) {
+int maim::IMEngine::screenshot( std::string file, bool hidecursor ) {
     // Get root window's dimensions
     Window root;
     int x, y;
@@ -90,5 +113,5 @@ int maim::IMEngine::screenshot( std::string file ) {
     XGetGeometry( xengine->m_display, xengine->m_root, &root,
                   &x, &y, &w, &h, &b, &d );
     // Then screenshot it.
-    return screenshot( file, x, y, w, h );
+    return screenshot( file, x, y, w, h, hidecursor );
 }
