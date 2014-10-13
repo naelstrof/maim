@@ -31,22 +31,18 @@ The following can be executed in any bash-like shells:
 $ maim "~/Pictures/$(date +%F-%T).png"
 ```
 
-* Take a screenshot of the active window: (Requires xwininfo, xdotool, and awk.)
+* Take a screenshot of the active window: (Requires xdotool.)
 ```bash
-$ maim -g=$(xwininfo -id $(xdotool getactivewindow) | awk '/geometry/ {print $2}')
-$ # Note: Some programs misreport their actual pixel geometry (mostly terminals).
-$ # This can be fixed by using their absolute X/Y/Width/Height values instead;
-$ # which is much more difficult and confusing to parse in one line from xwininfo,
-$ # and as such won't be included in this example.
+$ maim -id=$(xdotool getactivewindow)
 ```
 
-* Custom transparent red selection with 10 pixel padding: (Requires [slop](https://github.com/naelstrof/slop))
+* Custom transparent red selection with 10 pixel padding: (Requires [slop](https://github.com/naelstrof/slop).)
 ```bash
 $ maim -s -c=1,0,0,0.6 -p=10
 ```
 ![Image of maim selecting a window](http://farmpolice.com/content/images/window_selection.png)
 
-* Automatically upload selected region to Imgur: (Requires [Bart's Bash Script Imgur Uploader](http://imgur.com/tools/imgurbash.sh), xclip is optional)
+* Automatically upload selected region to Imgur: (Requires [Bart's Bash Script Imgur Uploader](http://imgur.com/tools/imgurbash.sh), xclip is optional.)
 ```bash
 $ maim -s /tmp/screenshot.png; imgurbash.sh /tmp/screenshot.png
 $ # If xclip is installed, your clipboard should have the online screenshot's URL in it!
@@ -70,6 +66,7 @@ options
     -w=INT                             Set the width for taking an image
     -h=INT                             Set the height for taking an image
     -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.
+    -id=INT, --windowid=INT            Set the window id to take a picture of, defaults to the root window id.
     -hc, --hidecursor                  Prevent the system cursor from appearing in the screenshot.
     -v, --version                      Prints version.
 
@@ -89,10 +86,9 @@ slop options
     -max=INT, --maximumsize=INT        Sets the maximum output of width or height values.
     -hi, --highlight                   Instead of outlining the selection, slop highlights it. Only useful when
                                        used with a --color with an alpha under 1.
-
 examples
     $ # Screenshot the active window
-    $ maim -g=$(xwininfo -id $(xdotool getactivewindow) | awk '/geometry/ {print $2}')
+    $ maim -id=$(xdotool getactivewindow)
 
     $ # Prompt a transparent red selection to screenshot.
     $ maim -s -c=1,0,0,0.6

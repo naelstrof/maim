@@ -3,7 +3,7 @@
 maim::Options* options = new maim::Options();
 
 maim::Options::Options() {
-    m_version = "v1.1.8";
+    m_version = "v1.1.9";
     m_xdisplay = ":0";
     m_file = "";
     m_select = false;
@@ -15,6 +15,8 @@ maim::Options::Options() {
     m_w = 0;
     m_h = 0;
     m_delay = 0;
+    // We set this to the root window later. See maim::Options::parseOptions()
+    m_window = 0;
 }
 
 void maim::Options::printHelp() {
@@ -31,6 +33,7 @@ void maim::Options::printHelp() {
     printf( "    -w=INT                             Set the width for taking an image\n" );
     printf( "    -h=INT                             Set the height for taking an image\n" );
     printf( "    -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.\n" );
+    printf( "    -id=INT, --windowid=INT            Set the window id to take a picture of, defaults to the root window id.\n" );
     printf( "    -hc, --hidecursor                  Prevent the system cursor from appearing in the screenshot.\n" );
     printf( "    -v, --version                      Prints version.\n" );
     printf( "\n" );
@@ -52,7 +55,7 @@ void maim::Options::printHelp() {
     printf( "                                       used with a --color with an alpha under 1.\n" );
     printf( "examples\n" );
     printf( "    $ # Screenshot the active window\n" );
-    printf( "    $ maim -g=$(xwininfo -id $(xdotool getactivewindow) | awk '/geometry/ {print $2}')\n" );
+    printf( "    $ maim -id=$(xdotool getactivewindow)\n" );
     printf( "\n" );
     printf( "    $ # Prompt a transparent red selection to screenshot.\n" );
     printf( "    $ maim -s -c=1,0,0,0.6\n" );
@@ -64,6 +67,7 @@ void maim::Options::printHelp() {
 int maim::Options::parseOptions( int argc, char** argv ) {
     // Simple command parsing. Just uses sscanf to read each argument.
     // It looks complicated because you have to have spaces for delimiters for sscanf.
+    m_window = xengine->m_root;
     for ( int i=1; i<argc; i++ ) {
         std::string arg = argv[i];
         if ( matches( arg, "-xd=", "--xdisplay=" ) ) {
@@ -77,6 +81,13 @@ int maim::Options::parseOptions( int argc, char** argv ) {
             if ( err ) {
                 return 1;
             }
+        } else if ( matches( arg, "-id=", "--windowid=" ) ) {
+            int test = 0;
+            int err = parseInt( arg, &test );
+            if ( err ) {
+                return 1;
+            }
+            m_window = xengine->getWindowByID( test );
         } else if ( matches( arg, "-nkb", "--nokeyboard" ) ) {
             m_slopoptions += arg + " ";
         } else if ( matches( arg, "-c=", "--color=" ) ) {
@@ -148,6 +159,12 @@ int maim::Options::parseOptions( int argc, char** argv ) {
                 // We're responsible for expanding ~, so we use wordexp to do everything for us.
                 wordexp_t p;
                 wordexp( argv[i], &p, 0 );
+                if ( p.we_wordc > 1 ) {
+                    fprintf( stderr, "Error: File name expanded into more than one name!\n" );
+                    fprintf( stderr, "This is not intended or expected behavior. (We don't want to overwrite 30 files with a single image.)\n" );
+                    fprintf( stderr, "Please use a filename that doesn't contain a * or similar wildcards. (Or escape them with \\.)\n" );
+                    return 1;
+                }
                 m_file = p.we_wordv[0];
                 wordfree( &p );
                 m_gotFile = true;

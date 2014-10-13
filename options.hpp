@@ -5,6 +5,8 @@
 #include <cstdio>
 #include <wordexp.h>
 
+#include "x.hpp"
+
 namespace maim {
 
 class Options {
@@ -26,6 +28,7 @@ public:
     std::string m_xdisplay;
     std::string m_file;
     std::string m_slopoptions;
+    Window      m_window;
 private:
     int         parseInt( std::string arg, int* returnInt );
     int         parseFloat( std::string arg, float* returnFloat );

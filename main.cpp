@@ -27,15 +27,15 @@ int exec( std::string cmd, std::string* ret ) {
 }
 
 int main( int argc, char** argv ) {
-    // First parse any options and the file we need.
-    int err = options->parseOptions( argc, argv );
-    if ( err ) {
-        return err;
-    }
-    // Then we set up the x interface
-    err = xengine->init( options->m_xdisplay.c_str() );
+    // First set up the x interface, important to do first since options needs to know what the root window is.
+    int err = xengine->init( options->m_xdisplay.c_str() );
     if ( err ) {
         fprintf( stderr, "Failed to grab X display!\n" );
+        return err;
+    }
+    // Then parse any options and the file we need.
+    err = options->parseOptions( argc, argv );
+    if ( err ) {
         return err;
     }
     // Then the imlib2 interface
@@ -88,7 +88,8 @@ int main( int argc, char** argv ) {
             err = imengine->screenshot( options->m_file,
                                         options->m_x, options->m_y,
                                         options->m_w, options->m_h,
-                                        options->m_hidecursor );
+                                        options->m_hidecursor,
+                                        options->m_window );
             if ( err ) {
                 return err;
             }
@@ -102,17 +103,19 @@ int main( int argc, char** argv ) {
         // Wait the designated amount of time before taking the screenshot.
         // 1000000 microseconds = 1 second
         usleep( (unsigned int)(options->m_delay * 1000000.f) );
-        err = imengine->screenshot( options->m_file, options->m_hidecursor );
+        err = imengine->screenshot( options->m_file, options->m_hidecursor, options->m_window );
         if ( err ) {
             return err;
         }
         return 0;
     }
     // Otherwise take a screen shot of the supplied region.
+    usleep( (unsigned int)(options->m_delay * 1000000.f) );
     err = imengine->screenshot( options->m_file,
                                 options->m_x, options->m_y,
                                 options->m_w, options->m_h,
-                                options->m_hidecursor );
+                                options->m_hidecursor,
+                                options->m_window );
     if ( err ) {
         return err;
     }

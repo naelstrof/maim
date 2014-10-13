@@ -21,6 +21,7 @@ public:
     Colormap            m_colormap;
     Window              m_root;
     bool                m_good;
+    Window              getWindowByID( int id );
 };
 
 }

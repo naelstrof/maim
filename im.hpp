@@ -15,8 +15,8 @@ public:
                         IMEngine();
                         ~IMEngine();
     int                 init();
-    int                 screenshot( std::string file, int x, int y, int w, int h, bool hidecursor );
-    int                 screenshot( std::string file, bool hidecursor );
+    int                 screenshot( std::string file, int x, int y, int w, int h, bool hidecursor, Window id );
+    int                 screenshot( std::string file, bool hidecursor, Window id );
 };
 
 }

@@ -33,6 +33,12 @@ int maim::XEngine::init( std::string display ) {
     return 0;
 }
 
+Window maim::XEngine::getWindowByID( int id ) {
+    // There's actually no way to check if the id is valid...
+    return (Window)id;
+    // The only thing we can do is use it and see if we get a BadWindow error later.
+}
+
 void maim::XEngine::tick() {
     if ( !m_good ) {
         return;

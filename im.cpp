@@ -16,14 +16,14 @@ int maim::IMEngine::init() {
     imlib_context_set_display( xengine->m_display );
     imlib_context_set_visual( xengine->m_visual );
     imlib_context_set_colormap( xengine->m_colormap );
-    imlib_context_set_drawable( xengine->m_root );
     imlib_context_set_blend( 1 );
     return 0;
 }
 
-int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bool hidecursor ) {
+int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bool hidecursor, Window id ) {
     Imlib_Image buffer = imlib_create_image( w, h );
     imlib_context_set_image( buffer );
+    imlib_context_set_drawable( id );
     imlib_copy_drawable_to_image( 0, x, y, w, h, 0, 0, 1 );
     Imlib_Load_Error err;
     if ( !hidecursor ) {
@@ -41,8 +41,16 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
         imlib_context_set_image( cursor );
         imlib_image_set_has_alpha( 1 );
         imlib_context_set_image( buffer );
+        // We grab the window's position with this, so we can find where the cursor would be located on our image.
+        Window root, junk;
+        int tx, ty;
+        unsigned int tw, th, tb, td;
+        XGetGeometry( xengine->m_display, id, &root,
+                      &tx, &ty, &tw, &th, &tb, &td );
+        // Make sure the window's position is in root coordinates
+        XTranslateCoordinates( xengine->m_display, id, root, -tb, -tb, &tx, &ty, &junk );
         // Finally blend the cursor to the screenshot, we don't have to worry about the cursor not being visible as it would be a non-existant image if it was.
-        imlib_blend_image_onto_image( cursor, 0, 0, 0, xcursor->width, xcursor->height, xcursor->x-x-xcursor->xhot, xcursor->y-y-xcursor->yhot, xcursor->width, xcursor->height );
+        imlib_blend_image_onto_image( cursor, 0, 0, 0, xcursor->width, xcursor->height, xcursor->x-tx-xcursor->xhot-x, xcursor->y-ty-xcursor->yhot-y, xcursor->width, xcursor->height );
         // Free the cursor image and delete its data.
         imlib_context_set_image( cursor );
         imlib_free_image();
@@ -105,13 +113,13 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
     return 0;
 }
 
-int maim::IMEngine::screenshot( std::string file, bool hidecursor ) {
-    // Get root window's dimensions
+int maim::IMEngine::screenshot( std::string file, bool hidecursor, Window id ) {
+    // Get the window's dimensions
     Window root;
     int x, y;
     unsigned int w, h, b, d;
-    XGetGeometry( xengine->m_display, xengine->m_root, &root,
+    XGetGeometry( xengine->m_display, id, &root,
                   &x, &y, &w, &h, &b, &d );
     // Then screenshot it.
-    return screenshot( file, x, y, w, h, hidecursor );
+    return screenshot( file, 0, 0, w, h, hidecursor, id );
 }
