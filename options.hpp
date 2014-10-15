@@ -29,6 +29,7 @@ public:
     std::string m_file;
     std::string m_slopoptions;
     Window      m_window;
+    std::string m_mask;
 private:
     int         parseInt( std::string arg, int* returnInt );
     int         parseFloat( std::string arg, float* returnFloat );

@@ -29,6 +29,11 @@ int maim::XEngine::init( std::string display ) {
     m_root      = RootWindow     ( m_display, XScreenNumberOfScreen( m_screen ) );
     //m_root      = DefaultRootWindow( m_display );
 
+    m_res = XRRGetScreenResourcesCurrent( m_display, m_root);
+    if ( !m_res ) {
+        fprintf( stderr, "Warning: failed to get screen resources. Multi-monitor X screens won't have garbage visual data removed.\n" );
+    }
+
     m_good = true;
     return 0;
 }
@@ -50,5 +55,27 @@ void maim::XEngine::tick() {
         switch ( event.type ) {
             default: break;
         }
+    }
+}
+
+// This stuff is used to detect which pixels we can actually see with
+// the physical monitor positions.
+// It's useful for people with multimonitor setups where the monitors
+// don't fit together well since we can black out the pixels that are
+// generally just garbage.
+std::vector<XRRCrtcInfo*> maim::XEngine::getCRTCS() {
+    std::vector<XRRCrtcInfo*> monitors;
+    if ( !m_res ) {
+        return monitors;
+    }
+    for ( int i=0;i<m_res->ncrtc;i++ ) {
+        monitors.push_back( XRRGetCrtcInfo( m_display, m_res, m_res->crtcs[ i ] ) );
+    }
+    return monitors;
+}
+
+void maim::XEngine::freeCRTCS( std::vector<XRRCrtcInfo*> monitors ) {
+    for ( int i=0;i<monitors.size();i++ ) {
+        XRRFreeCrtcInfo( monitors[ i ] );
     }
 }

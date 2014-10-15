@@ -6,8 +6,14 @@ maim (Make Image) is a utility that takes screenshots of your desktop using imli
 features
 --------
 * Allows you to take a screenshot of your desktop and save it in any format.
-* Allows you to take a screenshot of a predetermined region of your desktop and save it in any format.
+* Allows you to take a screenshot of a predetermined region or window of your desktop.
 * If slop (https://github.com/naelstrof/slop) is installed, it can be used for selecting a region to screenshot.
+![slopgood](http://farmpolice.com/content/images/2014-10-14-12:14:51.png)
+* Allows you to blend the system cursor to screenshots. (Why don't any other screenshooters do this?)
+![screenshot with cursor](http://farmpolice.com/content/images/wow.png)
+
+* Allows you to mask off-screen pixels to be black and transparent in screenshots. (Great for people who use an uneven multi-monitor setup!)
+![screenshot mask comparison](http://farmpolice.com/content/images/mask_compare.png)
 
 why use maim over import or scrot?
 --------------------
@@ -20,6 +26,7 @@ why use maim over import or scrot?
     - import doesn't play nicely with compositors; making effects like transparent windows not render properly in the screenshot. maim, like scrot, uses imlib2 which isn't inflicted with this problem.
 * Compared to either
     - maim can actually take screenshots with your cursor included in them! It does this using the XFixes extension. I don't think there's any other screenshooters that do this.
+    - For those of you with multiple monitors, maim is aware of which pixels are visible or not and will make off-screen pixels that are in screenshots black and transparent. Import and scrot both mindlessly include off-screen pixel data in their screenshots which is very often just garbage.
 
 examples
 -------------------
@@ -68,6 +75,11 @@ options
     -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.
     -id=INT, --windowid=INT            Set the window id to take a picture of, defaults to the root window id.
     -hc, --hidecursor                  Prevent the system cursor from appearing in the screenshot.
+    -m=TYPE, --mask=TYPE               Mask screenshots so non-visible pixels are black and transparent.
+                                           TYPE can be one of the following: ON, OFF, AUTO
+                                           The AUTO setting only masks screenshots when they cover
+                                           a majority of the screen and they aren't a specific window screenshot.
+                                           --mask is set to AUTO by default.
     -v, --version                      Prints version.
 
 slop options

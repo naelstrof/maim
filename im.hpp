@@ -5,6 +5,8 @@
 
 #include <Imlib2.h>
 #include <X11/extensions/Xfixes.h>
+#include <X11/extensions/Xrandr.h>
+#include <vector>
 
 #include "x.hpp"
 
@@ -15,8 +17,10 @@ public:
                         IMEngine();
                         ~IMEngine();
     int                 init();
-    int                 screenshot( std::string file, int x, int y, int w, int h, bool hidecursor, Window id );
-    int                 screenshot( std::string file, bool hidecursor, Window id );
+    int                 screenshot( std::string file, int x, int y, int w, int h, bool hidecursor, Window id, bool mask );
+    int                 screenshot( std::string file, bool hidecursor, Window id, bool mask );
+private:
+    void                blendCursor();
 };
 
 }

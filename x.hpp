@@ -4,6 +4,8 @@
 #define MAIM_X_H_
 
 #include <X11/Xlib.h>
+#include <X11/extensions/Xrandr.h>
+#include <vector>
 #include <string>
 #include <cstdio>
 
@@ -20,8 +22,11 @@ public:
     Screen*             m_screen;
     Colormap            m_colormap;
     Window              m_root;
+    XRRScreenResources* m_res;
     bool                m_good;
     Window              getWindowByID( int id );
+    std::vector<XRRCrtcInfo*>        getCRTCS();
+    void                freeCRTCS( std::vector<XRRCrtcInfo*> monitors );
 };
 
 }

@@ -20,9 +20,13 @@ int maim::IMEngine::init() {
     return 0;
 }
 
-int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bool hidecursor, Window id ) {
+int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bool hidecursor, Window id, bool mask ) {
+    if ( id == None ) {
+        id = xengine->m_root;
+    }
     Imlib_Image buffer = imlib_create_image( w, h );
     imlib_context_set_image( buffer );
+    imlib_image_set_has_alpha( 1 );
     imlib_context_set_drawable( id );
     imlib_copy_drawable_to_image( 0, x, y, w, h, 0, 0, 1 );
     Imlib_Load_Error err;
@@ -56,6 +60,38 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
         imlib_free_image();
         imlib_context_set_image( buffer );
         delete[] pixels;
+    }
+    // Here we generate a mask to make sure we only get the pixels on-screen.
+    if ( mask ) {
+        // So first we generate an image of the same exact size filled with the color 0,0,0,0
+        Imlib_Image mask = imlib_create_image( w, h );
+        imlib_context_set_image( mask );
+        imlib_image_set_has_alpha( 1 );
+        imlib_context_set_color( 0, 0, 0, 0 );
+        imlib_image_fill_rectangle( 0, 0, w, h );
+        // Grab our monitor information, (basically get pixel rectangles that are actually displaying).
+        std::vector<XRRCrtcInfo*> monitors = xengine->getCRTCS();
+        imlib_context_set_color( 0, 0, 0, 255 );
+        for ( int i=0;i<monitors.size();i++ ) {
+            XRRCrtcInfo* cmonitor = monitors[ i ];
+            // Then quickly block in our visible pixels on our mask
+            imlib_image_fill_rectangle( cmonitor->x - x, cmonitor->y - y, cmonitor->width, cmonitor->height );
+        }
+        imlib_context_set_color( 255, 255, 255, 255 );
+        imlib_context_set_image( buffer );
+        // Then finally apply our mask to the original image, which should remove any garbage pixels that are off-screen.
+        imlib_image_copy_alpha_to_image( mask, 0, 0 );
+        // But unfortunately that doesn't actually delete the pixels, so we have to do one more pass.
+        // This whole thing just creates another blank image, and blends the masked image onto it.
+        // This is because all we did was copy the alpha channel, so formats like jpg wouldn't even care that we did all this
+        // work unless I add this extra pass.
+        Imlib_Image finalimage = imlib_create_image( w, h );
+        imlib_context_set_image( finalimage );
+        imlib_image_set_has_alpha( 1 );
+        imlib_context_set_color( 0, 0, 0, 0 );
+        imlib_image_fill_rectangle( 0, 0, w, h );
+        imlib_context_set_color( 255, 255, 255, 255 );
+        imlib_blend_image_onto_image( buffer, 1, 0, 0, w, h, 0, 0, w, h );
     }
     imlib_save_image_with_error_return( file.c_str(), &err );
     if ( err != IMLIB_LOAD_ERROR_NONE ) {
@@ -113,7 +149,10 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
     return 0;
 }
 
-int maim::IMEngine::screenshot( std::string file, bool hidecursor, Window id ) {
+int maim::IMEngine::screenshot( std::string file, bool hidecursor, Window id, bool mask ) {
+    if ( id == None ) {
+        id = xengine->m_root;
+    }
     // Get the window's dimensions
     Window root;
     int x, y;
@@ -121,5 +160,5 @@ int maim::IMEngine::screenshot( std::string file, bool hidecursor, Window id ) {
     XGetGeometry( xengine->m_display, id, &root,
                   &x, &y, &w, &h, &b, &d );
     // Then screenshot it.
-    return screenshot( file, 0, 0, w, h, hidecursor, id );
+    return screenshot( file, 0, 0, w, h, hidecursor, id, mask );
 }

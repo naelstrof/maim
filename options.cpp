@@ -3,7 +3,7 @@
 maim::Options* options = new maim::Options();
 
 maim::Options::Options() {
-    m_version = "v1.1.9";
+    m_version = "v1.2.9";
     m_xdisplay = ":0";
     m_file = "";
     m_select = false;
@@ -15,8 +15,8 @@ maim::Options::Options() {
     m_w = 0;
     m_h = 0;
     m_delay = 0;
-    // We set this to the root window later. See maim::Options::parseOptions()
-    m_window = 0;
+    m_window = None;
+    m_mask = "AUTO";
 }
 
 void maim::Options::printHelp() {
@@ -35,6 +35,11 @@ void maim::Options::printHelp() {
     printf( "    -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.\n" );
     printf( "    -id=INT, --windowid=INT            Set the window id to take a picture of, defaults to the root window id.\n" );
     printf( "    -hc, --hidecursor                  Prevent the system cursor from appearing in the screenshot.\n" );
+    printf( "    -m=TYPE, --mask=TYPE               Mask screenshots so non-visible pixels are black and transparent.\n" );
+    printf( "                                           TYPE can be one of the following: ON, OFF, AUTO\n" );
+    printf( "                                           The AUTO setting only masks screenshots when they cover\n" );
+    printf( "                                           a majority of the screen and they aren't a specific window screenshot.\n" );
+    printf( "                                           --mask is set to AUTO by default.\n" );
     printf( "    -v, --version                      Prints version.\n" );
     printf( "\n" );
     printf( "slop options\n" );
@@ -67,7 +72,6 @@ void maim::Options::printHelp() {
 int maim::Options::parseOptions( int argc, char** argv ) {
     // Simple command parsing. Just uses sscanf to read each argument.
     // It looks complicated because you have to have spaces for delimiters for sscanf.
-    m_window = xengine->m_root;
     for ( int i=1; i<argc; i++ ) {
         std::string arg = argv[i];
         if ( matches( arg, "-xd=", "--xdisplay=" ) ) {
@@ -143,6 +147,16 @@ int maim::Options::parseOptions( int argc, char** argv ) {
             m_gotGeometry = true;
             int err = parseInt( arg, &m_h );
             if ( err ) {
+                return 1;
+            }
+        } else if ( matches( arg, "-m=", "--mask=" ) ) {
+            int err = parseString( arg, &m_mask );
+            if ( err ) {
+                return 1;
+            }
+            if ( m_mask != "AUTO" && m_mask != "ON" && m_mask != "OFF" ) {
+                fprintf( stderr, "Error: --mask must be one of the following: ON, OFF, or AUTO.\n" );
+                fprintf( stderr, "Got %s instead.\n", m_mask.c_str() );
                 return 1;
             }
         } else if ( arg ==  "-s" || arg ==  "--select" ) {
