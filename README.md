@@ -16,7 +16,7 @@ features
 
 * Allows you to mask off-screen pixels to be black and transparent in screenshots. (Great for people who use an uneven multi-monitor setup!)
 
-![screenshot mask comparison](http://farmpolice.com/content/images/mask_compare.png)
+![screenshot mask comparison](http://farmpolice.com/content/images/mask_compare2.png)
 
 why use maim over import or scrot?
 --------------------
