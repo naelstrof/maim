@@ -43,12 +43,12 @@ $ maim "~/Pictures/$(date +%F-%T).png"
 
 * Take a screenshot of the active window: (Requires xdotool.)
 ```bash
-$ maim -id=$(xdotool getactivewindow)
+$ maim -id $(xdotool getactivewindow)
 ```
 
 * Custom transparent red selection with 10 pixel padding: (Requires [slop](https://github.com/naelstrof/slop).)
 ```bash
-$ maim -s -c=1,0,0,0.6 -p=10
+$ maim -s -c 1,0,0,0.6 -p 10
 ```
 ![Image of maim selecting a window](http://farmpolice.com/content/images/window_selection.png)
 
@@ -63,50 +63,80 @@ In review, maim does one thing and does it well: it takes a screenshot of what y
 help
 -------------------
 ```text
+maim v2.2.9
+
+v2.2.9
+
+Takes screenshots.
+
 Usage: maim [options] [file]
-maim (make image) makes an image out of the given area on the given X screen. Defaults to the whole screen.
 
-options
-    -h, --help                         Show this message.
-    -s, --select                       Manually select screenshot location. Only works when slop is installed.
-    -xd=STRING, --xdisplay=STRING      Set x display (STRING must be hostname:number.screen_number format)
-    -g=GEOMETRY, --geometry=GEOMETRY   Set the region to capture. GEOMETRY is in format WxH+X+Y
-    -x=INT                             Set the x coordinate for taking an image
-    -y=INT                             Set the y coordinate for taking an image
-    -w=INT                             Set the width for taking an image
-    -h=INT                             Set the height for taking an image
-    -d=FLOAT, --delay=FLOAT            Set the amount of time to wait before taking an image.
-    -id=INT, --windowid=INT            Set the window id to take a picture of, defaults to the root window id.
-    -hc, --hidecursor                  Prevent the system cursor from appearing in the screenshot.
-    -m=TYPE, --mask=TYPE               Mask screenshots so non-visible pixels are black and transparent.
-                                           TYPE can be one of the following: ON, OFF, AUTO
-                                           The AUTO setting only masks screenshots when they cover
-                                           a majority of the screen and they aren't a specific window screenshot.
-                                           --mask is set to AUTO by default.
-    -v, --version                      Prints version.
+maim (Make Image) is a utility that takes screenshots of your desktop using
+imlib2. It's meant to replace scrot and performs better than scrot and import
+in several ways.
 
-slop options
-    -nkb, --nokeyboard                 Disables the ability to cancel selections with the keyboard.
-    -b=INT, --bordersize=INT           Set selection rectangle border size.
-    -p=INT, --padding=INT              Set padding size for selection.
-    -t=INT, --tolerance=INT            How far in pixels the mouse can move after clicking and still be detected
-                                       as a normal click. Setting to zero will disable window selections.
-    -c=COLOR, --color=COLOR            Set selection rectangle color, COLOR is in format FLOAT,FLOAT,FLOAT,FLOAT.
-                                       takes RGBA or RGB.
-    -w=FLOAT, --gracetime=FLOAT        Set the amount of time before slop will check for keyboard cancellations
-                                       in seconds.
-    -nd, --nodecorations               Attempts to remove decorations from window selections.
-    -min=INT, --minimumsize=INT        Sets the minimum output of width or height values, useful to avoid outputting 0
-                                       widths or heights.
-    -max=INT, --maximumsize=INT        Sets the maximum output of width or height values.
-    -hi, --highlight                   Instead of outlining the selection, slop highlights it. Only useful when
-                                       used with a --color with an alpha under 1.
-examples
+      --help                    Print help and exit
+  -V, --version                 Print version and exit
+Options
+      --xdisplay=hostname:number.screen_number
+                                Sets the x display.  (default=`:0')
+  -s, --select                  Enables user region selection. Requires slop to
+                                  be installed.  (default=off)
+  -x, --x=INT                   Sets the x coordinate for taking an image
+  -y, --y=INT                   Sets the y coordinate for taking an image
+  -w, --w=INT                   Sets the width for taking an image
+  -h, --h=INT                   Sets the height for taking an image
+  -g, --geometry=WxH+X+Y        Set the region to capture
+  -d, --delay=FLOAT             Set the amount of time to wait before taking an
+                                  image.  (default=`0.0')
+  -i, --windowid=INT            Set the window to capture. Defaults to the root
+                                  window id.
+      --hidecursor              Prevents the system cursor from showing up in
+                                  screenshots.  (default=off)
+  -m, --mask=STRING             Masks off-screen pixels so they don't show up
+                                  in screenshots.  (possible values="auto",
+                                  "off", "on" default=`auto')
+
+Slop Options
+      --nokeyboard              Disables the ability to cancel selections with
+                                  the keyboard.  (default=off)
+  -b, --bordersize=INT          Set the selection rectangle's thickness. Does
+                                  nothing when --highlight is enabled.
+                                  (default=`5')
+  -p, --padding=INT             Set the padding size of the selection. Can be
+                                  negative.  (default=`0')
+  -t, --tolerance=INT           How far in pixels the mouse can move after
+                                  clicking and still be detected as a normal
+                                  click instead of a click and drag. Setting
+                                  this to 0 will disable window selections.
+                                  (default=`2')
+      --gracetime=FLOAT         Set the amount of time before slop will check
+                                  for keyboard cancellations in seconds.
+                                  (default=`0.4')
+  -c, --color=FLOAT,FLOAT,FLOAT,FLOAT
+                                Set the selection rectangle's color. Supports
+                                  RGB or RGBA values.
+                                  (default=`0.5,0.5,0.5,1')
+  -n, --nodecorations           Attempt to select child windows in order to
+                                  avoid window decorations.  (default=off)
+      --min=INT                 Set the minimum output of width or height
+                                  values. This is useful to avoid outputting 0.
+                                  Setting min and max to the same value
+                                  disables drag selections.  (default=`0')
+      --max=INT                 Set the maximum output of width or height
+                                  values. Setting min and max to the same value
+                                  disables drag selections.  (default=`0')
+  -l, --highlight               Instead of outlining selections, slop
+                                  highlights it. This is only useful when
+                                  --color is set to a transparent color.
+                                  (default=off)
+
+Examples
     $ # Screenshot the active window
-    $ maim -id=$(xdotool getactivewindow)
+    $ maim -id $(xdotool getactivewindow)
 
     $ # Prompt a transparent red selection to screenshot.
-    $ maim -s -c=1,0,0,0.6
+    $ maim -s -c 1,0,0,0.6
 
     $ # Save a dated screenshot.
     $ maim "~/$(date +%F-%T).png"

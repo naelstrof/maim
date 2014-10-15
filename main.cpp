@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -7,7 +8,7 @@
 
 #include "x.hpp"
 #include "im.hpp"
-#include "options.hpp"
+#include "cmdline.h"
 
 // Executes a command and gets its output. Used for executing slop for selection.
 int exec( std::string cmd, std::string* ret ) {
@@ -15,7 +16,7 @@ int exec( std::string cmd, std::string* ret ) {
     if ( !pipe ) {
         return 1;
     }
-    char buffer[128];
+    char buffer[255];
     std::string result = "";
     while( !feof( pipe ) ) {
         if( fgets( buffer, 128, pipe ) != NULL ) {
@@ -27,6 +28,27 @@ int exec( std::string cmd, std::string* ret ) {
     return 0;
 }
 
+int parseGeometry( std::string arg, int* x, int* y, int* w, int* h ) {
+    std::string copy = arg;
+    // Replace all x's and +'s with spaces.
+    int find = copy.find( "x" );
+    while( find != copy.npos ) {
+        copy.at( find ) = ' ';
+        find = copy.find( "x" );
+    }
+    find = copy.find( "+" );
+    while( find != copy.npos ) {
+        copy.at( find ) = ' ';
+        find = copy.find( "+" );
+    }
+    int num = sscanf( copy.c_str(), "%d %d %d %d", w, h, x, y );
+    if ( num != 4 ) {
+        fprintf( stderr, "Error parsing geometry from %s\n", arg.c_str() );
+        return 1;
+    }
+    return 0;
+}
+
 // We use this to detect if we should enable masking or not.
 // This is really important because if a user tries to screenshot a window that's
 // slightly off-screen he probably wants the whole window, but if a user
@@ -34,7 +56,7 @@ int exec( std::string cmd, std::string* ret ) {
 bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
     int sw = WidthOfScreen( xengine->m_screen );
     int sh = HeightOfScreen( xengine->m_screen );
-    if ( type == "AUTO" ) {
+    if ( type == "auto" ) {
         // If we specified an actual window we certainly don't want to mask anything.
         if ( id != None && id != xengine->m_root ) {
             return false;
@@ -48,7 +70,7 @@ bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
         }
         // Otherwise we're probably taking a picture of a specific thing on the screen.
         return false;
-    } else if ( type == "ON" ) {
+    } else if ( type == "on" ) {
         return true;
     }
     return false;
@@ -56,12 +78,13 @@ bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
 
 int main( int argc, char** argv ) {
     // First parse any options and the filename we need.
-    int err = options->parseOptions( argc, argv );
+    gengetopt_args_info options;
+    int err = cmdline_parser( argc, argv, &options );
     if ( err ) {
         return err;
     }
     // Then set up the x interface.
-    err = xengine->init( options->m_xdisplay.c_str() );
+    err = xengine->init( options.xdisplay_arg );
     if ( err ) {
         fprintf( stderr, "Failed to grab X display!\n" );
         return err;
@@ -72,28 +95,50 @@ int main( int argc, char** argv ) {
         fprintf( stderr, "Failed to initialize imlib2!\n" );
         return err;
     }
-    xengine->getCRTCS();
+    float delay = atof( options.delay_arg );
+    if ( !options.windowid_given ) {
+        options.windowid_arg = None;
+    }
+    std::string file = "";
     // If we don't have a file, default to writing to the home directory.
-    if ( !options->m_gotFile ) {
-        struct passwd *pw = getpwuid( getuid() );
-        std::string homedir = pw->pw_dir;
+    if ( options.inputs_num <= 0 ) {
+        char currentdir[512];
+        // FIXME: getcwd is fundamentally broken, switch it with a C++ equivalent that won't ever have
+        // buffer sizing issues.
+        getcwd( currentdir, 512 );
+        file = currentdir;
         std::string result;
         err = exec( "date +%F-%T", &result );
         if ( err ) {
-            homedir += "/screenshot.png";
+            file += "/screenshot.png";
         } else {
-            homedir += "/" + result.substr( 0, result.length() - 1 ) + ".png";
+            file += "/" + result.substr( 0, result.length() - 1 ) + ".png";
         }
-        options->m_file = homedir;
-        printf( "No file specified, using %s\n", homedir.c_str() );
+        printf( "No file specified, using %s\n", file.c_str() );
+    } else if ( options.inputs_num == 1 ) {
+        file = options.inputs[ 0 ];
+    } else {
+        fprintf( stderr, "Unexpected number of output files! There should only be one.\n" );
+        return 1;
     }
     // Check if we were asked to prompt for selection:
-    if ( options->m_select ) {
+    if ( options.select_flag ) {
         // Execute slop with any options given.
         std::string result;
-        std::string cmd = "slop ";
-        cmd += options->m_slopoptions;
-        err = exec( cmd, &result );
+        char slopcommand[ 255 ];
+        sprintf( slopcommand, "slop %s -b %i -p %i -t %i -g %i -c %s %s --min=%i --max=%i %s",
+                 options.nokeyboard_flag ? "--nokeyboard" : "",
+                 options.bordersize_arg,
+                 options.padding_arg,
+                 options.tolerance_arg,
+                 options.gracetime_arg,
+                 options.color_arg,
+                 options.nodecorations_flag ? "-n" : "",
+                 options.min_arg,
+                 options.max_arg,
+                 options.highlight_flag ? "-l" : "" );
+
+        err = exec( slopcommand, &result );
         if ( err ) {
             fprintf( stderr, "slop failed to run, canceling screenshot. Is slop installed?\n" );
             return 1;
@@ -105,21 +150,22 @@ int main( int argc, char** argv ) {
             result.at( find ) = ' ';
             find = result.find( "=" );
         }
+        int x, y, w, h;
         int num = sscanf( result.c_str(), "X %d\n Y %d\n W %d\n H %d\n%*s",
-                          &options->m_x,
-                          &options->m_y,
-                          &options->m_w,
-                          &options->m_h );
-        if ( num == 4 && ( options->m_w > 0 && options->m_h > 0 ) ) {
-            bool mask = checkMask( options->m_mask, options->m_x, options->m_y, options->m_w, options->m_h, options->m_window );
+                          &x,
+                          &y,
+                          &w,
+                          &h );
+        if ( num == 4 && ( w > 0 && h > 0 ) ) {
+            bool mask = checkMask( options.mask_arg, x, y, w, h, options.windowid_arg );
             // Wait the designated amount of time before taking the screenshot.
             // 1000000 microseconds = 1 second
-            usleep( (unsigned int)(options->m_delay * 1000000.f) );
-            err = imengine->screenshot( options->m_file,
-                                        options->m_x, options->m_y,
-                                        options->m_w, options->m_h,
-                                        options->m_hidecursor,
-                                        options->m_window, mask );
+            usleep( (unsigned int)(delay * 1000000.f) );
+            err = imengine->screenshot( file,
+                                        x, y,
+                                        w, h,
+                                        options.hidecursor_flag,
+                                        options.windowid_arg, mask );
             if ( err ) {
                 return err;
             }
@@ -128,25 +174,38 @@ int main( int argc, char** argv ) {
         fprintf( stderr, "Either the user canceled the query for selection, or slop failed to run properly. Canceling screenshot.\n" );
         return 1;
     }
+    if ( options.x_given && options.y_given && options.w_given && options.h_given ) {
+        options.geometry_given = true;
+        char temp[128];
+        sprintf( temp, "%ix%i+%i+%i\0", options.w_arg, options.h_arg, options.x_arg, options.y_arg );
+        options.geometry_arg = temp;
+    } else if ( ( options.x_given || options.y_given || options.w_given || options.h_given ) && !options.geometry_given ) {
+        fprintf( stderr, "Partial geometry arguments were set, but it isn't enough data to take a screenshot!" );
+        fprintf( stderr, "Either give the geometry arugment, or give ALL of the following arguments: x, y, w, h," );
+        fprintf( stderr, "    or don't give any of them." );
+        return 1;
+    }
     // Just take a full screen shot if we didn't get any geometry.
-    if ( !options->m_gotGeometry ) {
+    if ( !options.geometry_given ) {
         // Wait the designated amount of time before taking the screenshot.
         // 1000000 microseconds = 1 second
-        usleep( (unsigned int)(options->m_delay * 1000000.f) );
-        err = imengine->screenshot( options->m_file, options->m_hidecursor, options->m_window, options->m_mask == "OFF" ? false : true );
+        usleep( (unsigned int)(delay * 1000000.f) );
+        err = imengine->screenshot( file, options.hidecursor_flag, options.windowid_arg, strcmp( options.mask_arg, "off" ) ? true : false );
         if ( err ) {
             return err;
         }
         return 0;
     }
     // Otherwise take a screen shot of the supplied region.
-    bool mask = checkMask( options->m_mask, options->m_x, options->m_y, options->m_w, options->m_h, options->m_window );
-    usleep( (unsigned int)(options->m_delay * 1000000.f) );
-    err = imengine->screenshot( options->m_file,
-                                options->m_x, options->m_y,
-                                options->m_w, options->m_h,
-                                options->m_hidecursor,
-                                options->m_window, mask );
+    int x, y, w, h;
+    parseGeometry( options.geometry_arg, &x, &y, &w, &h );
+    bool mask = checkMask( options.mask_arg, x, y, w, h, options.windowid_arg );
+    usleep( (unsigned int)(delay * 1000000.f) );
+    err = imengine->screenshot( file,
+                                x, y,
+                                w, h,
+                                options.hidecursor_flag,
+                                options.windowid_arg, mask );
     if ( err ) {
         return err;
     }
