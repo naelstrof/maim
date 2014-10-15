@@ -8,11 +8,14 @@ features
 * Allows you to take a screenshot of your desktop and save it in any format.
 * Allows you to take a screenshot of a predetermined region or window of your desktop.
 * If slop (https://github.com/naelstrof/slop) is installed, it can be used for selecting a region to screenshot.
+
 ![slopgood](http://farmpolice.com/content/images/2014-10-14-12:14:51.png)
 * Allows you to blend the system cursor to screenshots. (Why don't any other screenshooters do this?)
+
 ![screenshot with cursor](http://farmpolice.com/content/images/wow.png)
 
 * Allows you to mask off-screen pixels to be black and transparent in screenshots. (Great for people who use an uneven multi-monitor setup!)
+
 ![screenshot mask comparison](http://farmpolice.com/content/images/mask_compare.png)
 
 why use maim over import or scrot?
