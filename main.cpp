@@ -127,7 +127,7 @@ int main( int argc, char** argv ) {
         // Execute slop with any options given.
         std::string result;
         char slopcommand[ 255 ];
-        sprintf( slopcommand, "slop %s -b %i -p %i -t %i -g %i -c %s %s --min=%i --max=%i %s",
+        sprintf( slopcommand, "slop %s -b %i -p %i -t %i -g %s -c %s %s --min=%i --max=%i %s",
                  options.nokeyboard_flag ? "--nokeyboard" : "",
                  options.bordersize_arg,
                  options.padding_arg,
