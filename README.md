@@ -10,7 +10,7 @@ features
 * If slop (https://github.com/naelstrof/slop) is installed, it can be used for selecting a region to screenshot.
 
 ![slopgood](http://farmpolice.com/content/images/2014-10-14-12:14:51.png)
-* Allows you to blend the system cursor to screenshots. (Why don't any other screenshooters do this?)
+* Allows you to blend the system cursor to screenshots. (Why don't any other commandline screenshooters do this?)
 
 ![screenshot with cursor](http://farmpolice.com/content/images/wow.png)
 
@@ -28,7 +28,7 @@ why use maim over import or scrot?
 * Compared to ImageMagick's import
     - import doesn't play nicely with compositors; making effects like transparent windows not render properly in the screenshot. maim, like scrot, uses imlib2 which isn't inflicted with this problem.
 * Compared to either
-    - maim can actually take screenshots with your cursor included in them! It does this using the XFixes extension. I don't think there's any other screenshooters that do this.
+    - maim can actually take screenshots with your cursor included in them! It does this using the XFixes extension. To my knowlege, no other commandline screenshot utility does this.
     - For those of you with multiple monitors, maim is aware of which pixels are visible or not and will make off-screen pixels that are in screenshots black and transparent. Import and scrot both mindlessly include off-screen pixel data in their screenshots which is very often just garbage.
 
 examples
@@ -63,17 +63,17 @@ In review, maim does one thing and does it well: it takes a screenshot of what y
 help
 -------------------
 ```text
-maim v2.2.9
+maim v2.2.11
 
-v2.2.9
+Copyright (C) 2014 Dalton Nell, GPLv3
 
 Takes screenshots.
 
 Usage: maim [options] [file]
 
 maim (Make Image) is a utility that takes screenshots of your desktop using
-imlib2. It's meant to replace scrot and performs better than scrot and import
-in several ways.
+imlib2. It's meant to overcome shortcomings of scrot and performs better than
+scrot in several ways.
 
       --help                    Print help and exit
   -V, --version                 Print version and exit
