@@ -60,6 +60,16 @@ $ # If xclip is installed, your clipboard should have the online screenshot's UR
 
 In review, maim does one thing and does it well: it takes a screenshot of what you want. :) What you want is up to you, your programming skills, and your imagination.
 
+how to install
+--------------
+You really should use your package manager when possible, you never know what kind of garbage applications will dump everywhere. For example you can install maim on Arch Linux by installing it from the AUR: [maim-git](https://aur.archlinux.org/packages/maim-git/).
+
+However maim just installs a single binary to /usr/bin. If that's ok with you-- you can install it with:
+```bash
+make && sudo make install
+```
+Make sure to check out and install [slop](https://github.com/naelstrof/slop) too if you want selection capabilities!
+
 help
 -------------------
 ```text
