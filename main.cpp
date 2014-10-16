@@ -9,6 +9,7 @@
 #include <pwd.h>
 #include <string>
 #include <sstream>
+#include <time.h>
 
 #include "x.hpp"
 #include "im.hpp"
@@ -115,13 +116,10 @@ int main( int argc, char** argv ) {
             return errno;
         }
         file = currentdir;
-        std::string result;
-        err = exec( "date +%F-%T", &result );
-        if ( err ) {
-            file += "/screenshot.png";
-        } else {
-            file += "/" + result.substr( 0, result.length() - 1 ) + ".png";
-        }
+        // Get unix timestamp
+        std::stringstream result;
+        result << (int)time( NULL );
+        file += "/" + result.str() + ".png";
         printf( "No file specified, using %s\n", file.c_str() );
     } else if ( options.inputs_num == 1 ) {
         file = options.inputs[ 0 ];

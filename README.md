@@ -28,7 +28,7 @@ why use maim over import or scrot?
 * Compared to ImageMagick's import
     - import doesn't play nicely with compositors; making effects like transparent windows not render properly in the screenshot. maim, like scrot, uses imlib2 which isn't inflicted with this problem.
 * Compared to either
-    - maim can actually take screenshots with your cursor included in them! It does this using the XFixes extension. To my knowlege, no other commandline screenshot utility does this.
+    - maim can actually take screenshots with your cursor included in them! It does this using the XFixes extension. To my knowledge, no other commandline screenshot utility does this.
     - For those of you with multiple monitors, maim is aware of which pixels are visible or not and will make off-screen pixels that are in screenshots black and transparent. Import and scrot both mindlessly include off-screen pixel data in their screenshots which is very often just garbage.
 
 examples
