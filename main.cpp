@@ -1,9 +1,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cerrno>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/param.h>
 #include <pwd.h>
 
 #include "x.hpp"
@@ -102,10 +104,14 @@ int main( int argc, char** argv ) {
     std::string file = "";
     // If we don't have a file, default to writing to the home directory.
     if ( options.inputs_num <= 0 ) {
-        char currentdir[512];
+        char currentdir[MAXPATHLEN];
         // FIXME: getcwd is fundamentally broken, switch it with a C++ equivalent that won't ever have
         // buffer sizing issues.
-        getcwd( currentdir, 512 );
+        char* error = getcwd( currentdir, MAXPATHLEN );
+        if ( error == NULL ) {
+            fprintf( stderr, "Failed to get current working directory!\n" );
+            return errno;
+        }
         file = currentdir;
         std::string result;
         err = exec( "date +%F-%T", &result );
