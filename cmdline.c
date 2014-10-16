@@ -29,9 +29,9 @@ const char *gengetopt_args_info_purpose = "Takes screenshots.";
 
 const char *gengetopt_args_info_usage = "Usage: maim [options] [file]";
 
-const char *gengetopt_args_info_versiontext = "v2.2.9";
+const char *gengetopt_args_info_versiontext = "Copyright (C) 2014 Dalton Nell, GPLv3";
 
-const char *gengetopt_args_info_description = "maim (Make Image) is a utility that takes screenshots of your desktop using\nimlib2. It's meant to replace scrot and performs better than scrot and import\nin several ways.";
+const char *gengetopt_args_info_description = "maim (Make Image) is a utility that takes screenshots of your desktop using\nimlib2. It's meant to overcome shortcomings of scrot and performs better than\nscrot in several ways.";
 
 const char *gengetopt_args_info_help[] = {
   "      --help                    Print help and exit",

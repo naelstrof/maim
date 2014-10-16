@@ -7,6 +7,7 @@
 #include <X11/extensions/Xfixes.h>
 #include <X11/extensions/Xrandr.h>
 #include <vector>
+#include <stdlib.h>
 
 #include "x.hpp"
 

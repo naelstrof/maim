@@ -1,7 +1,7 @@
 maim
 ====
 
-maim (Make Image) is a utility that takes screenshots of your desktop using imlib2. It's meant to replace scrot and performs better than scrot and import in several ways.
+maim (Make Image) is a utility that takes screenshots of your desktop using imlib2. It's meant to overcome shortcomings of scrot and performs better in several ways.
 
 features
 --------

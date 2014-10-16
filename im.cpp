@@ -59,6 +59,7 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
         imlib_context_set_image( cursor );
         imlib_free_image();
         imlib_context_set_image( buffer );
+        free( xcursor );
         delete[] pixels;
     }
     // Here we generate a mask to make sure we only get the pixels on-screen.
@@ -77,10 +78,15 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
             // Then quickly block in our visible pixels on our mask
             imlib_image_fill_rectangle( cmonitor->x - x, cmonitor->y - y, cmonitor->width, cmonitor->height );
         }
+        xengine->freeCRTCS( monitors );
         imlib_context_set_color( 255, 255, 255, 255 );
         imlib_context_set_image( buffer );
         // Then finally apply our mask to the original image, which should remove any garbage pixels that are off-screen.
         imlib_image_copy_alpha_to_image( mask, 0, 0 );
+        imlib_context_set_image( mask );
+        imlib_free_image();
+        imlib_context_set_image( buffer );
+        // Then finally apply our mask to the original image, which should remove any garbage pixels that are off-screen.
         // But unfortunately that doesn't actually delete the pixels, so we have to do one more pass.
         // This whole thing just creates another blank image, and blends the masked image onto it.
         // This is because all we did was copy the alpha channel, so formats like jpg wouldn't even care that we did all this
@@ -92,6 +98,9 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
         imlib_image_fill_rectangle( 0, 0, w, h );
         imlib_context_set_color( 255, 255, 255, 255 );
         imlib_blend_image_onto_image( buffer, 1, 0, 0, w, h, 0, 0, w, h );
+        imlib_context_set_image( buffer );
+        imlib_free_image();
+        imlib_context_set_image( finalimage );
     }
     imlib_save_image_with_error_return( file.c_str(), &err );
     if ( err != IMLIB_LOAD_ERROR_NONE ) {

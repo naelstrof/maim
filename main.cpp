@@ -119,6 +119,7 @@ int main( int argc, char** argv ) {
         file = options.inputs[ 0 ];
     } else {
         fprintf( stderr, "Unexpected number of output files! There should only be one.\n" );
+        cmdline_parser_free( &options );
         return 1;
     }
     // Check if we were asked to prompt for selection:
@@ -141,6 +142,7 @@ int main( int argc, char** argv ) {
         err = exec( slopcommand, &result );
         if ( err ) {
             fprintf( stderr, "slop failed to run, canceling screenshot. Is slop installed?\n" );
+            cmdline_parser_free( &options );
             return 1;
         }
         // from here we'll just be parsing the output of slop.
@@ -166,12 +168,14 @@ int main( int argc, char** argv ) {
                                         w, h,
                                         options.hidecursor_flag,
                                         options.windowid_arg, mask );
+            cmdline_parser_free( &options );
             if ( err ) {
                 return err;
             }
             return 0;
         }
         fprintf( stderr, "Either the user canceled the query for selection, or slop failed to run properly. Canceling screenshot.\n" );
+        cmdline_parser_free( &options );
         return 1;
     }
     if ( options.x_given && options.y_given && options.w_given && options.h_given ) {
@@ -183,6 +187,7 @@ int main( int argc, char** argv ) {
         fprintf( stderr, "Partial geometry arguments were set, but it isn't enough data to take a screenshot!" );
         fprintf( stderr, "Either give the geometry arugment, or give ALL of the following arguments: x, y, w, h," );
         fprintf( stderr, "    or don't give any of them." );
+        cmdline_parser_free( &options );
         return 1;
     }
     // Just take a full screen shot if we didn't get any geometry.
@@ -191,6 +196,7 @@ int main( int argc, char** argv ) {
         // 1000000 microseconds = 1 second
         usleep( (unsigned int)(delay * 1000000.f) );
         err = imengine->screenshot( file, options.hidecursor_flag, options.windowid_arg, strcmp( options.mask_arg, "off" ) ? true : false );
+        cmdline_parser_free( &options );
         if ( err ) {
             return err;
         }
@@ -206,6 +212,7 @@ int main( int argc, char** argv ) {
                                 w, h,
                                 options.hidecursor_flag,
                                 options.windowid_arg, mask );
+    cmdline_parser_free( &options );
     if ( err ) {
         return err;
     }
