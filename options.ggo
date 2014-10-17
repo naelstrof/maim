@@ -1,5 +1,5 @@
 package "maim"
-version "v2.2.13"
+version "v2.2.14"
 purpose "Takes screenshots."
 usage "maim [options] [file]"
 description "maim (Make Image) is a utility that takes screenshots of your desktop using imlib2. It's meant to overcome shortcomings of scrot and performs better than scrot in several ways."

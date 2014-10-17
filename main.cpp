@@ -186,8 +186,8 @@ int main( int argc, char** argv ) {
     }
     if ( options.x_given && options.y_given && options.w_given && options.h_given ) {
         options.geometry_given = true;
-        char temp[128];
-        sprintf( temp, "%ix%i+%i+%i\0", options.w_arg, options.h_arg, options.x_arg, options.y_arg );
+        char* temp = (char*)malloc( 512 );
+        sprintf( temp, "%ix%i+%i+%i", options.w_arg, options.h_arg, options.x_arg, options.y_arg );
         options.geometry_arg = temp;
     } else if ( ( options.x_given || options.y_given || options.w_given || options.h_given ) && !options.geometry_given ) {
         fprintf( stderr, "Partial geometry arguments were set, but it isn't enough data to take a screenshot!" );

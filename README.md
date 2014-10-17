@@ -63,27 +63,19 @@ In review, maim does one thing and does it well: it takes a screenshot of what y
 how to install
 --------------
 
-### Install using Package Manager (preferred)
+### Install using your Package Manager (preferred)
 
-* [Arch Linux (maim-git)](https://aur.archlinux.org/packages/maim-git/)
+* [Arch Linux AUR (maim-git)](https://aur.archlinux.org/packages/maim-git/)
+* Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
 
 ### Install using Make
 
-Note: maim installs a single binary to `/usr/bin`.
+Note: Dependencies should be installed first: Imlib2, libXrandr, and libXfixes.
 
-**1. Clone repository**
 ```bash
 git clone https://github.com/naelstrof/maim.git
-```
-
-**2. Install dependencies**
-```bash
-sudo apt-get install libimlib2-dev
-```
-
-**3. Make & Install**
-```bash
+cd maim
 make && sudo make install
 ```
 
