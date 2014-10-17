@@ -1,10 +1,8 @@
-maim
-====
+# maim
 
 maim (Make Image) is a utility that takes screenshots of your desktop using imlib2. It's meant to overcome shortcomings of scrot and performs better in several ways.
 
-features
---------
+## features
 * Allows you to take a screenshot of your desktop and save it in any format.
 * Allows you to take a screenshot of a predetermined region or window of your desktop.
 * If slop (https://github.com/naelstrof/slop) is installed, it can be used for selecting a region to screenshot.
@@ -18,8 +16,7 @@ features
 
 ![screenshot mask comparison](http://farmpolice.com/content/images/mask_compare2.png)
 
-why use maim over import or scrot?
---------------------
+## why use maim over import or scrot?
 * Compared to scrot
     - maim has no --exec or naming features. This is because maim follows the unix philosophy of "do one thing and do it well". These features are things that should be handled by the shell.
     - scrot has no way to screenshot a predefined region. maim comes equipped with --geometry features that allow for specified region capture.
@@ -31,8 +28,7 @@ why use maim over import or scrot?
     - maim can actually take screenshots with your cursor included in them! It does this using the XFixes extension. To my knowledge, no other commandline screenshot utility does this.
     - For those of you with multiple monitors, maim is aware of which pixels are visible or not and will make off-screen pixels that are in screenshots black and transparent. Import and scrot both mindlessly include off-screen pixel data in their screenshots which is very often just garbage.
 
-examples
--------------------
+## examples
 I'm including this section because some people don't see how powerful and flexible their shell can be with simple tools like maim. Remember you can always bind keys to shell commands!
 The following can be executed in any bash-like shells:
 
@@ -60,8 +56,7 @@ $ # If xclip is installed, your clipboard should have the online screenshot's UR
 
 In review, maim does one thing and does it well: it takes a screenshot of what you want. :) What you want is up to you, your programming skills, and your imagination.
 
-how to install
---------------
+## how to install
 
 ### Install using your Package Manager (preferred)
 
@@ -81,12 +76,11 @@ make && sudo make install
 
 Make sure to check out and install [slop](https://github.com/naelstrof/slop) too if you want selection capabilities!
 
-need help?
--------------------
+## need help?
 Join us on irc at freenode in *#maim*.
 
 ```text
-maim v2.2.13
+maim v2.2.14
 
 Copyright (C) 2014 Dalton Nell, GPLv3
 
