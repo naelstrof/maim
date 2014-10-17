@@ -113,7 +113,7 @@ option "highlight" l "Instead of outlining selections, slop highlights it. This 
 
 text "\nExamples\n"
 text "    $ # Screenshot the active window\n"
-text "    $ maim -id $(xdotool getactivewindow)\n"
+text "    $ maim -i $(xdotool getactivewindow)\n"
 text "\n"
 text "    $ # Prompt a transparent red selection to screenshot.\n"
 text "    $ maim -s -c 1,0,0,0.6\n"

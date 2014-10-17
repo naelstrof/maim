@@ -43,7 +43,7 @@ $ maim "~/Pictures/$(date +%F-%T).png"
 
 * Take a screenshot of the active window: (Requires xdotool.)
 ```bash
-$ maim -id $(xdotool getactivewindow)
+$ maim -i $(xdotool getactivewindow)
 ```
 
 * Custom transparent red selection with 10 pixel padding: (Requires [slop](https://github.com/naelstrof/slop).)
@@ -145,7 +145,7 @@ Slop Options
 
 Examples
     $ # Screenshot the active window
-    $ maim -id $(xdotool getactivewindow)
+    $ maim -i $(xdotool getactivewindow)
 
     $ # Prompt a transparent red selection to screenshot.
     $ maim -s -c 1,0,0,0.6
