@@ -62,12 +62,26 @@ In review, maim does one thing and does it well: it takes a screenshot of what y
 
 how to install
 --------------
-You really should use your package manager when possible, you never know what kind of garbage applications will dump everywhere. For example you can install maim on Arch Linux by installing it from the AUR: [maim-git](https://aur.archlinux.org/packages/maim-git/).
 
-However maim just installs a single binary to /usr/bin. If that's ok with you-- you can install it with:
+### Install using Package Manager (preferred)
+
+* [Arch Linux (maim-git)](https://aur.archlinux.org/packages/maim-git/)
+
+
+### Install using Make
+
+Note: maim installs a single binary to `/usr/bin`.
+
+**1. Install dependencies**
+```bash
+sudo apt-get install libimlib2-dev
+```
+
+**2. Make & Install**
 ```bash
 make && sudo make install
 ```
+
 Make sure to check out and install [slop](https://github.com/naelstrof/slop) too if you want selection capabilities!
 
 need help?
