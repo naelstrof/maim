@@ -72,12 +72,17 @@ how to install
 
 Note: maim installs a single binary to `/usr/bin`.
 
-**1. Install dependencies**
+**1. Clone repository**
+```bash
+git clone https://github.com/naelstrof/maim.git
+```
+
+**2. Install dependencies**
 ```bash
 sudo apt-get install libimlib2-dev
 ```
 
-**2. Make & Install**
+**3. Make & Install**
 ```bash
 make && sudo make install
 ```
