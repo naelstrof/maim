@@ -46,6 +46,7 @@ const char *gengetopt_args_info_help[] = {
   "  -g, --geometry=WxH+X+Y        Set the region to capture",
   "  -d, --delay=FLOAT             Set the amount of time to wait before taking an\n                                  image.  (default=`0.0')",
   "  -i, --windowid=INT            Set the window to capture. Defaults to the root\n                                  window id.",
+  "      --localize                Localizes given geometry to the given window.\n                                  So \"maim -i $ID -g 100x100+0+0 --localize\"\n                                  would screenshot the top-left 100x100 pixels\n                                  of the given window, rather than the top-left\n                                  100x100 pixels of the root window.\n                                  (default=off)",
   "      --hidecursor              Prevents the system cursor from showing up in\n                                  screenshots.  (default=off)",
   "  -m, --mask=STRING             Masks off-screen pixels so they don't show up\n                                  in screenshots.  (possible values=\"auto\",\n                                  \"off\", \"on\" default=`auto')",
   "\nSlop Options",
@@ -98,6 +99,7 @@ void clear_given (struct gengetopt_args_info *args_info)
   args_info->geometry_given = 0 ;
   args_info->delay_given = 0 ;
   args_info->windowid_given = 0 ;
+  args_info->localize_given = 0 ;
   args_info->hidecursor_given = 0 ;
   args_info->mask_given = 0 ;
   args_info->nokeyboard_given = 0 ;
@@ -128,6 +130,7 @@ void clear_args (struct gengetopt_args_info *args_info)
   args_info->delay_arg = gengetopt_strdup ("0.0");
   args_info->delay_orig = NULL;
   args_info->windowid_orig = NULL;
+  args_info->localize_flag = 0;
   args_info->hidecursor_flag = 0;
   args_info->mask_arg = gengetopt_strdup ("auto");
   args_info->mask_orig = NULL;
@@ -167,18 +170,19 @@ void init_args_info(struct gengetopt_args_info *args_info)
   args_info->geometry_help = gengetopt_args_info_help[9] ;
   args_info->delay_help = gengetopt_args_info_help[10] ;
   args_info->windowid_help = gengetopt_args_info_help[11] ;
-  args_info->hidecursor_help = gengetopt_args_info_help[12] ;
-  args_info->mask_help = gengetopt_args_info_help[13] ;
-  args_info->nokeyboard_help = gengetopt_args_info_help[15] ;
-  args_info->bordersize_help = gengetopt_args_info_help[16] ;
-  args_info->padding_help = gengetopt_args_info_help[17] ;
-  args_info->tolerance_help = gengetopt_args_info_help[18] ;
-  args_info->gracetime_help = gengetopt_args_info_help[19] ;
-  args_info->color_help = gengetopt_args_info_help[20] ;
-  args_info->nodecorations_help = gengetopt_args_info_help[21] ;
-  args_info->min_help = gengetopt_args_info_help[22] ;
-  args_info->max_help = gengetopt_args_info_help[23] ;
-  args_info->highlight_help = gengetopt_args_info_help[24] ;
+  args_info->localize_help = gengetopt_args_info_help[12] ;
+  args_info->hidecursor_help = gengetopt_args_info_help[13] ;
+  args_info->mask_help = gengetopt_args_info_help[14] ;
+  args_info->nokeyboard_help = gengetopt_args_info_help[16] ;
+  args_info->bordersize_help = gengetopt_args_info_help[17] ;
+  args_info->padding_help = gengetopt_args_info_help[18] ;
+  args_info->tolerance_help = gengetopt_args_info_help[19] ;
+  args_info->gracetime_help = gengetopt_args_info_help[20] ;
+  args_info->color_help = gengetopt_args_info_help[21] ;
+  args_info->nodecorations_help = gengetopt_args_info_help[22] ;
+  args_info->min_help = gengetopt_args_info_help[23] ;
+  args_info->max_help = gengetopt_args_info_help[24] ;
+  args_info->highlight_help = gengetopt_args_info_help[25] ;
   
 }
 
@@ -385,6 +389,8 @@ cmdline_parser_dump(FILE *outfile, struct gengetopt_args_info *args_info)
     write_into_file(outfile, "delay", args_info->delay_orig, 0);
   if (args_info->windowid_given)
     write_into_file(outfile, "windowid", args_info->windowid_orig, 0);
+  if (args_info->localize_given)
+    write_into_file(outfile, "localize", 0, 0 );
   if (args_info->hidecursor_given)
     write_into_file(outfile, "hidecursor", 0, 0 );
   if (args_info->mask_given)
@@ -685,6 +691,7 @@ cmdline_parser_internal (
         { "geometry",	1, NULL, 'g' },
         { "delay",	1, NULL, 'd' },
         { "windowid",	1, NULL, 'i' },
+        { "localize",	0, NULL, 0 },
         { "hidecursor",	0, NULL, 0 },
         { "mask",	1, NULL, 'm' },
         { "nokeyboard",	0, NULL, 0 },
@@ -903,6 +910,18 @@ cmdline_parser_internal (
                 &(local_args_info.xdisplay_given), optarg, 0, ":0", ARG_STRING,
                 check_ambiguity, override, 0, 0,
                 "xdisplay", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Localizes given geometry to the given window. So \"maim -i $ID -g 100x100+0+0 --localize\" would screenshot the top-left 100x100 pixels of the given window, rather than the top-left 100x100 pixels of the root window..  */
+          else if (strcmp (long_options[option_index].name, "localize") == 0)
+          {
+          
+          
+            if (update_arg((void *)&(args_info->localize_flag), 0, &(args_info->localize_given),
+                &(local_args_info.localize_given), optarg, 0, 0, ARG_FLAG,
+                check_ambiguity, override, 1, 0, "localize", '-',
                 additional_error))
               goto failure;
           

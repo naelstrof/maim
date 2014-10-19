@@ -1,5 +1,5 @@
 package "maim"
-version "v2.3.16"
+version "v2.3.17"
 purpose "Takes screenshots."
 usage "maim [options] [file]"
 description "maim (Make Image) is a utility that takes screenshots of your desktop using imlib2. It's meant to overcome shortcomings of scrot and performs better than scrot in several ways."
@@ -49,6 +49,10 @@ option "delay" d "Set the amount of time to wait before taking an image."
 option "windowid" i "Set the window to capture. Defaults to the root window id."
     int
     optional
+
+option "localize" - "Localizes given geometry to the given window. So \"maim -i $ID -g 100x100+0+0 --localize\" would screenshot the top-left 100x100 pixels of the given window, rather than the top-left 100x100 pixels of the root window."
+    flag
+    off
 
 option "hidecursor" - "Prevents the system cursor from showing up in screenshots."
     flag

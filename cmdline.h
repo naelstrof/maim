@@ -31,7 +31,7 @@ extern "C" {
 
 #ifndef CMDLINE_PARSER_VERSION
 /** @brief the program version */
-#define CMDLINE_PARSER_VERSION "v2.3.16"
+#define CMDLINE_PARSER_VERSION "v2.3.17"
 #endif
 
 /** @brief Where the command line options are stored */
@@ -65,6 +65,8 @@ struct gengetopt_args_info
   int windowid_arg;	/**< @brief Set the window to capture. Defaults to the root window id..  */
   char * windowid_orig;	/**< @brief Set the window to capture. Defaults to the root window id. original value given at command line.  */
   const char *windowid_help; /**< @brief Set the window to capture. Defaults to the root window id. help description.  */
+  int localize_flag;	/**< @brief Localizes given geometry to the given window. So \"maim -i $ID -g 100x100+0+0 --localize\" would screenshot the top-left 100x100 pixels of the given window, rather than the top-left 100x100 pixels of the root window. (default=off).  */
+  const char *localize_help; /**< @brief Localizes given geometry to the given window. So \"maim -i $ID -g 100x100+0+0 --localize\" would screenshot the top-left 100x100 pixels of the given window, rather than the top-left 100x100 pixels of the root window. help description.  */
   int hidecursor_flag;	/**< @brief Prevents the system cursor from showing up in screenshots. (default=off).  */
   const char *hidecursor_help; /**< @brief Prevents the system cursor from showing up in screenshots. help description.  */
   char * mask_arg;	/**< @brief Masks off-screen pixels so they don't show up in screenshots. (default='auto').  */
@@ -109,6 +111,7 @@ struct gengetopt_args_info
   unsigned int geometry_given ;	/**< @brief Whether geometry was given.  */
   unsigned int delay_given ;	/**< @brief Whether delay was given.  */
   unsigned int windowid_given ;	/**< @brief Whether windowid was given.  */
+  unsigned int localize_given ;	/**< @brief Whether localize was given.  */
   unsigned int hidecursor_given ;	/**< @brief Whether hidecursor was given.  */
   unsigned int mask_given ;	/**< @brief Whether mask was given.  */
   unsigned int nokeyboard_given ;	/**< @brief Whether nokeyboard was given.  */
