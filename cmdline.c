@@ -60,7 +60,7 @@ const char *gengetopt_args_info_help[] = {
   "      --min=INT                 Set the minimum output of width or height\n                                  values. This is useful to avoid outputting 0.\n                                  Setting min and max to the same value\n                                  disables drag selections.  (default=`0')",
   "      --max=INT                 Set the maximum output of width or height\n                                  values. Setting min and max to the same value\n                                  disables drag selections.  (default=`0')",
   "  -l, --highlight               Instead of outlining selections, slop\n                                  highlights it. This is only useful when\n                                  --color is set to a transparent color.\n                                  (default=off)",
-  "\nExamples\n    $ # Screenshot the active window\n    $ maim -i $(xdotool getactivewindow)\n\n    $ # Prompt a transparent red selection to screenshot.\n    $ maim -s -c 1,0,0,0.6\n\n    $ # Save a dated screenshot.\n    $ maim \"~/$(date +%F-%T).png\"\n",
+  "\nExamples\n    $ # Screenshot the active window\n    $ maim -i $(xdotool getactivewindow)\n\n    $ # Prompt a transparent red selection to screenshot.\n    $ maim -s -c 1,0,0,0.6\n\n    $ # Save a dated screenshot.\n    $ maim ~/$(date +%F-%T).png\n",
     0
 };
 

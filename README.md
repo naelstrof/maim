@@ -34,7 +34,7 @@ The following can be executed in any bash-like shells:
 
 * Set the screenshot's name to the current time and date:
 ```bash
-$ maim "~/Pictures/$(date +%F-%T).png"
+$ maim ~/Pictures/$(date +%F-%T).png
 ```
 
 * Take a screenshot of the active window: (Requires xdotool.)
@@ -156,5 +156,5 @@ Examples
     $ maim -s -c 1,0,0,0.6
 
     $ # Save a dated screenshot.
-    $ maim "~/$(date +%F-%T).png"
+    $ maim ~/$(date +%F-%T).png
 ```
