@@ -136,7 +136,7 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
         find = result.find( "=" );
     }
     Window test = None;
-    int num = sscanf( result.c_str(), "X %i\n Y %i\n W %i\n H %i\nG %*s\nID %i", x, y, w, h, &test );
+    int num = sscanf( result.c_str(), "X %i\n Y %i\n W %i\n H %i\nG %*s\nID %lu", x, y, w, h, &test );
     if ( num != 5 || ( *w == 0 && *h == 0 ) ) {
         return 1;
     }
@@ -191,7 +191,7 @@ int main( int argc, char** argv ) {
     } else if ( options.geometry_given ) {
         err = parseGeometry( options.geometry_arg, &x, &y, &w, &h );
         if ( err ) {
-            fprintf( stderr, "Failed to parse geometry %s, should be in format WxH+X+Y!\n" );
+            fprintf( stderr, "Failed to parse geometry %s, should be in format WxH+X+Y!\n", options.geometry_arg );
             cmdline_parser_free( &options );
             return 1;
         }
