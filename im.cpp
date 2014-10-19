@@ -47,7 +47,13 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
     imlib_context_set_image( buffer );
     imlib_image_set_has_alpha( 1 );
     imlib_context_set_drawable( id );
-    imlib_copy_drawable_to_image( 0, x, y, w, h, 0, 0, 1 );
+    // This make sure negative x or y values actually affect the location
+    // of the drawable. Since asking for it to copy from a negative
+    // x or y position doesn't seem to do anything.
+    // Might be a bug, but if it's fixed it'll break my program :v
+    int destinationx = x < 0 ? -x : 0;
+    int destinationy = y < 0 ? -y : 0;
+    imlib_copy_drawable_to_image( 0, x, y, w, h, destinationx, destinationy, 0 );
     Imlib_Load_Error err;
     if ( !hidecursor ) {
         // Grab the cursor image with XFixes
