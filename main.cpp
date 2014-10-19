@@ -201,6 +201,9 @@ int main( int argc, char** argv ) {
     Window window = xengine->m_root;
     if ( options.windowid_given ) {
         window = (Window)options.windowid_arg;
+        // Since we have a window we need to offset our x and y geometry (we may not even be using it).
+        Window junk;
+        XTranslateCoordinates( xengine->m_display, xengine->m_root, window, x, y, &x, &y, &junk );
     }
     // Get our file name
     std::string file = "";
