@@ -29,7 +29,6 @@
 #include <string>
 #include <sstream>
 #include <time.h>
-#include <wordexp.h>
 
 #include "x.hpp"
 #include "im.hpp"
@@ -190,7 +189,12 @@ int main( int argc, char** argv ) {
         cmdline_parser_free( &options );
         return 1;
     } else if ( options.geometry_given ) {
-        parseGeometry( options.geometry_arg, &x, &y, &w, &h );
+        err = parseGeometry( options.geometry_arg, &x, &y, &w, &h );
+        if ( err ) {
+            fprintf( stderr, "Failed to parse geometry %s, should be in format WxH+X+Y!\n" );
+            cmdline_parser_free( &options );
+            return 1;
+        }
         gotGeometry = true;
     }
     // Get our window if we have one, default to the root window.
@@ -229,12 +233,7 @@ int main( int argc, char** argv ) {
         printf( "No file specified, using %s\n", file.c_str() );
         free( currentdir );
     } else if ( options.inputs_num == 1 ) {
-        // Our files can be in quotes, which disables expansion of ~ for whatever reason.
-        // We manually expand it with wordexp
-        wordexp_t p;
-        wordexp( options.inputs[ 0 ], &p, 0 );
-        file = p.we_wordv[ 0 ];
-        wordfree( &p );
+        file = options.inputs[ 0 ];
     } else {
         fprintf( stderr, "Unexpected number of output files! There should only be one.\n" );
         cmdline_parser_free( &options );

@@ -152,7 +152,7 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
                 fprintf( stderr, "path component is not a directory\n" );
                 break;
             case IMLIB_LOAD_ERROR_PATH_COMPONENT_NON_EXISTANT:
-                fprintf( stderr, "path component is non-existant\n" );
+                fprintf( stderr, "path component is non-existant (~ isn't expanded inside quotes!)\n" );
                 break;
             case IMLIB_LOAD_ERROR_PATH_TOO_LONG:
                 fprintf( stderr, "path is too long\n" );
@@ -178,6 +178,7 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
                 break;
             }
         }
+        return 1;
     }
     imlib_free_image();
     return 0;
