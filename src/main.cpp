@@ -125,7 +125,7 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
     slopcommand << "\n";
     std::string result;
     int err = exec( slopcommand.str(), &result );
-    if ( err ) {
+    if ( err != EXIT_SUCCESS ) {
         return EXIT_FAILURE;
     }
     // From here we'll just be parsing the output of slop.
@@ -156,18 +156,18 @@ int app( int argc, char** argv ) {
     // First parse any options and the filename we need.
     gengetopt_args_info options;
     int err = cmdline_parser( argc, argv, &options );
-    if ( err ) {
+    if ( err != EXIT_SUCCESS ) {
         return EXIT_FAILURE;
     }
     // Then set up the x interface.
     err = xengine->init( options.xdisplay_arg );
-    if ( err ) {
+    if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Failed to grab X display!\n" );
         return EXIT_FAILURE;
     }
     // Then the imlib2 interface
     err = imengine->init();
-    if ( err ) {
+    if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Failed to initialize imlib2!\n" );
         return EXIT_FAILURE;
     }
@@ -190,7 +190,7 @@ int app( int argc, char** argv ) {
         return EXIT_FAILURE;
     } else if ( options.geometry_given ) {
         err = parseGeometry( options.geometry_arg, &x, &y, &w, &h );
-        if ( err ) {
+        if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to parse geometry %s, should be in format WxH+X+Y!\n", options.geometry_arg );
             cmdline_parser_free( &options );
             return EXIT_FAILURE;
@@ -249,7 +249,7 @@ int app( int argc, char** argv ) {
     // Finally we have all our information, now to use it.
     if ( gotSelectFlag ) {
         err = slop( options, &x, &y, &w, &h, &window );
-        if ( err ) {
+        if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Selection was cancelled or slop failed to run. Make sure it's installed!\n" );
             cmdline_parser_free( &options );
             return EXIT_FAILURE;
@@ -258,7 +258,7 @@ int app( int argc, char** argv ) {
         bool mask = checkMask( options.mask_arg, x, y, w, h, window );
         err = imengine->screenshot( file, x, y, w, h, options.hidecursor_flag, window, mask );
         cmdline_parser_free( &options );
-        if ( err ) {
+        if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
@@ -269,7 +269,7 @@ int app( int argc, char** argv ) {
         bool mask = checkMask( options.mask_arg, x, y, w, h, window );
         err = imengine->screenshot( file, x, y, w, h, options.hidecursor_flag, window, mask );
         cmdline_parser_free( &options );
-        if ( err ) {
+        if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
@@ -281,7 +281,7 @@ int app( int argc, char** argv ) {
     bool mask = checkMask( options.mask_arg, 0, 0, WidthOfScreen( xengine->m_screen ), HeightOfScreen( xengine->m_screen ), window );
     err = imengine->screenshot( file, options.hidecursor_flag, window, mask );
     cmdline_parser_free( &options );
-    if ( err ) {
+    if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Failed to take screenshot.\n" );
         return EXIT_FAILURE;
     }
