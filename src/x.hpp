@@ -23,6 +23,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
+#include <cstdlib>
 #include <vector>
 #include <string>
 #include <cstdio>

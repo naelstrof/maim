@@ -38,7 +38,7 @@
 int exec( std::string cmd, std::string* ret ) {
     FILE* pipe = popen( cmd.c_str(), "r" );
     if ( !pipe ) {
-        return 1;
+        return EXIT_FAILURE;
     }
     // Doesn't matter what size the buffer is, since it's grabbed in chunks.
     char buffer[255];
@@ -50,7 +50,7 @@ int exec( std::string cmd, std::string* ret ) {
     }
     pclose( pipe );
     *ret = result;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 // Parse geometry from a string, it's pretty simple really.
@@ -71,9 +71,9 @@ int parseGeometry( std::string arg, int* x, int* y, int* w, int* h ) {
     int num = sscanf( copy.c_str(), "%d %d %d %d", w, h, x, y );
     if ( num != 4 ) {
         fprintf( stderr, "Error parsing geometry from %s\n", arg.c_str() );
-        return 1;
+        return EXIT_FAILURE;
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 // We use this to detect if we should enable masking or not.
@@ -126,7 +126,7 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
     std::string result;
     int err = exec( slopcommand.str(), &result );
     if ( err ) {
-        return 1;
+        return EXIT_FAILURE;
     }
     // From here we'll just be parsing the output of slop.
     // Replace all ='s with spaces in the result, this is so sscanf works properly.
@@ -138,7 +138,7 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
     Window test = None;
     int num = sscanf( result.c_str(), "X %i\n Y %i\n W %i\n H %i\nG %*s\nID %lu", x, y, w, h, &test );
     if ( num != 5 || ( *w == 0 && *h == 0 ) ) {
-        return 1;
+        return EXIT_FAILURE;
     }
     // If we actually have a window selection, set the window and offset the coordinates to be
     // localized to that particular window.
@@ -149,27 +149,27 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
         Window junk;
         XTranslateCoordinates( xengine->m_display, xengine->m_root, test, *x, *y, x, y, &junk );
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
-int main( int argc, char** argv ) {
+int app( int argc, char** argv ) {
     // First parse any options and the filename we need.
     gengetopt_args_info options;
     int err = cmdline_parser( argc, argv, &options );
     if ( err ) {
-        return err;
+        return EXIT_FAILURE;
     }
     // Then set up the x interface.
     err = xengine->init( options.xdisplay_arg );
     if ( err ) {
         fprintf( stderr, "Failed to grab X display!\n" );
-        return err;
+        return EXIT_FAILURE;
     }
     // Then the imlib2 interface
     err = imengine->init();
     if ( err ) {
         fprintf( stderr, "Failed to initialize imlib2!\n" );
-        return err;
+        return EXIT_FAILURE;
     }
     // Grab all of our variables from the options.
     bool gotGeometry = false;
@@ -187,13 +187,13 @@ int main( int argc, char** argv ) {
         fprintf( stderr, "Partial geometry arguments were set, but it isn't enough data to take a screenshot!\n" );
         fprintf( stderr, "Please give the geometry argument or give ALL of the following arguments: x, y, w, h.\n" );
         cmdline_parser_free( &options );
-        return 1;
+        return EXIT_FAILURE;
     } else if ( options.geometry_given ) {
         err = parseGeometry( options.geometry_arg, &x, &y, &w, &h );
         if ( err ) {
             fprintf( stderr, "Failed to parse geometry %s, should be in format WxH+X+Y!\n", options.geometry_arg );
             cmdline_parser_free( &options );
-            return 1;
+            return EXIT_FAILURE;
         }
         gotGeometry = true;
     }
@@ -215,12 +215,12 @@ int main( int argc, char** argv ) {
         // Try as hard as we can to get the current directory.
         int trycount = 0;
         int length = MAXPATHLEN;
-        char* currentdir = (char*)malloc( length );
+        char* currentdir = new char[ length ];
         char* error = getcwd( currentdir, length );
         while ( error == NULL ) {
-            free( currentdir );
+            delete[] currentdir;
             length *= 2;
-            currentdir = (char*)malloc( length );
+            currentdir = new char[ length ];
             error = getcwd( currentdir, length );
             trycount++;
             // Ok someone's trying to be whacky with the current directory if we're going 8 times over
@@ -228,7 +228,7 @@ int main( int argc, char** argv ) {
             if ( trycount > 3 ) {
                 fprintf( stderr, "Failed to grab the current directory!" );
                 cmdline_parser_free( &options );
-                return 1;
+                return EXIT_FAILURE;
             }
         }
         file = currentdir;
@@ -243,7 +243,7 @@ int main( int argc, char** argv ) {
     } else {
         fprintf( stderr, "Unexpected number of output files! There should only be one.\n" );
         cmdline_parser_free( &options );
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Finally we have all our information, now to use it.
@@ -252,7 +252,7 @@ int main( int argc, char** argv ) {
         if ( err ) {
             fprintf( stderr, "Selection was cancelled or slop failed to run. Make sure it's installed!\n" );
             cmdline_parser_free( &options );
-            return err;
+            return EXIT_FAILURE;
         }
         usleep( (unsigned int)(delay * 1000000.f) );
         bool mask = checkMask( options.mask_arg, x, y, w, h, window );
@@ -260,9 +260,9 @@ int main( int argc, char** argv ) {
         cmdline_parser_free( &options );
         if ( err ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
-            return err;
+            return EXIT_FAILURE;
         }
-        return 0;
+        return EXIT_SUCCESS;
     }
     if ( gotGeometry ) {
         usleep( (unsigned int)(delay * 1000000.f) );
@@ -271,9 +271,9 @@ int main( int argc, char** argv ) {
         cmdline_parser_free( &options );
         if ( err ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
-            return err;
+            return EXIT_FAILURE;
         }
-        return 0;
+        return EXIT_SUCCESS;
     }
     // If we didn't get any special options, just screenshot the specified window
     // (Which defaults to the whole screen).
@@ -283,7 +283,18 @@ int main( int argc, char** argv ) {
     cmdline_parser_free( &options );
     if ( err ) {
         fprintf( stderr, "Failed to take screenshot.\n" );
-        return err;
+        return EXIT_FAILURE;
     }
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+int main( int argc, char** argv ) {
+    int exitvalue = EXIT_SUCCESS;
+    try {
+        exitvalue = app( argc, argv );
+    } catch( std::exception* exception ) {
+        fprintf( stderr, "Unhandled Exception Thrown: %s\n", exception->what() );
+        exit( EXIT_FAILURE );
+    }
+    return exitvalue;
 }

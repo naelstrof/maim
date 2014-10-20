@@ -55,7 +55,7 @@ int maim::XEngine::init( std::string display ) {
     }
 
     m_good = true;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 Window maim::XEngine::getWindowByID( int id ) {

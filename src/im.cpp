@@ -29,14 +29,14 @@ maim::IMEngine::~IMEngine() {
 
 int maim::IMEngine::init() {
     if ( !xengine->m_good ) {
-        return 1;
+        return EXIT_FAILURE;
     }
     imlib_set_cache_size( 2048 * 1024 );
     imlib_context_set_display( xengine->m_display );
     imlib_context_set_visual( xengine->m_visual );
     imlib_context_set_colormap( xengine->m_colormap );
     imlib_context_set_blend( 1 );
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bool hidecursor, Window id, bool mask ) {
@@ -178,10 +178,10 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
                 break;
             }
         }
-        return 1;
+        return EXIT_FAILURE;
     }
     imlib_free_image();
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int maim::IMEngine::screenshot( std::string file, bool hidecursor, Window id, bool mask ) {
