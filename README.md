@@ -64,13 +64,14 @@ In review, maim does one thing and does it well: it takes a screenshot of what y
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
 
-### Install using Make
+### Install using CMake (Requires CMake)
 
 Note: Dependencies should be installed first: Imlib2, libXrandr, and libXfixes.
 
 ```bash
 git clone https://github.com/naelstrof/maim.git
 cd maim
+cmake ./
 make && sudo make install
 ```
 
