@@ -211,7 +211,7 @@ int main( int argc, char** argv ) {
     // Get our file name
     std::string file = "";
     // If we don't have a file, default to writing to the home directory.
-    if ( options.inputs_num <= 0 ) {
+    if ( options.inputs_num == 0 ) {
         // Try as hard as we can to get the current directory.
         int trycount = 0;
         int length = MAXPATHLEN;

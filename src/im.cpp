@@ -62,7 +62,7 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
         // I'm guessing this is because some old AMD cpu's longs are actually 32 bits.
         // Regardless this is how I convert it to the correct bit length.
         unsigned int* pixels = new unsigned int[ xcursor->width * xcursor->height ];
-        for ( unsigned int i=0;i<xcursor->width*xcursor->height;i++ ) {
+        for ( int i=0;i<xcursor->width*xcursor->height;i++ ) {
             pixels[ i ] = (unsigned int)xcursor->pixels[ i ];
         }
         Imlib_Image cursor = imlib_create_image_using_data( xcursor->width, xcursor->height, pixels );
@@ -98,7 +98,7 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
         // Grab our monitor information, (basically get pixel rectangles that are actually displaying).
         std::vector<XRRCrtcInfo*> monitors = xengine->getCRTCS();
         imlib_context_set_color( 0, 0, 0, 255 );
-        for ( int i=0;i<monitors.size();i++ ) {
+        for ( unsigned int i=0;i<monitors.size();i++ ) {
             XRRCrtcInfo* cmonitor = monitors[ i ];
             // Then quickly block in our visible pixels on our mask
             imlib_image_fill_rectangle( cmonitor->x - x, cmonitor->y - y, cmonitor->width, cmonitor->height );

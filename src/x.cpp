@@ -64,20 +64,6 @@ Window maim::XEngine::getWindowByID( int id ) {
     // The only thing we can do is use it and see if we get a BadWindow error later.
 }
 
-void maim::XEngine::tick() {
-    if ( !m_good ) {
-        return;
-    }
-    XFlush( m_display );
-    XEvent event;
-    while ( XPending( m_display ) ) {
-        XNextEvent( m_display, &event );
-        switch ( event.type ) {
-            default: break;
-        }
-    }
-}
-
 // This stuff is used to detect which pixels we can actually see with
 // the physical monitor positions.
 // It's useful for people with multimonitor setups where the monitors
@@ -95,7 +81,7 @@ std::vector<XRRCrtcInfo*> maim::XEngine::getCRTCS() {
 }
 
 void maim::XEngine::freeCRTCS( std::vector<XRRCrtcInfo*> monitors ) {
-    for ( int i=0;i<monitors.size();i++ ) {
+    for ( unsigned int i=0;i<monitors.size();i++ ) {
         XRRFreeCrtcInfo( monitors[ i ] );
     }
 }

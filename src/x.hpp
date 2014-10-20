@@ -34,7 +34,6 @@ public:
                         XEngine();
                         ~XEngine();
     int                 init( std::string display );
-    void                tick();
     Display*            m_display;
     Visual*             m_visual;
     Screen*             m_screen;
