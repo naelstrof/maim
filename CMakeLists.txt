@@ -56,7 +56,7 @@ add_executable( ${BIN_TARGET} ${source} )
 # Libraries
 target_link_libraries( ${BIN_TARGET}
                        ${IMLIB2_LIBRARIES}
-                       ${X11_LIBRARY}
+                       ${X11_LIBRARIES}
                        ${XRANDR_LIBRARY}
                        ${XFIXES_LIBRARY} )
 
