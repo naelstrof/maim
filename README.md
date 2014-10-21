@@ -81,7 +81,7 @@ Make sure to check out and install [slop](https://github.com/naelstrof/slop) too
 Join us on irc at freenode in *#maim*.
 
 ```text
-maim v2.3.27
+maim v2.3.28
 
 Copyright (C) 2014 Dalton Nell, Maim Contributors
 (https://github.com/naelstrof/maim/graphs/contributors)

@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.0 )
 
 project( "maim"
-         VERSION 2.3.27 )
+         VERSION 2.3.28 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
 set( CMAKE_INSTALL_PREFIX "/usr/bin" )
