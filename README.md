@@ -81,9 +81,10 @@ Make sure to check out and install [slop](https://github.com/naelstrof/slop) too
 Join us on irc at freenode in *#maim*.
 
 ```text
-maim v2.3.22
+maim v2.3.23
 
-Copyright (C) 2014 Dalton Nell, Maim Contributors (https://github.com/naelstrof/maim/graphs/contributors)
+Copyright (C) 2014 Dalton Nell, Maim Contributors
+(https://github.com/naelstrof/maim/graphs/contributors)
 
 Takes screenshots.
 
@@ -109,6 +110,12 @@ Options
                                   image.  (default=`0.0')
   -i, --windowid=INT            Set the window to capture. Defaults to the root
                                   window id.
+      --localize                Localizes given geometry to the given window.
+                                  So "maim -i $ID -g 100x100+0+0 --localize"
+                                  would screenshot the top-left 100x100 pixels
+                                  of the given window, rather than the top-left
+                                  100x100 pixels of the root window.
+                                  (default=off)
       --hidecursor              Prevents the system cursor from showing up in
                                   screenshots.  (default=off)
   -m, --mask=STRING             Masks off-screen pixels so they don't show up
@@ -158,4 +165,5 @@ Examples
 
     $ # Save a dated screenshot.
     $ maim ~/$(date +%F-%T).png
+
 ```

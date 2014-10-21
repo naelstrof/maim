@@ -48,8 +48,10 @@ int exec( std::string cmd, std::string* ret ) {
             result += buffer;
         }
     }
-    pclose( pipe );
     *ret = result;
+    if ( pclose( pipe ) == -1 ) {
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 
@@ -89,8 +91,8 @@ bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
             return false;
         }
         // If our screenshot has > 80% of the screen covered, we probably want it masked by off-screen pixels.
-        if ( abs( (float)sw - (float)w ) / (float)sw < 0.2 &&
-             abs( (float)sh - (float)h ) / (float)sh < 0.2 &&
+        if ( abs( (int)( (float)sw - (float)w ) ) / (float)sw < 0.2 &&
+             abs( (int)( (float)sh - (float)h ) ) / (float)sh < 0.2 &&
              (float)x / (float)sw < 0.2 &&
              (float)y / (float)sh < 0.2 ) {
             return true;
@@ -289,11 +291,17 @@ int app( int argc, char** argv ) {
 }
 
 int main( int argc, char** argv ) {
-    int exitvalue = EXIT_SUCCESS;
+    int exitvalue = EXIT_FAILURE;
     try {
         exitvalue = app( argc, argv );
-    } catch( std::exception* exception ) {
-        fprintf( stderr, "Unhandled Exception Thrown: %s\n", exception->what() );
+    } catch( std::bad_alloc const& exception ) {
+        fprintf( stderr, "Couldn't allocate enough memory! No space left in RAM." );
+        exit( EXIT_FAILURE );
+    } catch( std::exception const& exception ) {
+        fprintf( stderr, "Unhandled Exception Thrown: %s\n", exception.what() );
+        exit( EXIT_FAILURE );
+    } catch( ... ) {
+        fprintf( stderr, "Unknown Exception Thrown!\n" );
         exit( EXIT_FAILURE );
     }
     return exitvalue;

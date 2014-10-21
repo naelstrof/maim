@@ -1,11 +1,11 @@
 package "maim"
-version "v2.3.22"
+version "v@maim_VERSION_MAJOR@.@maim_VERSION_MINOR@.@maim_VERSION_PATCH@"
 purpose "Takes screenshots."
 usage "maim [options] [file]"
 description "maim (Make Image) is a utility that takes screenshots of your desktop using imlib2. It's meant to overcome shortcomings of scrot and performs better than scrot in several ways."
 versiontext "Copyright (C) 2014 Dalton Nell, Maim Contributors (https://github.com/naelstrof/maim/graphs/contributors)"
 
-args "--unamed-opts"
+args "--unamed-opts --file-name=gengetopt"
 
 text "Options"
 
