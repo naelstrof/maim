@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.8 )
 project( "maim" )
 set( maim_VERSION_MAJOR 2 )
 set( maim_VERSION_MINOR 3 )
-set( maim_VERSION_PATCH 29 )
+set( maim_VERSION_PATCH 30 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
 set( CMAKE_INSTALL_PREFIX "/usr/bin" )
@@ -34,10 +34,14 @@ endif()
 # so nobody has to go find and install gengetopt if they don't want to.
 find_program( GENGETOPT_EXECUTABLE gengetopt
               DOC "A tool to generate code to grab command line options." )
-if ( GENGETOPT_EXECUTABLE )
-    message( "Executing " "${GENGETOPT_EXECUTABLE}" " " "--input=options.ggo" " " "--header-extension=in" )
+find_program( COPY_EXECUTABLE cp )
+if ( GENGETOPT_EXECUTABLE AND COPY_EXECUTABLE )
+    message( "Executing " "${GENGETOPT_EXECUTABLE}" " " "--input=options.ggo" )
     execute_process( COMMAND
-                     "${GENGETOPT_EXECUTABLE}" "--input=options.ggo" "--header-extension=in"
+                     "${GENGETOPT_EXECUTABLE}" "--input=options.ggo"
+                     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src" )
+    execute_process( COMMAND
+                     "${COPY_EXECUTABLE}" "cmdline.h" "cmdline.in"
                      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src" )
 else()
     message( "Command gengetopt not found! Won't regenerate command line code." )
