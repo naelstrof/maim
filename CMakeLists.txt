@@ -1,7 +1,9 @@
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 2.8 )
 
-project( "maim"
-         VERSION 2.3.28 )
+project( "maim" )
+set( maim_VERSION_MAJOR 2 )
+set( maim_VERSION_MINOR 3 )
+set( maim_VERSION_PATCH 28 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
 set( CMAKE_INSTALL_PREFIX "/usr/bin" )
@@ -98,7 +100,7 @@ add_executable( "${BIN_TARGET}" ${source} )
 
 # Libraries
 target_link_libraries( "${BIN_TARGET}"
-                       "${IMLIB2_LIBRARIES}"
+                       ${IMLIB2_LIBRARIES}
                        "${X11_LIBRARIES}"
                        "${XRANDR_LIBRARY}"
                        "${XFIXES_LIBRARY}" )
