@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function test {
     "$@"
     local status=$?
@@ -34,7 +36,8 @@ test ./maim "/tmp/should be what you selected second.png" -s -c 1,0,0
 test_fail ./maim "/tmp/$(date +%s-%N).png" "~/whyamihere.png" 2>/dev/null
 test_fail ./maim "/tmp/$(date +%s-%N).png" -x 0 -y 0 -w 100 2>/dev/null
 test_fail ./maim "/tmp/$(date +%s-%N).png" -g thisisntageo 2>/dev/null
-test_fail ./maim "/tmp/test.this.is.not.a.real.extension" 2>/dev/null
+test_fail ./maim "/tmp/should.not.exist.extension" 2>/dev/null
+test_fail ./maim -d notafloat "/tmp/should.not.exist.png" 2>/dev/null
 
 rm ~/test.png
 
