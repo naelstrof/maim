@@ -1,0 +1,2 @@
+# These files are ignored since cmake generates them from cmdline.in
+src/cmdline.h

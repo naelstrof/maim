@@ -1,3 +1,0 @@
-# These files are ignored since cmake generates them from gengetopt.c and gengetopt.h
-src/cmdline.c
-src/cmdline.h

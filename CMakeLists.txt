@@ -35,9 +35,9 @@ endif()
 find_program( GENGETOPT_EXECUTABLE gengetopt
               DOC "A tool to generate code to grab command line options." )
 if ( GENGETOPT_EXECUTABLE )
-    message( "Executing " "${GENGETOPT_EXECUTABLE}" " " "--input=options.ggo" )
+    message( "Executing " "${GENGETOPT_EXECUTABLE}" " " "--input=options.ggo" " " "--header-extension=in" )
     execute_process( COMMAND
-                     "${GENGETOPT_EXECUTABLE}" "--input=options.ggo"
+                     "${GENGETOPT_EXECUTABLE}" "--input=options.ggo" "--header-extension=in"
                      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src" )
 else()
     message( "Command gengetopt not found! Won't regenerate command line code." )
@@ -45,18 +45,8 @@ endif()
 
 # By default our src/options.ggo has our cmake versions variables for
 # the 'version ""' line. We replace them here.
-configure_file( "src/gengetopt.h"
+configure_file( "src/cmdline.in"
                 "src/cmdline.h" )
-# I simply could not get cmake to copy a damned file. So i'll use the cp executable.
-find_program( COPY_EXECUTABLE cp )
-if ( COPY_EXECUTABLE )
-    execute_process( COMMAND
-                     "${COPY_EXECUTABLE}" "gengetopt.c" "cmdline.c"
-                     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src" )
-else()
-    message( FATAL_ERROR "Command cp not found!" )
-endif()
-
 
 # Here we need to make sure our README has the correct version inside of it.
 # We use a simple regex search and replace for it, but it seems really
