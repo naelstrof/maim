@@ -177,7 +177,15 @@ int app( int argc, char** argv ) {
     bool gotGeometry = false;
     bool gotSelectFlag = options.select_flag;
     int x, y, w, h;
-    float delay = atof( options.delay_arg );
+    float delay;
+    err = sscanf( options.delay_arg, "%f", &delay );
+    if ( err != 1 ) {
+        fprintf( stderr, "Failed to parse %s as a float for delay!\n", options.delay_arg );
+        return EXIT_FAILURE;
+    }
+    struct timespec delayTime;
+    delayTime.tv_sec = delay;
+    delayTime.tv_nsec = 0;
     // Get our geometry if we have any.
     if ( options.x_given && options.y_given && options.w_given && options.h_given && !options.geometry_given ) {
         x = options.x_arg;
@@ -256,7 +264,10 @@ int app( int argc, char** argv ) {
             cmdline_parser_free( &options );
             return EXIT_FAILURE;
         }
-        usleep( (unsigned int)(delay * 1000000.f) );
+        err = nanosleep( &delayTime, NULL );
+        if ( err != EXIT_SUCCESS ) {
+            fprintf( stderr, "Warning: Failed to delay the screenshot. Continuing anyway..." );
+        }
         bool mask = checkMask( options.mask_arg, x, y, w, h, window );
         err = imengine->screenshot( file, x, y, w, h, options.hidecursor_flag, window, mask );
         cmdline_parser_free( &options );
@@ -267,7 +278,10 @@ int app( int argc, char** argv ) {
         return EXIT_SUCCESS;
     }
     if ( gotGeometry ) {
-        usleep( (unsigned int)(delay * 1000000.f) );
+        err = nanosleep( &delayTime, NULL );
+        if ( err != EXIT_SUCCESS ) {
+            fprintf( stderr, "Warning: Failed to delay the screenshot. Continuing anyway..." );
+        }
         bool mask = checkMask( options.mask_arg, x, y, w, h, window );
         err = imengine->screenshot( file, x, y, w, h, options.hidecursor_flag, window, mask );
         cmdline_parser_free( &options );
@@ -279,7 +293,10 @@ int app( int argc, char** argv ) {
     }
     // If we didn't get any special options, just screenshot the specified window
     // (Which defaults to the whole screen).
-    usleep( (unsigned int)(delay * 1000000.f) );
+    err = nanosleep( &delayTime, NULL );
+    if ( err != EXIT_SUCCESS ) {
+        fprintf( stderr, "Warning: Failed to delay the screenshot. Continuing anyway..." );
+    }
     bool mask = checkMask( options.mask_arg, 0, 0, WidthOfScreen( xengine->m_screen ), HeightOfScreen( xengine->m_screen ), window );
     err = imengine->screenshot( file, options.hidecursor_flag, window, mask );
     cmdline_parser_free( &options );
