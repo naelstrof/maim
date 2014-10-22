@@ -308,18 +308,16 @@ int app( int argc, char** argv ) {
 }
 
 int main( int argc, char** argv ) {
-    int exitvalue = EXIT_FAILURE;
     try {
-        exitvalue = app( argc, argv );
+        return app( argc, argv );
     } catch( std::bad_alloc const& exception ) {
         fprintf( stderr, "Couldn't allocate enough memory! No space left in RAM." );
-        exit( EXIT_FAILURE );
+        return EXIT_FAILURE;
     } catch( std::exception const& exception ) {
         fprintf( stderr, "Unhandled Exception Thrown: %s\n", exception.what() );
-        exit( EXIT_FAILURE );
+        return EXIT_FAILURE;
     } catch( ... ) {
         fprintf( stderr, "Unknown Exception Thrown!\n" );
-        exit( EXIT_FAILURE );
+        return EXIT_FAILURE;
     }
-    return exitvalue;
 }
