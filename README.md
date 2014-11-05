@@ -61,6 +61,7 @@ In review, maim does one thing and does it well: it takes a screenshot of what y
 ### Install using your Package Manager (preferred)
 
 * [Arch Linux: community/maim](https://www.archlinux.org/packages/community/x86_64/maim/)
+* [FreeBSD: graphics/maim](http://www.freshports.org/graphics/maim/)
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
 
