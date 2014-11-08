@@ -39,7 +39,7 @@ struct gengetopt_args_info
 {
   const char *help_help; /**< @brief Print help and exit help description.  */
   const char *version_help; /**< @brief Print version and exit help description.  */
-  char * xdisplay_arg;	/**< @brief Sets the x display. (default=':0').  */
+  char * xdisplay_arg;	/**< @brief Sets the x display..  */
   char * xdisplay_orig;	/**< @brief Sets the x display. original value given at command line.  */
   const char *xdisplay_help; /**< @brief Sets the x display. help description.  */
   int select_flag;	/**< @brief Enables user region selection. Requires slop to be installed. (default=off).  */

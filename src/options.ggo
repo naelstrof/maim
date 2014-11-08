@@ -12,7 +12,6 @@ text "Options"
 option "xdisplay" - "Sets the x display."
     string
     typestr="hostname:number.screen_number"
-    default=":0"
     optional
 
 option "select" s "Enables user region selection. Requires slop to be installed."

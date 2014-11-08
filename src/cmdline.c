@@ -37,7 +37,7 @@ const char *gengetopt_args_info_help[] = {
   "      --help                    Print help and exit",
   "  -V, --version                 Print version and exit",
   "Options",
-  "      --xdisplay=hostname:number.screen_number\n                                Sets the x display.  (default=`:0')",
+  "      --xdisplay=hostname:number.screen_number\n                                Sets the x display.",
   "  -s, --select                  Enables user region selection. Requires slop to\n                                  be installed.  (default=off)",
   "  -x, --x=INT                   Sets the x coordinate for taking an image",
   "  -y, --y=INT                   Sets the y coordinate for taking an image",
@@ -118,7 +118,7 @@ static
 void clear_args (struct gengetopt_args_info *args_info)
 {
   FIX_UNUSED (args_info);
-  args_info->xdisplay_arg = gengetopt_strdup (":0");
+  args_info->xdisplay_arg = NULL;
   args_info->xdisplay_orig = NULL;
   args_info->select_flag = 0;
   args_info->x_orig = NULL;
@@ -907,7 +907,7 @@ cmdline_parser_internal (
           
             if (update_arg( (void *)&(args_info->xdisplay_arg), 
                  &(args_info->xdisplay_orig), &(args_info->xdisplay_given),
-                &(local_args_info.xdisplay_given), optarg, 0, ":0", ARG_STRING,
+                &(local_args_info.xdisplay_given), optarg, 0, 0, ARG_STRING,
                 check_ambiguity, override, 0, 0,
                 "xdisplay", '-',
                 additional_error))

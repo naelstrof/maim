@@ -100,7 +100,7 @@ scrot in several ways.
   -V, --version                 Print version and exit
 Options
       --xdisplay=hostname:number.screen_number
-                                Sets the x display.  (default=`:0')
+                                Sets the x display.
   -s, --select                  Enables user region selection. Requires slop to
                                   be installed.  (default=off)
   -x, --x=INT                   Sets the x coordinate for taking an image

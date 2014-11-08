@@ -134,7 +134,9 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
     }
     slopcommand << " --min=" << options.min_arg;
     slopcommand << " --max=" << options.max_arg;
-    slopcommand << " --xdisplay=" << options.xdisplay_arg;
+    if ( options.xdisplay_given ) {
+        slopcommand << " --xdisplay=" << options.xdisplay_arg;
+    }
     if ( options.highlight_flag ) {
         slopcommand << " -l";
     }
@@ -176,7 +178,19 @@ int app( int argc, char** argv ) {
         return EXIT_FAILURE;
     }
     // Then set up the x interface.
-    err = xengine->init( options.xdisplay_arg );
+    if ( options.xdisplay_given ) {
+        err = xengine->init( options.xdisplay_arg );
+    } else {
+        // If we weren't specifically given a xdisplay, we try
+        // to parse it from environment variables
+        char* display = getenv( "DISPLAY" );
+        if ( display ) {
+            err = xengine->init( display );
+        } else {
+            fprintf( stderr, "Warning: Failed to parse environment variable: DISPLAY. Using \":0\" instead.\n" );
+            err = xengine->init( ":0" );
+        }
+    }
     if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Failed to grab X display!\n" );
         return EXIT_FAILURE;
