@@ -13,7 +13,7 @@ if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
      "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
      "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     set( CMAKE_CXX_FLAGS
-         "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic-errors" )
+         "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic-errors -Wno-unused-parameter" )
          # -Wall:   Enable all warnings.
          # -Wextra: Enable some more warnings.
          # -Werror: Have errors on warnings.

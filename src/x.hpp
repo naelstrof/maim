@@ -47,6 +47,8 @@ public:
     void                freeCRTCS( std::vector<XRRCrtcInfo*> monitors );
 };
 
+int IgnoreErrorHandler( Display* dpy, XErrorEvent* event );
+
 }
 
 extern maim::XEngine* xengine;

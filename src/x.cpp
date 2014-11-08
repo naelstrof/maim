@@ -49,7 +49,11 @@ int maim::XEngine::init( std::string display ) {
     m_root      = RootWindow     ( m_display, XScreenNumberOfScreen( m_screen ) );
     //m_root      = DefaultRootWindow( m_display );
 
+    XErrorHandler originalHandler = XSetErrorHandler( maim::IgnoreErrorHandler );
+    // We ignore X errors since we don't care if we fail to get
+    // the physical monitor positions.
     m_res = XRRGetScreenResourcesCurrent( m_display, m_root);
+    XSetErrorHandler( originalHandler );
     if ( !m_res ) {
         fprintf( stderr, "Warning: failed to get screen resources. Multi-monitor X screens won't have garbage visual data removed.\n" );
     }
@@ -84,4 +88,8 @@ void maim::XEngine::freeCRTCS( std::vector<XRRCrtcInfo*> monitors ) {
     for ( unsigned int i=0;i<monitors.size();i++ ) {
         XRRFreeCrtcInfo( monitors[ i ] );
     }
+}
+
+int maim::IgnoreErrorHandler( Display* dpy, XErrorEvent* event ) {
+    return EXIT_SUCCESS;
 }
