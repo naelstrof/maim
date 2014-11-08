@@ -88,17 +88,15 @@ bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
     int sh = HeightOfScreen( xengine->m_screen );
     if ( type == "auto" ) {
         // First we check if there's even any offscreen pixels
+        int monitorArea = 0;
         std::vector<XRRCrtcInfo*> monitors = xengine->getCRTCS();
-        int checkw = 0;
-        int checkh = 0;
         for ( unsigned int i = 0;i<monitors.size();i++ ) {
             XRRCrtcInfo* cmonitor = monitors[ i ];
-            checkw += cmonitor->width;
-            checkh += cmonitor->height;
+            monitorArea += cmonitor->height * cmonitor->width;
         }
         xengine->freeCRTCS( monitors );
         // If our monitors cover the entire screen, masking won't do anything anyway.
-        if ( checkw >= sw && checkh >= sh ) {
+        if ( monitorArea >= sw * sh ) {
             return false;
         }
         // If we specified an actual window we certainly don't want to mask anything.
