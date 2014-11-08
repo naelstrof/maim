@@ -136,6 +136,7 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
     }
     slopcommand << " --min=" << options.min_arg;
     slopcommand << " --max=" << options.max_arg;
+    slopcommand << " --xdisplay=" << options.xdisplay_arg;
     if ( options.highlight_flag ) {
         slopcommand << " -l";
     }
