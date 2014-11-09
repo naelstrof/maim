@@ -93,7 +93,8 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
         }
     }
     // Here we generate a mask to make sure we only get the pixels on-screen.
-    if ( mask ) {
+    // Make sure that we have the screen resources available as well
+    if ( mask && xengine->m_res ) {
         // So first we generate an image of the same exact size filled with the color 0,0,0,0
         Imlib_Image mask = imlib_create_image( w, h );
         imlib_context_set_image( mask );

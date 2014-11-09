@@ -55,7 +55,7 @@ int maim::XEngine::init( std::string display ) {
     m_res = XRRGetScreenResourcesCurrent( m_display, m_root);
     XSetErrorHandler( originalHandler );
     if ( !m_res ) {
-        fprintf( stderr, "Warning: failed to get screen resources. Multi-monitor X screens won't have garbage visual data removed.\n" );
+        fprintf( stderr, "Warning: Failed to get screen resources. Multi-monitor X screens won't have garbage visual data removed.\n" );
     }
 
     m_good = true;
