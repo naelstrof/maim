@@ -58,34 +58,39 @@ int maim::IMEngine::screenshot( std::string file, int x, int y, int w, int h, bo
     if ( !hidecursor ) {
         // Grab the cursor image with XFixes
         XFixesCursorImage* xcursor = XFixesGetCursorImage( xengine->m_display );
-        // For whatever reason, XFixes returns 32 bit ARGB colors with 64 bit longs?
-        // I'm guessing this is because some old AMD cpu's longs are actually 32 bits.
-        // Regardless this is how I convert it to the correct bit length.
-        unsigned int* pixels = new unsigned int[ xcursor->width * xcursor->height ];
-        for ( int i=0;i<xcursor->width*xcursor->height;i++ ) {
-            pixels[ i ] = (unsigned int)xcursor->pixels[ i ];
+        // If we failed don't do anything.
+        if ( xcursor ) {
+            // For whatever reason, XFixes returns 32 bit ARGB colors with 64 bit longs?
+            // I'm guessing this is because some old AMD cpu's longs are actually 32 bits.
+            // Regardless this is how I convert it to the correct bit length.
+            unsigned int* pixels = new unsigned int[ xcursor->width * xcursor->height ];
+            for ( int i=0;i<xcursor->width*xcursor->height;i++ ) {
+                pixels[ i ] = (unsigned int)xcursor->pixels[ i ];
+            }
+            Imlib_Image cursor = imlib_create_image_using_data( xcursor->width, xcursor->height, pixels );
+            // Make sure imlib knows that it has alpha
+            imlib_context_set_image( cursor );
+            imlib_image_set_has_alpha( 1 );
+            imlib_context_set_image( buffer );
+            // We grab the window's position with this, so we can find where the cursor would be located on our image.
+            Window root, junk;
+            int tx, ty;
+            unsigned int tw, th, tb, td;
+            XGetGeometry( xengine->m_display, id, &root,
+                          &tx, &ty, &tw, &th, &tb, &td );
+            // Make sure the window's position is in root coordinates
+            XTranslateCoordinates( xengine->m_display, id, root, -tb, -tb, &tx, &ty, &junk );
+            // Finally blend the cursor to the screenshot, we don't have to worry about the cursor not being visible as it would be a non-existant image if it was.
+            imlib_blend_image_onto_image( cursor, 0, 0, 0, xcursor->width, xcursor->height, xcursor->x-tx-xcursor->xhot-x, xcursor->y-ty-xcursor->yhot-y, xcursor->width, xcursor->height );
+            // Free the cursor image and delete its data.
+            imlib_context_set_image( cursor );
+            imlib_free_image();
+            imlib_context_set_image( buffer );
+            free( xcursor );
+            delete[] pixels;
+        } else {
+            fprintf( stderr, "Warning: Failed to grab cursor image, it won't appear in screenshots!\n" );
         }
-        Imlib_Image cursor = imlib_create_image_using_data( xcursor->width, xcursor->height, pixels );
-        // Make sure imlib knows that it has alpha
-        imlib_context_set_image( cursor );
-        imlib_image_set_has_alpha( 1 );
-        imlib_context_set_image( buffer );
-        // We grab the window's position with this, so we can find where the cursor would be located on our image.
-        Window root, junk;
-        int tx, ty;
-        unsigned int tw, th, tb, td;
-        XGetGeometry( xengine->m_display, id, &root,
-                      &tx, &ty, &tw, &th, &tb, &td );
-        // Make sure the window's position is in root coordinates
-        XTranslateCoordinates( xengine->m_display, id, root, -tb, -tb, &tx, &ty, &junk );
-        // Finally blend the cursor to the screenshot, we don't have to worry about the cursor not being visible as it would be a non-existant image if it was.
-        imlib_blend_image_onto_image( cursor, 0, 0, 0, xcursor->width, xcursor->height, xcursor->x-tx-xcursor->xhot-x, xcursor->y-ty-xcursor->yhot-y, xcursor->width, xcursor->height );
-        // Free the cursor image and delete its data.
-        imlib_context_set_image( cursor );
-        imlib_free_image();
-        imlib_context_set_image( buffer );
-        free( xcursor );
-        delete[] pixels;
     }
     // Here we generate a mask to make sure we only get the pixels on-screen.
     if ( mask ) {
