@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.8 )
 project( "maim" )
 set( maim_VERSION_MAJOR 2 )
 set( maim_VERSION_MINOR 3 )
-set( maim_VERSION_PATCH 34 )
+set( maim_VERSION_PATCH 35 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
 set( CMAKE_INSTALL_PREFIX "/usr/bin" )
@@ -17,6 +17,8 @@ if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
          # -Wall:   Enable all warnings.
          # -Wextra: Enable some more warnings.
          # -Werror: Have errors on warnings.
+         # -Wno-unused-parameter: Don't error on unused parameters, required since we have function hooks
+         #                        that have unused parameters.
 else()
     message( FATAL_ERROR "Your operating system isn't supported yet! CMake will now exit." )
 endif()
@@ -34,17 +36,13 @@ endif()
 # so nobody has to go find and install gengetopt if they don't want to.
 find_program( GENGETOPT_EXECUTABLE gengetopt
               DOC "A tool to generate code to grab command line options." )
-find_program( COPY_EXECUTABLE cp )
-if ( GENGETOPT_EXECUTABLE AND COPY_EXECUTABLE )
-    message( "Executing " "${GENGETOPT_EXECUTABLE}" " " "--input=options.ggo" )
-    execute_process( COMMAND
-                     "${GENGETOPT_EXECUTABLE}" "--input=options.ggo"
+if ( GENGETOPT_EXECUTABLE )
+    message( "-- Regenerating cmdline.in" )
+    execute_process( COMMAND "${GENGETOPT_EXECUTABLE}" "--input=options.ggo"
                      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src" )
-    execute_process( COMMAND
-                     "${COPY_EXECUTABLE}" "cmdline.h" "cmdline.in"
-                     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src" )
+    file( RENAME "${CMAKE_SOURCE_DIR}/src/cmdline.h" "${CMAKE_SOURCE_DIR}/src/cmdline.in" )
 else()
-    message( "Command gengetopt not found! Won't regenerate command line code." )
+    message( "Warning: Command gengetopt not found! Won't regenerate command line code. (If you're just compiling this doesn't matter.)" )
 endif()
 
 # By default our src/options.ggo has our cmake versions variables for
@@ -52,19 +50,11 @@ endif()
 configure_file( "src/cmdline.in"
                 "src/cmdline.h" )
 
-# Here we need to make sure our README has the correct version inside of it.
-# We use a simple regex search and replace for it, but it seems really
-# hard because cmake is silly.
-# I think this is better than using configure_file since README.md needs
-# to exist within github, rather than as an input file with a different
-# name or extension.
-message( "Replacing version in readme..." )
-set( SEARCH_REGEX "maim v([0-9]+)\\.([0-9]+)\\.([0-9]+)" )
-set( REPLACE_TEXT "maim v${maim_VERSION_MAJOR}.${maim_VERSION_MINOR}.${maim_VERSION_PATCH}" )
-file( READ "${CMAKE_CURRENT_SOURCE_DIR}/README.md" FILE_CONTENT )
-string( REGEX REPLACE "${SEARCH_REGEX}" "${REPLACE_TEXT}"
-        MODIFIED_FILE_CONTENT "${FILE_CONTENT}" )
-file( WRITE "${CMAKE_CURRENT_SOURCE_DIR}/README.md" "${MODIFIED_FILE_CONTENT}" )
+# This allows for "make README.md" to be ran to update the README's help
+# section automatically. We don't add it to ALL because running arbitrary
+# scripts is unsafe and I don't know if systems will actually have it
+# be executbable.
+add_custom_target( README.md "./generateReadme.sh" DEPENDS "maim" )
 
 # Sources
 set( source
