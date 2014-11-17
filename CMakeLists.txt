@@ -3,22 +3,30 @@ cmake_minimum_required( VERSION 2.8 )
 project( "maim" )
 set( maim_VERSION_MAJOR 2 )
 set( maim_VERSION_MINOR 3 )
-set( maim_VERSION_PATCH 35 )
+set( maim_VERSION_PATCH 36 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
 set( CMAKE_INSTALL_PREFIX "/usr/bin" )
+
+if( NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE )
+   set( CMAKE_BUILD_TYPE RelWithDebInfo )
+endif()
 
 # Linux compiler initialization.
 if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
      "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
      "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
-    set( CMAKE_CXX_FLAGS
-         "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic-errors -Wno-unused-parameter" )
+    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-parameter" )
+    set( CMAKE_CXX_FLAGS_DEBUG "-Wextra -pedantic-errors -O0 -g" )
+    set( CMAKE_CXX_FLAGS_RELEASE "-O2" )
+    set( CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" )
          # -Wall:   Enable all warnings.
          # -Wextra: Enable some more warnings.
          # -Werror: Have errors on warnings.
+         # -pedantic-errors: Even more errors.
          # -Wno-unused-parameter: Don't error on unused parameters, required since we have function hooks
          #                        that have unused parameters.
+         # -O#: Optimization level
 else()
     message( FATAL_ERROR "Your operating system isn't supported yet! CMake will now exit." )
 endif()
@@ -47,8 +55,8 @@ endif()
 
 # By default our src/options.ggo has our cmake versions variables for
 # the 'version ""' line. We replace them here.
-configure_file( "src/cmdline.in"
-                "src/cmdline.h" )
+# The ${CMAKE_SOURCE_DIR} is there to fix problems with OpenBSD's out-of-source build black magic.
+configure_file( "src/cmdline.in" "${CMAKE_SOURCE_DIR}/src/cmdline.h" )
 
 # This allows for "make README.md" to be ran to update the README's help
 # section automatically. We don't add it to ALL because running arbitrary

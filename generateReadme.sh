@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # generateReadme.sh: Regenerates the help section of the README.md using output from ./maim --help.
 
 # Remove help section
