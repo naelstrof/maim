@@ -296,8 +296,18 @@ int app( int argc, char** argv ) {
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Warning: Failed to delay the screenshot. Continuing anyway..." );
         }
-        bool mask = checkMask( options.mask_arg, x, y, w, h, window );
-        err = imengine->screenshot( file, x, y, w, h, options.hidecursor_flag, window, mask );
+        err = imengine->screenshot( window, x, y, w, h );
+        if ( err != EXIT_SUCCESS ) {
+            fprintf( stderr, "Failed to take screenshot.\n" );
+            return EXIT_FAILURE;
+        }
+        if ( !options.hidecursor_flag ) {
+            imengine->blendCursor( window, x, y );
+        }
+        if ( checkMask( options.mask_arg, x, y, w, h, window ) ) {
+            imengine->mask( x, y, w, h );
+        }
+        err = imengine->save( file );
         cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
@@ -310,8 +320,18 @@ int app( int argc, char** argv ) {
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Warning: Failed to delay the screenshot. Continuing anyway..." );
         }
-        bool mask = checkMask( options.mask_arg, x, y, w, h, window );
-        err = imengine->screenshot( file, x, y, w, h, options.hidecursor_flag, window, mask );
+        err = imengine->screenshot( window, x, y, w, h );
+        if ( err != EXIT_SUCCESS ) {
+            fprintf( stderr, "Failed to take screenshot.\n" );
+            return EXIT_FAILURE;
+        }
+        if ( !options.hidecursor_flag ) {
+            imengine->blendCursor( window, x, y );
+        }
+        if ( checkMask( options.mask_arg, x, y, w, h, window ) ) {
+            imengine->mask( x, y, w, h );
+        }
+        err = imengine->save( file );
         cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
@@ -325,8 +345,18 @@ int app( int argc, char** argv ) {
     if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Warning: Failed to delay the screenshot. Continuing anyway..." );
     }
-    bool mask = checkMask( options.mask_arg, 0, 0, WidthOfScreen( xengine->m_screen ), HeightOfScreen( xengine->m_screen ), window );
-    err = imengine->screenshot( file, options.hidecursor_flag, window, mask );
+    err = imengine->screenshot( window );
+    if ( err != EXIT_SUCCESS ) {
+        fprintf( stderr, "Failed to take screenshot.\n" );
+        return EXIT_FAILURE;
+    }
+    if ( !options.hidecursor_flag ) {
+        imengine->blendCursor( window );
+    }
+    if ( checkMask( options.mask_arg, 0, 0, WidthOfScreen( xengine->m_screen ), HeightOfScreen( xengine->m_screen ), window ) ) {
+        imengine->mask();
+    }
+    err = imengine->save( file );
     cmdline_parser_free( &options );
     if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Failed to take screenshot.\n" );

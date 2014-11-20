@@ -26,6 +26,7 @@
 #include <X11/extensions/Xrandr.h>
 #include <vector>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "x.hpp"
 
@@ -36,10 +37,12 @@ public:
                         IMEngine();
                         ~IMEngine();
     int                 init();
-    int                 screenshot( std::string file, int x, int y, int w, int h, bool hidecursor, Window id, bool mask );
-    int                 screenshot( std::string file, bool hidecursor, Window id, bool mask );
+    int                 screenshot( Window id, int x, int y, unsigned int w, unsigned int h );
+    int                 screenshot( Window id );
+    int                 blendCursor( Window id, int x = 0, int y = 0 );
+    int                 mask( int x = 0, int y = 0, unsigned int w = 0, unsigned int h = 0 );
+    int                 save( std::string filename );
 private:
-    void                blendCursor();
 };
 
 }

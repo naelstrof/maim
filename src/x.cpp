@@ -49,9 +49,9 @@ int maim::XEngine::init( std::string display ) {
     m_root      = RootWindow     ( m_display, XScreenNumberOfScreen( m_screen ) );
     //m_root      = DefaultRootWindow( m_display );
 
-    XErrorHandler originalHandler = XSetErrorHandler( maim::IgnoreErrorHandler );
     // We ignore X errors since we don't care if we fail to get
     // the physical monitor positions.
+    XErrorHandler originalHandler = XSetErrorHandler( maim::IgnoreErrorHandler );
     m_res = XRRGetScreenResourcesCurrent( m_display, m_root);
     XSetErrorHandler( originalHandler );
     if ( !m_res ) {
