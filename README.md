@@ -84,7 +84,7 @@ help
 ----
 Join us on irc at freenode in *#maim*.
 ```text
-maim v2.3.38
+maim v3.3.39
 
 Copyright (C) 2014 Dalton Nell, Maim Contributors
 (https://github.com/naelstrof/maim/graphs/contributors)
