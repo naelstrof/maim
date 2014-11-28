@@ -72,7 +72,9 @@ int maim::IMEngine::screenshot( Window id ) {
     // prevents blending issues in the future.
     imlib_image_set_has_alpha( 1 );
     imlib_context_set_drawable( id );
-    imlib_copy_drawable_to_image( 0, x, y, w, h, 0, 0, 0 );
+    int destinationx = x < 0 ? -x : 0;
+    int destinationy = y < 0 ? -y : 0;
+    imlib_copy_drawable_to_image( 0, destinationx, destinationy, w, h, 0, 0, 0 );
     // Screenshot image is now in the imlib context!
     return EXIT_SUCCESS;
 }
