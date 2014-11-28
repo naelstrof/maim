@@ -3,10 +3,12 @@ cmake_minimum_required( VERSION 2.8 )
 project( "maim" )
 set( maim_VERSION_MAJOR 2 )
 set( maim_VERSION_MINOR 3 )
-set( maim_VERSION_PATCH 38 )
+set( maim_VERSION_PATCH 39 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
-set( CMAKE_INSTALL_PREFIX "/usr/bin" )
+if( NOT CMAKE_INSTALL_PREFIX )
+   set( CMAKE_INSTALL_PREFIX "/usr" )
+endif()
 
 if( NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE )
    set( CMAKE_BUILD_TYPE RelWithDebInfo )
@@ -98,4 +100,4 @@ target_link_libraries( "${BIN_TARGET}"
                        "${XFIXES_LIBRARY}" )
 
 install( TARGETS "${BIN_TARGET}"
-         DESTINATION  "${CMAKE_INSTALL_PREFIX}" )
+         DESTINATION  "${CMAKE_INSTALL_PREFIX}/bin" )
