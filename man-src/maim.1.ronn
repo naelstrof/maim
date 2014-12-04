@@ -91,19 +91,17 @@ scrot in several ways.
     Instead of outlining selections, slop highlights it. This is only useful when `--color` is set to a transparent color. (default=off)
 
 ## EXAMPLES
-
-  Screenshot the active window
+Screenshot the active window
 
     $ maim -i $(xdotool getactivewindow)
 
-  Prompt a transparent red selection to screenshot.
+Prompt a transparent red selection to screenshot.
 
     $ maim -s -c 1,0,0,0.6
 
-  Save a dated screenshot.
+Save a dated screenshot.
 
     $ maim ~/$(date +%F-%T).png
-
 ## COPYRIGHT
 
-Maim is Copyright (C) 2014 Dalton Nell `<naelstrof@gmail.com>` and Maim Contributors `<http://github.com/naelstrof/maim/graphs/contributors>`
+Copyright (C) 2014 Dalton Nell `<naelstrof@gmail.com>`, Maim Contributors `<http://github.com/naelstrof/maim/graphs/contributors>`.
