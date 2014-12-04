@@ -3,15 +3,22 @@ cmake_minimum_required( VERSION 2.8 )
 project( "maim" )
 set( maim_VERSION_MAJOR 3 )
 set( maim_VERSION_MINOR 3 )
-set( maim_VERSION_PATCH 40 )
+set( maim_VERSION_PATCH 41 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
-if( NOT CMAKE_INSTALL_PREFIX )
-   set( CMAKE_INSTALL_PREFIX "/usr" )
+
+if ( NOT CMAKE_INSTALL_PREFIX )
+    set( CMAKE_INSTALL_PREFIX "/usr" )
 endif()
 
-if ( NOT CMAKE_INSTALL_MANDIR )
-    set( CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_PREFIX}/share/man" )
+set( CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_PREFIX}/share/man" CACHE PATH "Directory where man pages reside. (/usr/share/man, /usr/local/share/man, etc.)" )
+
+set( CMAKE_COMPRESS_MAN TRUE CACHE BOOL "Whether or not to compress the man pages for install." )
+
+if ( CMAKE_COMPRESS_MAN )
+    set( MANTARGET "man-src/maim.1.gz" )
+else()
+    set( MANTARGET "man-src/maim.1" )
 endif()
 
 if( NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE )
@@ -54,7 +61,7 @@ find_program( GZIP_EXECUTABLE gzip
 if ( RONN_EXECUTABLE AND GZIP_EXECUTABLE )
     add_custom_target( "man"
                        COMMAND "${RONN_EXECUTABLE}" "-r" "maim.1.ronn"
-                       COMMAND "${GZIP_EXECUTABLE}" "maim.1"
+                       COMMAND "${GZIP_EXECUTABLE}" "-k" "maim.1"
                        WORKING_DIRECTORY man-src VERBATIM )
 endif()
 
@@ -118,6 +125,6 @@ target_link_libraries( "${BIN_TARGET}"
 install( TARGETS "${BIN_TARGET}"
          DESTINATION  "${CMAKE_INSTALL_PREFIX}/bin" )
 
-install( FILES "${CMAKE_SOURCE_DIR}/man-src/maim.1.gz"
+install( FILES "${CMAKE_SOURCE_DIR}/${MANTARGET}"
          DESTINATION  "${CMAKE_INSTALL_MANDIR}/man1"
          COMPONENT doc )
