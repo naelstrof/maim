@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.8 )
 project( "maim" )
 set( maim_VERSION_MAJOR 3 )
 set( maim_VERSION_MINOR 3 )
-set( maim_VERSION_PATCH 39 )
+set( maim_VERSION_PATCH 40 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
 if( NOT CMAKE_INSTALL_PREFIX )
@@ -11,7 +11,7 @@ if( NOT CMAKE_INSTALL_PREFIX )
 endif()
 
 if ( NOT CMAKE_INSTALL_MANDIR )
-    set( CMAKE_INSTALL_MANDIR "/usr/share/man" )
+    set( CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_PREFIX}/share/man" )
 endif()
 
 if( NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE )
