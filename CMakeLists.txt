@@ -10,6 +10,10 @@ if( NOT CMAKE_INSTALL_PREFIX )
    set( CMAKE_INSTALL_PREFIX "/usr" )
 endif()
 
+if ( NOT CMAKE_INSTALL_MANDIR )
+    set( CMAKE_INSTALL_MANDIR "/usr/share/man" )
+endif()
+
 if( NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE )
    set( CMAKE_BUILD_TYPE RelWithDebInfo )
 endif()
@@ -40,6 +44,18 @@ if ( CPPCHECK_EXECUTABLE )
     add_custom_target( "check"
                        COMMAND "${CPPCHECK_EXECUTABLE}" "--enable=all" "*"
                        WORKING_DIRECTORY src VERBATIM )
+endif()
+
+# Add our manpage generator if possible. Not needed as we include the man pages by default.
+find_program( RONN_EXECUTABLE ronn
+              DOC "A tool for generating our manpages." )
+find_program( GZIP_EXECUTABLE gzip
+              DOC "A tool for generating our manpages." )
+if ( RONN_EXECUTABLE AND GZIP_EXECUTABLE )
+    add_custom_target( "man"
+                       COMMAND "${RONN_EXECUTABLE}" "-r" "maim.1.ronn"
+                       COMMAND "${GZIP_EXECUTABLE}" "maim.1"
+                       WORKING_DIRECTORY man-src VERBATIM )
 endif()
 
 # Here we generate some of our code if we can. I package it pre-generated
@@ -101,3 +117,7 @@ target_link_libraries( "${BIN_TARGET}"
 
 install( TARGETS "${BIN_TARGET}"
          DESTINATION  "${CMAKE_INSTALL_PREFIX}/bin" )
+
+install( FILES "${CMAKE_SOURCE_DIR}/man-src/maim.1.gz"
+         DESTINATION  "${CMAKE_INSTALL_MANDIR}/man1"
+         COMPONENT doc )
