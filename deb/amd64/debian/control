@@ -1,0 +1,12 @@
+Package: maim
+Version: 3.3.39
+Architecture: amd64
+Maintainer: Carla Souza <contact@carlasouza.com>
+Installed-Size: 324
+Section: graphics
+Priority: optional
+Homepage: http://github.com/naelstrof/maim
+Description: maim (make image) takes screenshots of your desktop
+ maim (Make Image) is a utility that takes screenshots of
+ your desktop using imlib2. It's meant to overcome shortcomings
+ of scrot and performs better in several ways.

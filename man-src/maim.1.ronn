@@ -1,0 +1,107 @@
+maim(1) -- Takes screenshots
+============================
+
+## SYNOPSIS
+
+`maim` [options] [file]
+
+## DESCRIPTION
+
+maim (MAke IMage) is a utility that takes screenshots of your desktop using
+imlib2. It's meant to overcome shortcomings of scrot and performs better than
+scrot in several ways.
+
+## OPTIONS
+
+  * `--help`:
+    Print help and exit
+
+  * `-V`, `--version`:
+    Print version and exit
+
+### Options
+
+  * `--xdisplay=hostname:number.screen_number`:
+    Sets the x display.
+
+  * `-s`, `--select`:
+    Enables user region selection. Requires slop to
+    be installed.  (default=off)
+
+  * `-x`, `--x=INT`:
+    Sets the x coordinate for taking an image
+
+  * `-y`, `--y=INT`:
+    Sets the y coordinate for taking an image
+
+  * `-w`, `--w=INT`:
+    Sets the width for taking an image
+
+  * `-h`, `--h=INT`:
+    Sets the height for taking an image
+
+  * `-g`, `--geometry=WxH+X+Y`:
+    Set the region to capture
+
+  * `-d`, `--delay=FLOAT`:
+    Set the amount of time to wait before taking an image. (default=`0.0')
+
+  * `-i`, `--windowid=INT`:
+    Set the window to capture. Defaults to the root window id.
+
+  * `--localize`:
+    Localizes given geometry to the given window. So `maim -i $ID -g 100x100+0+0 --localize` would screenshot the top-left 100x100 pixels of the given window, rather than the top-left 100x100 pixels of the root window. (default=off)
+
+  * `--hidecursor`:
+    Prevents the system cursor from showing up in screenshots.  (default=off)
+
+  * `-m`, `--mask=STRING`:
+    Masks off-screen pixels so they don't show up in screenshots.  (possible values="auto", "off", "on" default=`auto')
+
+### SLOP OPTIONS
+
+  * `--nokeyboard`:
+    Disables the ability to cancel selections with the keyboard.  (default=off)
+
+  * `-b`, `--bordersize=INT`:
+    Set the selection rectangle's thickness. Does nothing when `--highlight` is enabled. (default=`5')
+
+  * `-p`, `--padding=INT`:
+    Set the padding size of the selection. Can be negative.  (default=`0')
+
+  * `-t`, `--tolerance=INT`:
+    How far in pixels the mouse can move after clicking and still be detected as a normal click instead of a click and drag. Setting this to 0 will disable window selections. (default=`2')
+
+  * `--gracetime=FLOAT`:
+    Set the amount of time before slop will check for keyboard cancellations in seconds. (default=`0.4')
+
+  * `-c`, `--color=FLOAT,FLOAT,FLOAT,FLOAT`:
+    Set the selection rectangle's color. Supports RGB or RGBA values. (default=`0.5,0.5,0.5,1')
+
+  * `-n`, `--nodecorations`:
+    Attempt to select child windows in order to avoid window decorations.  (default=off)
+
+  * `--min=INT`:
+    Set the minimum output of width or height values. This is useful to avoid outputting 0. Setting min and max to the same value disables drag selections.  (default=`0')
+
+  * `--max=INT`:
+    Set the maximum output of width or height values. Setting min and max to the same value disables drag selections.  (default=`0')
+
+  * `-l`, `--highlight`:
+    Instead of outlining selections, slop highlights it. This is only useful when `--color` is set to a transparent color. (default=off)
+
+## EXAMPLES
+Screenshot the active window
+
+    $ maim -i $(xdotool getactivewindow)
+
+Prompt a transparent red selection to screenshot.
+
+    $ maim -s -c 1,0,0,0.6
+
+Save a dated screenshot.
+
+    $ maim ~/$(date +%F-%T).png
+## COPYRIGHT
+
+Copyright (C) 2014 Dalton Nell `<naelstrof@gmail.com>`, Maim Contributors `<http://github.com/naelstrof/maim/graphs/contributors>`.
