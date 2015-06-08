@@ -26,6 +26,7 @@ maim::XEngine::XEngine() {
     m_display = NULL;
     m_visual = NULL;
     m_screen = NULL;
+    m_res = NULL;
     m_good = false;
 }
 
