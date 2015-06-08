@@ -60,23 +60,13 @@ int maim::IMEngine::screenshot( Window id ) {
     Window root;
     int x, y;
     unsigned int w, h, b, d;
-    int status = XGetGeometry( xengine->m_display, id, &root, &x, &y, &w, &h, &b, &d );
+    const int status = XGetGeometry( xengine->m_display, id, &root, &x, &y, &w, &h, &b, &d );
     if ( status == 0 ) {
         fprintf( stderr, "Error: Failed to grab window geometry of window id: %lu\n", id );
         return EXIT_FAILURE;
     }
-    // Create an uninitialized image buffer of the same width and height as the window
-    Imlib_Image buffer = imlib_create_image( w, h );
-    imlib_context_set_image( buffer );
-    // Make sure that imlib knows that it's possible for the image to have alpha
-    // prevents blending issues in the future.
-    imlib_image_set_has_alpha( 1 );
-    imlib_context_set_drawable( id );
-    int destinationx = x < 0 ? -x : 0;
-    int destinationy = y < 0 ? -y : 0;
-    imlib_copy_drawable_to_image( 0, destinationx, destinationy, w, h, 0, 0, 0 );
-    // Screenshot image is now in the imlib context!
-    return EXIT_SUCCESS;
+
+    return screenshot (id, x, y, w, h);
 }
 
 /**
@@ -106,8 +96,8 @@ int maim::IMEngine::screenshot( Window id, int x, int y, unsigned int w, unsigne
     // of the drawable. Since asking for it to copy from a negative
     // x or y position doesn't seem to do anything.
     // Might be a bug, but if it's fixed it'll break my program as it is now. :v
-    int destinationx = x < 0 ? -x : 0;
-    int destinationy = y < 0 ? -y : 0;
+    const int destinationx = x < 0 ? -x : 0;
+    const int destinationy = y < 0 ? -y : 0;
     imlib_copy_drawable_to_image( 0, x, y, w, h, destinationx, destinationy, 0 );
     // Screenshot image is now in the imlib context!
     return EXIT_SUCCESS;
