@@ -34,6 +34,11 @@ maim::XEngine::~XEngine() {
     if ( !m_good ) {
         return;
     }
+
+    if ( m_res ) {
+        XRRFreeScreenResources( m_res );
+    }
+
     XCloseDisplay( m_display );
 }
 
