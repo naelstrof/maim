@@ -299,6 +299,7 @@ int app( int argc, char** argv ) {
                 if ( home_env == NULL ) {
                     fprintf( stderr, "Failed to get HOME environment variable, no where left to save!" );
                     cmdline_parser_free( &options );
+                    delete [] currentdir;
                     return EXIT_FAILURE;
                 }
             }
