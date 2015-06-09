@@ -266,6 +266,7 @@ int app( int argc, char** argv ) {
             if ( trycount > 3 ) {
                 fprintf( stderr, "Failed to grab the current directory!" );
                 cmdline_parser_free( &options );
+                delete [] currentdir;
                 return EXIT_FAILURE;
             }
         }
