@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/param.h>
+#include <sys/stat.h>
 #include <pwd.h>
 #include <string>
 #include <sstream>
@@ -170,6 +171,32 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
     return EXIT_SUCCESS;
 }
 
+
+//TODO: good english error message
+int is_valid_directory ( const char * dirname ) {
+
+    //assert ( dirname != NULL);
+
+    struct stat st;
+
+    if ( stat( dirname, &st ) == -1 ) {
+       fprintf( stderr, "Failed 'stat' process.\n");
+       return EXIT_FAILURE;
+    }
+
+    if ( ! S_ISDIR( st.st_mode ) ) {
+        fprintf( stderr, "Failed to save in the directory '%s': it's not a directory.\n", dirname);
+        return EXIT_FAILURE;
+    }
+
+    if ( st.st_uid != getuid() || ! (st.st_mode & S_IWUSR) ) {
+         fprintf( stderr, "Failed to save in the directory '%s': permission denied\n", dirname);
+         return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
 int app( int argc, char** argv ) {
     // First parse any options and the filename we need.
     gengetopt_args_info options;
@@ -252,9 +279,11 @@ int app( int argc, char** argv ) {
     if ( options.inputs_num == 0 ) {
         // Try as hard as we can to get the current directory.
         int trycount = 0;
+        char* home_env = getenv("HOME");
         int length = MAXPATHLEN;
         char* currentdir = new char[ length ];
         char* error = getcwd( currentdir, length );
+
         while ( error == NULL ) {
             delete[] currentdir;
             length *= 2;
@@ -265,11 +294,23 @@ int app( int argc, char** argv ) {
             // the max path length.
             if ( trycount > 3 ) {
                 fprintf( stderr, "Failed to grab the current directory!" );
-                cmdline_parser_free( &options );
-                return EXIT_FAILURE;
+
+                // Try to HOME later
+                if ( home_env == NULL ) {
+                    fprintf( stderr, "Failed to get HOME variable environment!" );
+                    cmdline_parser_free( &options );
+                    return EXIT_FAILURE;
+                }
             }
         }
-        file = currentdir;
+
+        if ( is_valid_directory ( currentdir ) == EXIT_SUCCESS )
+        {
+          file = currentdir;
+        } else {
+          file = home_env;
+        }
+
         // Get unix timestamp
         std::stringstream result;
         result << (int)time( NULL );
