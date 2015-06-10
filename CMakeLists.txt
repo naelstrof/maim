@@ -30,7 +30,7 @@ if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
      "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
      "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-unused-parameter" )
-    set( CMAKE_CXX_FLAGS_DEBUG "-Wextra -pedantic-errors -O0 -g" )
+    set( CMAKE_CXX_FLAGS_DEBUG "-Wextra -pedantic -O0 -g" )
     set( CMAKE_CXX_FLAGS_RELEASE "-O2" )
     set( CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g" )
          # -Wall:   Enable all warnings.
