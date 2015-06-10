@@ -257,8 +257,8 @@ int maim::IMEngine::mask( int x, int y, unsigned int w, unsigned int h ) {
 int maim::IMEngine::save( std::string file ) {
     Imlib_Load_Error err;
     imlib_save_image_with_error_return( file.c_str(), &err );
+    imlib_free_image();
     if ( err == IMLIB_LOAD_ERROR_NONE ) {
-        imlib_free_image();
         return EXIT_SUCCESS;
     }
     fprintf( stderr, "Failed to save image %s: ", file.c_str() );
@@ -310,6 +310,5 @@ int maim::IMEngine::save( std::string file ) {
             break;
         }
     }
-    imlib_free_image();
     return EXIT_FAILURE;
 }
