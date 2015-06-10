@@ -26,6 +26,7 @@ maim::XEngine::XEngine() {
     m_display = NULL;
     m_visual = NULL;
     m_screen = NULL;
+    m_res = NULL;
     m_good = false;
 }
 
@@ -33,6 +34,11 @@ maim::XEngine::~XEngine() {
     if ( !m_good ) {
         return;
     }
+
+    if ( m_res ) {
+        XRRFreeScreenResources( m_res );
+    }
+
     XCloseDisplay( m_display );
 }
 

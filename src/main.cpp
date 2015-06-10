@@ -266,6 +266,7 @@ int app( int argc, char** argv ) {
             if ( trycount > 3 ) {
                 fprintf( stderr, "Failed to grab the current directory!" );
                 cmdline_parser_free( &options );
+                delete [] currentdir;
                 return EXIT_FAILURE;
             }
         }
@@ -275,7 +276,7 @@ int app( int argc, char** argv ) {
         result << (int)time( NULL );
         file += "/" + result.str() + ".png";
         printf( "No file specified, using %s\n", file.c_str() );
-        free( currentdir );
+        delete [] currentdir;
     } else if ( options.inputs_num == 1 ) {
         file = options.inputs[ 0 ];
     } else {

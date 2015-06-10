@@ -141,8 +141,10 @@ int maim::IMEngine::blendCursor( Window id, int x, int y ) {
     // For whatever reason, XFixes returns 32 bit ARGB colors with 64 bit longs?
     // I'm guessing this is because some old AMD cpu's longs are actually 32 bits.
     // Regardless this is how I convert it to the correct bit length.
-    uint32_t* pixels = new uint32_t[ xcursor->width * xcursor->height ];
-    for ( int i=0;i<xcursor->width*xcursor->height;i++ ) {
+    const size_t size_px = xcursor->width * xcursor->height;
+    DATA32 pixels [ size_px ] = { 0x0 };
+
+    for ( unsigned int i=0;i<size_px;i++ ) {
         pixels[ i ] = (uint32_t)xcursor->pixels[ i ];
     }
     Imlib_Image cursor = imlib_create_image_using_data( xcursor->width, xcursor->height, pixels );
@@ -160,6 +162,7 @@ int maim::IMEngine::blendCursor( Window id, int x, int y ) {
     int status = XGetGeometry( xengine->m_display, id, &root, &tx, &ty, &tw, &th, &tb, &td );
     if ( status == 0 ) {
         fprintf( stderr, "Error: Failed to grab window geometry of window id: %lu\n", id );
+        free( xcursor );
         return EXIT_FAILURE;
     }
     // Make sure the window's position is in root coordinates
@@ -171,7 +174,6 @@ int maim::IMEngine::blendCursor( Window id, int x, int y ) {
     imlib_free_image();
     imlib_context_set_image( buffer );
     free( xcursor );
-    delete[] pixels;
     return EXIT_SUCCESS;
 }
 
@@ -257,8 +259,8 @@ int maim::IMEngine::mask( int x, int y, unsigned int w, unsigned int h ) {
 int maim::IMEngine::save( std::string file ) {
     Imlib_Load_Error err;
     imlib_save_image_with_error_return( file.c_str(), &err );
+    imlib_free_image();
     if ( err == IMLIB_LOAD_ERROR_NONE ) {
-        imlib_free_image();
         return EXIT_SUCCESS;
     }
     fprintf( stderr, "Failed to save image %s: ", file.c_str() );
@@ -310,6 +312,5 @@ int maim::IMEngine::save( std::string file ) {
             break;
         }
     }
-    imlib_free_image();
     return EXIT_FAILURE;
 }
