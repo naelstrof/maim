@@ -556,7 +556,9 @@ int update_arg(void *field, char **orig_field,
   stop_char = 0;
   found = 0;
 
-  if (!multiple_option && prev_given && (*prev_given || (check_ambiguity && *field_given)))
+  _Bool valid_pointers = ( prev_given && field_given );
+
+  if (!multiple_option && valid_pointers && (*prev_given || (check_ambiguity && *field_given)))
     {
       if (short_opt != '-')
         fprintf (stderr, "%s: `--%s' (`-%c') option given more than once%s\n", 
@@ -568,8 +570,10 @@ int update_arg(void *field, char **orig_field,
                (additional_error ? additional_error : ""));
       return 1; /* failure */
     }
+  
+  valid_pointers = ( possible_values && default_value );
 
-  if (possible_values && (found = check_possible_values((value ? value : default_value), possible_values)) < 0)
+  if (valid_pointers && (found = check_possible_values((value ? value : default_value), possible_values)) < 0)
     {
       if (short_opt != '-')
         fprintf (stderr, "%s: %s argument, \"%s\", for option `--%s' (`-%c')%s\n", 
