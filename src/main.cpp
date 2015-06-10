@@ -297,7 +297,7 @@ int app( int argc, char** argv ) {
 
                 // Try to HOME later
                 if ( home_env == NULL ) {
-                    fprintf( stderr, "Failed to get HOME variable environment!" );
+                    fprintf( stderr, "Failed to get HOME environment variable, no where left to save!" );
                     cmdline_parser_free( &options );
                     return EXIT_FAILURE;
                 }
