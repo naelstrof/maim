@@ -132,7 +132,7 @@ int maim::IMEngine::blendCursor( Window id, int x, int y ) {
     // I'm guessing this is because some old AMD cpu's longs are actually 32 bits.
     // Regardless this is how I convert it to the correct bit length.
     const size_t size_px = xcursor->width * xcursor->height;
-    DATA32 pixels [ size_px ] = { 0x0 };
+    DATA32 pixels [ size_px ];
 
     for ( unsigned int i=0;i<size_px;i++ ) {
         pixels[ i ] = (uint32_t)xcursor->pixels[ i ];
