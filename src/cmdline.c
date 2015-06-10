@@ -341,8 +341,8 @@ check_possible_values(const char *val, const char *values[])
 static void
 write_into_file(FILE *outfile, const char *opt, const char *arg, const char *values[])
 {
-  int found = -1;
   if (arg) {
+    int found = -1;
     if (values) {
       found = check_possible_values(arg, values);      
     }
