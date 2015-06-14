@@ -86,6 +86,10 @@ int parseGeometry( std::string arg, int* x, int* y, int* w, int* h ) {
 // only if they have pixels that are offscreen.
 bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
     if ( type == "auto" ) {
+        // If we specified an actual window we certainly don't want to mask anything.
+        if ( id != None && id != xengine->m_root ) {
+            return false;
+        }
         const int sw = WidthOfScreen( xengine->m_screen );
         const int sh = HeightOfScreen( xengine->m_screen );
         // First we check if there's even any offscreen pixels
@@ -98,10 +102,6 @@ bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
         xengine->freeCRTCS( monitors );
         // If our monitors cover the entire screen, masking won't do anything anyway.
         if ( monitorArea >= sw * sh ) {
-            return false;
-        }
-        // If we specified an actual window we certainly don't want to mask anything.
-        if ( id != None && id != xengine->m_root ) {
             return false;
         }
         // If our screenshot has > 80% of the screen covered, we probably want it masked by off-screen pixels.
