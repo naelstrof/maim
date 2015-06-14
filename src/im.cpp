@@ -152,7 +152,7 @@ int maim::IMEngine::blendCursor( Window id, int x, int y ) {
     int status = XGetGeometry( xengine->m_display, id, &root, &tx, &ty, &tw, &th, &tb, &td );
     if ( status == 0 ) {
         fprintf( stderr, "Error: Failed to grab window geometry of window id: %lu\n", id );
-        free( xcursor );
+        XFree( xcursor );
         return EXIT_FAILURE;
     }
     // Make sure the window's position is in root coordinates
@@ -163,7 +163,7 @@ int maim::IMEngine::blendCursor( Window id, int x, int y ) {
     imlib_context_set_image( cursor );
     imlib_free_image();
     imlib_context_set_image( buffer );
-    free( xcursor );
+    XFree( xcursor );
     return EXIT_SUCCESS;
 }
 
