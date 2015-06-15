@@ -26,6 +26,8 @@
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 #include <pwd.h>
 #include <string>
 #include <sstream>
@@ -202,6 +204,44 @@ int is_valid_directory ( const char * dirname ) {
     return EXIT_SUCCESS;
 }
 
+int file_to_stdout( const char* filename ) {
+    char * addr; // reduce the scope of this variables: restricted
+    int fd;
+
+    if ( ( fd = open( filename, O_RDONLY ) ) == -1) {
+        perror( "open:" );
+        return EXIT_FAILURE;
+    }
+
+    struct stat st;
+    if ( fstat ( fd, &st ) == -1) {
+        perror( "stat:" );
+        goto error;
+    }
+    
+    addr = (char*) mmap( NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
+
+    if ( addr == MAP_FAILED ) {
+        perror( "mmap:" );
+        goto error;
+    }
+
+    if ( write( STDOUT_FILENO, addr, st.st_size ) != st.st_size ) {
+        perror( "write to stdout:" );
+        munmap( addr, st.st_size );
+        goto error;
+    }
+
+    close( fd );
+    munmap( addr, st.st_size );
+    return EXIT_SUCCESS;
+
+error:
+    close( fd );
+    return EXIT_FAILURE;
+}
+
+
 int app( int argc, char** argv ) {
     // First parse any options and the filename we need.
     gengetopt_args_info options;
@@ -236,6 +276,7 @@ int app( int argc, char** argv ) {
     // Grab all of our variables from the options.
     bool gotGeometry = false;
     bool gotSelectFlag = options.select_flag;
+    bool gotStdout = options.stdout_given;
     int x, y, w, h;
     float delay;
     err = sscanf( options.delay_arg, "%f", &delay );
@@ -267,6 +308,7 @@ int app( int argc, char** argv ) {
         }
         gotGeometry = true;
     }
+
     // Get our window if we have one, default to the root window.
     Window window = xengine->m_root;
     if ( options.windowid_given ) {
@@ -321,7 +363,7 @@ int app( int argc, char** argv ) {
         std::stringstream result;
         result << (int)time( NULL );
         file += "/" + result.str() + ".png";
-        printf( "No file specified, using %s\n", file.c_str() );
+        fprintf(stderr, "No file specified, using %s\n", file.c_str() );
         delete [] currentdir;
     } else if ( options.inputs_num == 1 ) {
         file = options.inputs[ 0 ];
@@ -360,6 +402,11 @@ int app( int argc, char** argv ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
+
+        if ( gotStdout ) {
+            file_to_stdout (file.c_str() );
+        }
+
         return EXIT_SUCCESS;
     }
     if ( gotGeometry ) {
@@ -384,6 +431,11 @@ int app( int argc, char** argv ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
+
+        if ( gotStdout ) {
+            file_to_stdout (file.c_str() );
+        }
+
         return EXIT_SUCCESS;
     }
     // If we didn't get any special options, just screenshot the specified window
@@ -409,6 +461,11 @@ int app( int argc, char** argv ) {
         fprintf( stderr, "Failed to take screenshot.\n" );
         return EXIT_FAILURE;
     }
+
+    if ( gotStdout ) {
+        file_to_stdout (file.c_str() );
+    }
+
     return EXIT_SUCCESS;
 }
 
