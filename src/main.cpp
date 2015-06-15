@@ -26,6 +26,8 @@
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 #include <pwd.h>
 #include <string>
 #include <sstream>
@@ -201,6 +203,43 @@ int is_valid_directory ( const char * dirname ) {
 
     return EXIT_SUCCESS;
 }
+
+int file_to_stdout( const char* filename ) {
+
+    char * addr; // reduce the scope of this variable: restricted
+    int fd;
+
+    if ( ( fd = open( filename, O_RDONLY ) ) == -1) {
+        perror( "open:" );
+        return EXIT_FAILURE;
+    }
+
+    struct stat st;
+    if ( fstat ( fd, &st ) == -1) {
+        perror( "stat:" );
+        goto error;
+    }
+
+    addr = (char*) mmap( NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
+
+    if ( addr == MAP_FAILED ) {
+        perror( "mmap:" );
+        goto error;
+    }
+
+    if ( write ( STDOUT_FILENO, addr, st.st_size ) != st.st_size ) {
+        perror( "write to stdout:" );
+        goto error;
+    }
+
+    close( fd );
+    return EXIT_SUCCESS;
+
+error:
+    close( fd );
+    return EXIT_FAILURE;
+}
+
 
 int app( int argc, char** argv ) {
     // First parse any options and the filename we need.
@@ -409,6 +448,7 @@ int app( int argc, char** argv ) {
         fprintf( stderr, "Failed to take screenshot.\n" );
         return EXIT_FAILURE;
     }
+
     return EXIT_SUCCESS;
 }
 
