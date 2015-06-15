@@ -276,6 +276,7 @@ int app( int argc, char** argv ) {
     // Grab all of our variables from the options.
     bool gotGeometry = false;
     bool gotSelectFlag = options.select_flag;
+    bool gotStdout = options.stdout_given;
     int x, y, w, h;
     float delay;
     err = sscanf( options.delay_arg, "%f", &delay );
@@ -396,16 +397,16 @@ int app( int argc, char** argv ) {
             imengine->mask( x, y, w, h );
         }
         err = imengine->save( file );
+        cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
 
-        if ( options.stdout_given ) {
+        if ( gotStdout ) {
             file_to_stdout (file.c_str() );
         }
 
-        cmdline_parser_free( &options );
         return EXIT_SUCCESS;
     }
     if ( gotGeometry ) {
@@ -425,16 +426,16 @@ int app( int argc, char** argv ) {
             imengine->mask( x, y, w, h );
         }
         err = imengine->save( file );
+        cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
 
-        if ( options.stdout_given ) {
+        if ( gotStdout ) {
             file_to_stdout (file.c_str() );
         }
 
-        cmdline_parser_free( &options );
         return EXIT_SUCCESS;
     }
     // If we didn't get any special options, just screenshot the specified window
@@ -455,16 +456,15 @@ int app( int argc, char** argv ) {
         imengine->mask();
     }
     err = imengine->save( file );
+    cmdline_parser_free( &options );
     if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Failed to take screenshot.\n" );
         return EXIT_FAILURE;
     }
 
-    if ( options.stdout_given ) {
+    if ( gotStdout ) {
         file_to_stdout (file.c_str() );
     }
-
-    cmdline_parser_free( &options );
 
     return EXIT_SUCCESS;
 }
