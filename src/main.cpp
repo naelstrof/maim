@@ -56,24 +56,29 @@ int exec( std::string cmd, std::string* ret ) {
     return EXIT_SUCCESS;
 }
 
+// Replace all x's and +'s with spaces. This is so that sscanf works properly, it just doesn't
+// like using anything but spaces for delimiters.
+const std::string findGeometryValues ( char arg[] ) {
+   std::string values;
+   const char * const delimiters ="x+";
+   char * tok = std::strtok (arg, delimiters);
+
+   while( tok != NULL) { 
+       values += tok;
+       values += " ";
+       tok = std::strtok (NULL, delimiters);
+   }
+   return values;
+}
+
 // Parse geometry from a string, it's pretty simple really.
-int parseGeometry( std::string arg, int* x, int* y, int* w, int* h ) {
-    std::string copy = arg;
-    // Replace all x's and +'s with spaces. This is so that sscanf works properly, it just doesn't
-    // like using anything but spaces for delimiters.
-    int find = copy.find( "x" );
-    while( find != (int)copy.npos ) {
-        copy.at( find ) = ' ';
-        find = copy.find( "x" );
-    }
-    find = copy.find( "+" );
-    while( find != (int)copy.npos ) {
-        copy.at( find ) = ' ';
-        find = copy.find( "+" );
-    }
-    int num = sscanf( copy.c_str(), "%d %d %d %d", w, h, x, y );
-    if ( num != 4 ) {
-        fprintf( stderr, "Error parsing geometry from %s\n", arg.c_str() );
+int parseGeometry( gengetopt_args_info option, int* x, int* y, int* w, int* h ) {
+
+    const std::string values = findGeometryValues( option.geometry_arg );
+    const int num = sscanf( values.c_str(), "%d %d %d %d", w, h, x, y );
+
+    if ( num != 4 ||  *w <= 0 || *h <= 0) {
+        fprintf( stderr, "Error parsing geometry from %s\n", option.geometry_orig );
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
@@ -85,9 +90,13 @@ int parseGeometry( std::string arg, int* x, int* y, int* w, int* h ) {
 // takes a full screenshot, then he would most certainly want it masked, but
 // only if they have pixels that are offscreen.
 bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
-    int sw = WidthOfScreen( xengine->m_screen );
-    int sh = HeightOfScreen( xengine->m_screen );
     if ( type == "auto" ) {
+        // If we specified an actual window we certainly don't want to mask anything.
+        if ( id != None && id != xengine->m_root ) {
+            return false;
+        }
+        const int sw = WidthOfScreen( xengine->m_screen );
+        const int sh = HeightOfScreen( xengine->m_screen );
         // First we check if there's even any offscreen pixels
         int monitorArea = 0;
         std::vector<XRRCrtcInfo*> monitors = xengine->getCRTCS();
@@ -98,10 +107,6 @@ bool checkMask( std::string type, int x, int y, int w, int h, Window id ) {
         xengine->freeCRTCS( monitors );
         // If our monitors cover the entire screen, masking won't do anything anyway.
         if ( monitorArea >= sw * sh ) {
-            return false;
-        }
-        // If we specified an actual window we certainly don't want to mask anything.
-        if ( id != None && id != xengine->m_root ) {
             return false;
         }
         // If our screenshot has > 80% of the screen covered, we probably want it masked by off-screen pixels.
@@ -254,9 +259,9 @@ int app( int argc, char** argv ) {
         cmdline_parser_free( &options );
         return EXIT_FAILURE;
     } else if ( options.geometry_given ) {
-        err = parseGeometry( options.geometry_arg, &x, &y, &w, &h );
+        err = parseGeometry( options, &x, &y, &w, &h );
         if ( err != EXIT_SUCCESS ) {
-            fprintf( stderr, "Failed to parse geometry %s, should be in format WxH+X+Y!\n", options.geometry_arg );
+            fprintf( stderr, "Failed to parse geometry %s, should be in format WxH+X+Y!\n", options.geometry_orig );
             cmdline_parser_free( &options );
             return EXIT_FAILURE;
         }
