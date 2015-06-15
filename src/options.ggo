@@ -114,6 +114,10 @@ option "highlight" l "Instead of outlining selections, slop highlights it. This 
     flag
     off
 
+option "stdout" o "Copy the capture image to stdout"
+    flag
+    off
+
 text "\nExamples\n"
 text "    $ # Screenshot the active window\n"
 text "    $ maim -i $(xdotool getactivewindow)\n"

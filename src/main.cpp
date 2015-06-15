@@ -205,8 +205,7 @@ int is_valid_directory ( const char * dirname ) {
 }
 
 int file_to_stdout( const char* filename ) {
-
-    char * addr; // reduce the scope of this variable: restricted
+    char * addr; // reduce the scope of this variables: restricted
     int fd;
 
     if ( ( fd = open( filename, O_RDONLY ) ) == -1) {
@@ -219,7 +218,7 @@ int file_to_stdout( const char* filename ) {
         perror( "stat:" );
         goto error;
     }
-
+    
     addr = (char*) mmap( NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
 
     if ( addr == MAP_FAILED ) {
@@ -227,12 +226,14 @@ int file_to_stdout( const char* filename ) {
         goto error;
     }
 
-    if ( write ( STDOUT_FILENO, addr, st.st_size ) != st.st_size ) {
+    if ( write( STDOUT_FILENO, addr, st.st_size ) != st.st_size ) {
         perror( "write to stdout:" );
+        munmap( addr, st.st_size );
         goto error;
     }
 
     close( fd );
+    munmap( addr, st.st_size );
     return EXIT_SUCCESS;
 
 error:
@@ -306,6 +307,7 @@ int app( int argc, char** argv ) {
         }
         gotGeometry = true;
     }
+
     // Get our window if we have one, default to the root window.
     Window window = xengine->m_root;
     if ( options.windowid_given ) {
@@ -360,7 +362,7 @@ int app( int argc, char** argv ) {
         std::stringstream result;
         result << (int)time( NULL );
         file += "/" + result.str() + ".png";
-        printf( "No file specified, using %s\n", file.c_str() );
+        fprintf(stderr, "No file specified, using %s\n", file.c_str() );
         delete [] currentdir;
     } else if ( options.inputs_num == 1 ) {
         file = options.inputs[ 0 ];
@@ -394,11 +396,16 @@ int app( int argc, char** argv ) {
             imengine->mask( x, y, w, h );
         }
         err = imengine->save( file );
-        cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
+
+        if ( options.stdout_given ) {
+            file_to_stdout (file.c_str() );
+        }
+
+        cmdline_parser_free( &options );
         return EXIT_SUCCESS;
     }
     if ( gotGeometry ) {
@@ -418,11 +425,16 @@ int app( int argc, char** argv ) {
             imengine->mask( x, y, w, h );
         }
         err = imengine->save( file );
-        cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
+
+        if ( options.stdout_given ) {
+            file_to_stdout (file.c_str() );
+        }
+
+        cmdline_parser_free( &options );
         return EXIT_SUCCESS;
     }
     // If we didn't get any special options, just screenshot the specified window
@@ -443,11 +455,16 @@ int app( int argc, char** argv ) {
         imengine->mask();
     }
     err = imengine->save( file );
-    cmdline_parser_free( &options );
     if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Failed to take screenshot.\n" );
         return EXIT_FAILURE;
     }
+
+    if ( options.stdout_given ) {
+        file_to_stdout (file.c_str() );
+    }
+
+    cmdline_parser_free( &options );
 
     return EXIT_SUCCESS;
 }
