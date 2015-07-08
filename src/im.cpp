@@ -246,8 +246,11 @@ int maim::IMEngine::mask( int x, int y, unsigned int w, unsigned int h ) {
 *
 * @return 0 on success, 1 on failure.
 */
-int maim::IMEngine::save( std::string file ) {
+int maim::IMEngine::save( std::string file, std::string format ) {
     Imlib_Load_Error err;
+    if ( format != "auto" ) {
+        imlib_image_set_format(format.c_str());
+    }
     imlib_save_image_with_error_return( file.c_str(), &err );
     imlib_free_image();
     if ( err == IMLIB_LOAD_ERROR_NONE ) {

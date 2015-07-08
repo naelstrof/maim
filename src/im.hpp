@@ -41,7 +41,7 @@ public:
     int                 screenshot( Window id );
     int                 blendCursor( Window id, int x = 0, int y = 0 );
     int                 mask( int x = 0, int y = 0, unsigned int w = 0, unsigned int h = 0 );
-    int                 save( std::string filename );
+    int                 save( std::string filename, std::string format = "auto" );
 private:
 };
 

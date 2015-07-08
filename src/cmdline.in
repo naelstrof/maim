@@ -42,6 +42,9 @@ struct gengetopt_args_info
   char * xdisplay_arg;	/**< @brief Sets the x display..  */
   char * xdisplay_orig;	/**< @brief Sets the x display. original value given at command line.  */
   const char *xdisplay_help; /**< @brief Sets the x display. help description.  */
+  char * format_arg;	/**< @brief Sets output format (png, jpg, etc) (default='auto').  */
+  char * format_orig;	/**< @brief Sets output format (png, jpg, etc) original value given at command line.  */
+  const char *format_help; /**< @brief Sets output format (png, jpg, etc) help description.  */
   int select_flag;	/**< @brief Enables user region selection. Requires slop to be installed. (default=off).  */
   const char *select_help; /**< @brief Enables user region selection. Requires slop to be installed. help description.  */
   int x_arg;	/**< @brief Sets the x coordinate for taking an image.  */
@@ -103,6 +106,7 @@ struct gengetopt_args_info
   unsigned int help_given ;	/**< @brief Whether help was given.  */
   unsigned int version_given ;	/**< @brief Whether version was given.  */
   unsigned int xdisplay_given ;	/**< @brief Whether xdisplay was given.  */
+  unsigned int format_given ;	/**< @brief Whether format was given.  */
   unsigned int select_given ;	/**< @brief Whether select was given.  */
   unsigned int x_given ;	/**< @brief Whether x was given.  */
   unsigned int y_given ;	/**< @brief Whether y was given.  */

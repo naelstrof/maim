@@ -86,7 +86,7 @@ help
 ----
 Join us on irc at freenode in *#maim*.
 ```text
-maim v3.4.43
+maim v3.4.44
 
 Copyright (C) 2014 Dalton Nell, Maim Contributors
 (https://github.com/naelstrof/maim/graphs/contributors)
@@ -104,6 +104,8 @@ scrot in several ways.
 Options
       --xdisplay=hostname:number.screen_number
                                 Sets the x display.
+      --format=FORMAT           Sets output format (png, jpg, etc)
+                                  (default=`auto')
   -s, --select                  Enables user region selection. Requires slop to
                                   be installed.  (default=off)
   -x, --x=INT                   Sets the x coordinate for taking an image
@@ -170,4 +172,7 @@ Examples
 
     $ # Save a dated screenshot.
     $ maim ~/$(date +%F-%T).png
+
+    $ # Output screenshot to stdout.
+    $ maim --format png /dev/stdout
 ```

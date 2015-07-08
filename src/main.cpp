@@ -354,7 +354,11 @@ int app( int argc, char** argv ) {
         if ( checkMask( options.mask_arg, x, y, w, h, window ) ) {
             imengine->mask( x, y, w, h );
         }
-        err = imengine->save( file );
+        if ( options.format_given ) {
+            err = imengine->save( file, options.format_arg );
+        } else {
+            err = imengine->save( file, "" );
+        }
         cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
@@ -378,7 +382,7 @@ int app( int argc, char** argv ) {
         if ( checkMask( options.mask_arg, x, y, w, h, window ) ) {
             imengine->mask( x, y, w, h );
         }
-        err = imengine->save( file );
+        err = imengine->save( file, options.format_arg );
         cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
@@ -403,7 +407,7 @@ int app( int argc, char** argv ) {
     if ( checkMask( options.mask_arg, 0, 0, WidthOfScreen( xengine->m_screen ), HeightOfScreen( xengine->m_screen ), window ) ) {
         imengine->mask();
     }
-    err = imengine->save( file );
+    err = imengine->save( file, options.format_arg );
     cmdline_parser_free( &options );
     if ( err != EXIT_SUCCESS ) {
         fprintf( stderr, "Failed to take screenshot.\n" );

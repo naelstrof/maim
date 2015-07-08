@@ -38,6 +38,7 @@ const char *gengetopt_args_info_help[] = {
   "  -V, --version                 Print version and exit",
   "Options",
   "      --xdisplay=hostname:number.screen_number\n                                Sets the x display.",
+  "      --format=FORMAT           Sets output format (png, jpg, etc)\n                                  (default=`auto')",
   "  -s, --select                  Enables user region selection. Requires slop to\n                                  be installed.  (default=off)",
   "  -x, --x=INT                   Sets the x coordinate for taking an image",
   "  -y, --y=INT                   Sets the y coordinate for taking an image",
@@ -60,7 +61,7 @@ const char *gengetopt_args_info_help[] = {
   "      --min=INT                 Set the minimum output of width or height\n                                  values. This is useful to avoid outputting 0.\n                                  Setting min and max to the same value\n                                  disables drag selections.  (default=`0')",
   "      --max=INT                 Set the maximum output of width or height\n                                  values. Setting min and max to the same value\n                                  disables drag selections.  (default=`0')",
   "  -l, --highlight               Instead of outlining selections, slop\n                                  highlights it. This is only useful when\n                                  --color is set to a transparent color.\n                                  (default=off)",
-  "\nExamples\n    $ # Screenshot the active window\n    $ maim -i $(xdotool getactivewindow)\n\n    $ # Prompt a transparent red selection to screenshot.\n    $ maim -s -c 1,0,0,0.6\n\n    $ # Save a dated screenshot.\n    $ maim ~/$(date +%F-%T).png\n",
+  "\nExamples\n    $ # Screenshot the active window\n    $ maim -i $(xdotool getactivewindow)\n\n    $ # Prompt a transparent red selection to screenshot.\n    $ maim -s -c 1,0,0,0.6\n\n    $ # Save a dated screenshot.\n    $ maim ~/$(date +%F-%T).png\n\n    $ # Output screenshot to stdout.\n    $ maim --format png /dev/stdout\n\n",
     0
 };
 
@@ -91,6 +92,7 @@ void clear_given (struct gengetopt_args_info *args_info)
   args_info->help_given = 0 ;
   args_info->version_given = 0 ;
   args_info->xdisplay_given = 0 ;
+  args_info->format_given = 0 ;
   args_info->select_given = 0 ;
   args_info->x_given = 0 ;
   args_info->y_given = 0 ;
@@ -120,6 +122,8 @@ void clear_args (struct gengetopt_args_info *args_info)
   FIX_UNUSED (args_info);
   args_info->xdisplay_arg = NULL;
   args_info->xdisplay_orig = NULL;
+  args_info->format_arg = gengetopt_strdup ("auto");
+  args_info->format_orig = NULL;
   args_info->select_flag = 0;
   args_info->x_orig = NULL;
   args_info->y_orig = NULL;
@@ -162,27 +166,28 @@ void init_args_info(struct gengetopt_args_info *args_info)
   args_info->help_help = gengetopt_args_info_help[0] ;
   args_info->version_help = gengetopt_args_info_help[1] ;
   args_info->xdisplay_help = gengetopt_args_info_help[3] ;
-  args_info->select_help = gengetopt_args_info_help[4] ;
-  args_info->x_help = gengetopt_args_info_help[5] ;
-  args_info->y_help = gengetopt_args_info_help[6] ;
-  args_info->w_help = gengetopt_args_info_help[7] ;
-  args_info->h_help = gengetopt_args_info_help[8] ;
-  args_info->geometry_help = gengetopt_args_info_help[9] ;
-  args_info->delay_help = gengetopt_args_info_help[10] ;
-  args_info->windowid_help = gengetopt_args_info_help[11] ;
-  args_info->localize_help = gengetopt_args_info_help[12] ;
-  args_info->hidecursor_help = gengetopt_args_info_help[13] ;
-  args_info->mask_help = gengetopt_args_info_help[14] ;
-  args_info->nokeyboard_help = gengetopt_args_info_help[16] ;
-  args_info->bordersize_help = gengetopt_args_info_help[17] ;
-  args_info->padding_help = gengetopt_args_info_help[18] ;
-  args_info->tolerance_help = gengetopt_args_info_help[19] ;
-  args_info->gracetime_help = gengetopt_args_info_help[20] ;
-  args_info->color_help = gengetopt_args_info_help[21] ;
-  args_info->nodecorations_help = gengetopt_args_info_help[22] ;
-  args_info->min_help = gengetopt_args_info_help[23] ;
-  args_info->max_help = gengetopt_args_info_help[24] ;
-  args_info->highlight_help = gengetopt_args_info_help[25] ;
+  args_info->format_help = gengetopt_args_info_help[4] ;
+  args_info->select_help = gengetopt_args_info_help[5] ;
+  args_info->x_help = gengetopt_args_info_help[6] ;
+  args_info->y_help = gengetopt_args_info_help[7] ;
+  args_info->w_help = gengetopt_args_info_help[8] ;
+  args_info->h_help = gengetopt_args_info_help[9] ;
+  args_info->geometry_help = gengetopt_args_info_help[10] ;
+  args_info->delay_help = gengetopt_args_info_help[11] ;
+  args_info->windowid_help = gengetopt_args_info_help[12] ;
+  args_info->localize_help = gengetopt_args_info_help[13] ;
+  args_info->hidecursor_help = gengetopt_args_info_help[14] ;
+  args_info->mask_help = gengetopt_args_info_help[15] ;
+  args_info->nokeyboard_help = gengetopt_args_info_help[17] ;
+  args_info->bordersize_help = gengetopt_args_info_help[18] ;
+  args_info->padding_help = gengetopt_args_info_help[19] ;
+  args_info->tolerance_help = gengetopt_args_info_help[20] ;
+  args_info->gracetime_help = gengetopt_args_info_help[21] ;
+  args_info->color_help = gengetopt_args_info_help[22] ;
+  args_info->nodecorations_help = gengetopt_args_info_help[23] ;
+  args_info->min_help = gengetopt_args_info_help[24] ;
+  args_info->max_help = gengetopt_args_info_help[25] ;
+  args_info->highlight_help = gengetopt_args_info_help[26] ;
   
 }
 
@@ -271,6 +276,8 @@ cmdline_parser_release (struct gengetopt_args_info *args_info)
   unsigned int i;
   free_string_field (&(args_info->xdisplay_arg));
   free_string_field (&(args_info->xdisplay_orig));
+  free_string_field (&(args_info->format_arg));
+  free_string_field (&(args_info->format_orig));
   free_string_field (&(args_info->x_orig));
   free_string_field (&(args_info->y_orig));
   free_string_field (&(args_info->w_orig));
@@ -373,6 +380,8 @@ cmdline_parser_dump(FILE *outfile, struct gengetopt_args_info *args_info)
     write_into_file(outfile, "version", 0, 0 );
   if (args_info->xdisplay_given)
     write_into_file(outfile, "xdisplay", args_info->xdisplay_orig, 0);
+  if (args_info->format_given)
+    write_into_file(outfile, "format", args_info->format_orig, 0);
   if (args_info->select_given)
     write_into_file(outfile, "select", 0, 0 );
   if (args_info->x_given)
@@ -683,6 +692,7 @@ cmdline_parser_internal (
         { "help",	0, NULL, 0 },
         { "version",	0, NULL, 'V' },
         { "xdisplay",	1, NULL, 0 },
+        { "format",	1, NULL, 0 },
         { "select",	0, NULL, 's' },
         { "x",	1, NULL, 'x' },
         { "y",	1, NULL, 'y' },
@@ -910,6 +920,20 @@ cmdline_parser_internal (
                 &(local_args_info.xdisplay_given), optarg, 0, 0, ARG_STRING,
                 check_ambiguity, override, 0, 0,
                 "xdisplay", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Sets output format (png, jpg, etc).  */
+          else if (strcmp (long_options[option_index].name, "format") == 0)
+          {
+          
+          
+            if (update_arg( (void *)&(args_info->format_arg), 
+                 &(args_info->format_orig), &(args_info->format_given),
+                &(local_args_info.format_given), optarg, 0, "auto", ARG_STRING,
+                check_ambiguity, override, 0, 0,
+                "format", '-',
                 additional_error))
               goto failure;
           

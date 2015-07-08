@@ -24,6 +24,9 @@ scrot in several ways.
   * `--xdisplay=hostname:number.screen_number`:
     Sets the x display.
 
+  * `--format=FORMAT`:
+    Sets output format (png, jpg, etc)  (default=`auto')
+
   * `-s`, `--select`:
     Enables user region selection. Requires slop to
     be installed.  (default=off)
@@ -102,6 +105,11 @@ Prompt a transparent red selection to screenshot.
 Save a dated screenshot.
 
     $ maim ~/$(date +%F-%T).png
+
+Output screenshot to stdout
+
+    $ maim --format png /dev/stdout
+
 ## COPYRIGHT
 
 Copyright (C) 2014 Dalton Nell `<naelstrof@gmail.com>`, Maim Contributors `<http://github.com/naelstrof/maim/graphs/contributors>`.

@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.8 )
 project( "maim" )
 set( maim_VERSION_MAJOR 3 )
 set( maim_VERSION_MINOR 4 )
-set( maim_VERSION_PATCH 43 )
+set( maim_VERSION_PATCH 44 )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )
 
