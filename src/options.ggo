@@ -63,6 +63,10 @@ option "showcursor" - "Causes the system cursor to be blended on top of the scre
     flag
     off
 
+option "hidecursor" - "Deprecated, does nothing."
+    flag
+    off
+
 option "mask" m "Masks off-screen pixels so they don't show up in screenshots."
     string
     values="auto","off","on"

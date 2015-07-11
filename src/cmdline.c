@@ -49,6 +49,7 @@ const char *gengetopt_args_info_help[] = {
   "  -i, --windowid=INT            Set the window to capture. Defaults to the root\n                                  window id.",
   "      --localize                Localizes given geometry to the given window.\n                                  So \"maim -i $ID -g 100x100+0+0 --localize\"\n                                  would screenshot the top-left 100x100 pixels\n                                  of the given window, rather than the top-left\n                                  100x100 pixels of the root window.\n                                  (default=off)",
   "      --showcursor              Causes the system cursor to be blended on top\n                                  of the screenshot.  (default=off)",
+  "      --hidecursor              Deprecated, does nothing.  (default=off)",
   "  -m, --mask=STRING             Masks off-screen pixels so they don't show up\n                                  in screenshots.  (possible values=\"auto\",\n                                  \"off\", \"on\" default=`auto')",
   "\nSlop Options",
   "      --nokeyboard              Disables the ability to cancel selections with\n                                  the keyboard.  (default=off)",
@@ -110,6 +111,7 @@ void clear_given (struct gengetopt_args_info *args_info)
   args_info->windowid_given = 0 ;
   args_info->localize_given = 0 ;
   args_info->showcursor_given = 0 ;
+  args_info->hidecursor_given = 0 ;
   args_info->mask_given = 0 ;
   args_info->nokeyboard_given = 0 ;
   args_info->bordersize_given = 0 ;
@@ -149,6 +151,7 @@ void clear_args (struct gengetopt_args_info *args_info)
   args_info->windowid_orig = NULL;
   args_info->localize_flag = 0;
   args_info->showcursor_flag = 0;
+  args_info->hidecursor_flag = 0;
   args_info->mask_arg = gengetopt_strdup ("auto");
   args_info->mask_orig = NULL;
   args_info->nokeyboard_flag = 0;
@@ -200,23 +203,24 @@ void init_args_info(struct gengetopt_args_info *args_info)
   args_info->windowid_help = gengetopt_args_info_help[12] ;
   args_info->localize_help = gengetopt_args_info_help[13] ;
   args_info->showcursor_help = gengetopt_args_info_help[14] ;
-  args_info->mask_help = gengetopt_args_info_help[15] ;
-  args_info->nokeyboard_help = gengetopt_args_info_help[17] ;
-  args_info->bordersize_help = gengetopt_args_info_help[18] ;
-  args_info->padding_help = gengetopt_args_info_help[19] ;
-  args_info->tolerance_help = gengetopt_args_info_help[20] ;
-  args_info->gracetime_help = gengetopt_args_info_help[21] ;
-  args_info->color_help = gengetopt_args_info_help[22] ;
-  args_info->nodecorations_help = gengetopt_args_info_help[23] ;
-  args_info->min_help = gengetopt_args_info_help[24] ;
-  args_info->max_help = gengetopt_args_info_help[25] ;
-  args_info->highlight_help = gengetopt_args_info_help[26] ;
-  args_info->opengl_help = gengetopt_args_info_help[27] ;
-  args_info->magnify_help = gengetopt_args_info_help[28] ;
-  args_info->magstrength_help = gengetopt_args_info_help[29] ;
-  args_info->magpixels_help = gengetopt_args_info_help[30] ;
-  args_info->theme_help = gengetopt_args_info_help[31] ;
-  args_info->shader_help = gengetopt_args_info_help[32] ;
+  args_info->hidecursor_help = gengetopt_args_info_help[15] ;
+  args_info->mask_help = gengetopt_args_info_help[16] ;
+  args_info->nokeyboard_help = gengetopt_args_info_help[18] ;
+  args_info->bordersize_help = gengetopt_args_info_help[19] ;
+  args_info->padding_help = gengetopt_args_info_help[20] ;
+  args_info->tolerance_help = gengetopt_args_info_help[21] ;
+  args_info->gracetime_help = gengetopt_args_info_help[22] ;
+  args_info->color_help = gengetopt_args_info_help[23] ;
+  args_info->nodecorations_help = gengetopt_args_info_help[24] ;
+  args_info->min_help = gengetopt_args_info_help[25] ;
+  args_info->max_help = gengetopt_args_info_help[26] ;
+  args_info->highlight_help = gengetopt_args_info_help[27] ;
+  args_info->opengl_help = gengetopt_args_info_help[28] ;
+  args_info->magnify_help = gengetopt_args_info_help[29] ;
+  args_info->magstrength_help = gengetopt_args_info_help[30] ;
+  args_info->magpixels_help = gengetopt_args_info_help[31] ;
+  args_info->theme_help = gengetopt_args_info_help[32] ;
+  args_info->shader_help = gengetopt_args_info_help[33] ;
   
 }
 
@@ -437,6 +441,8 @@ cmdline_parser_dump(FILE *outfile, struct gengetopt_args_info *args_info)
     write_into_file(outfile, "localize", 0, 0 );
   if (args_info->showcursor_given)
     write_into_file(outfile, "showcursor", 0, 0 );
+  if (args_info->hidecursor_given)
+    write_into_file(outfile, "hidecursor", 0, 0 );
   if (args_info->mask_given)
     write_into_file(outfile, "mask", args_info->mask_orig, cmdline_parser_mask_values);
   if (args_info->nokeyboard_given)
@@ -754,6 +760,7 @@ cmdline_parser_internal (
         { "windowid",	1, NULL, 'i' },
         { "localize",	0, NULL, 0 },
         { "showcursor",	0, NULL, 0 },
+        { "hidecursor",	0, NULL, 0 },
         { "mask",	1, NULL, 'm' },
         { "nokeyboard",	0, NULL, 0 },
         { "bordersize",	1, NULL, 'b' },
@@ -1015,6 +1022,18 @@ cmdline_parser_internal (
             if (update_arg((void *)&(args_info->showcursor_flag), 0, &(args_info->showcursor_given),
                 &(local_args_info.showcursor_given), optarg, 0, 0, ARG_FLAG,
                 check_ambiguity, override, 1, 0, "showcursor", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Deprecated, does nothing..  */
+          else if (strcmp (long_options[option_index].name, "hidecursor") == 0)
+          {
+          
+          
+            if (update_arg((void *)&(args_info->hidecursor_flag), 0, &(args_info->hidecursor_given),
+                &(local_args_info.hidecursor_given), optarg, 0, 0, ARG_FLAG,
+                check_ambiguity, override, 1, 0, "hidecursor", '-',
                 additional_error))
               goto failure;
           
