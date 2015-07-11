@@ -93,6 +93,24 @@ scrot in several ways.
   * `-l`, `--highlight`:
     Instead of outlining selections, slop highlights it. This is only useful when `--color` is set to a transparent color. (default=off)
 
+  * `--opengl`:
+    Enable hardware acceleration. Only works with modern systems that are also running a compositor.  (default=off)
+
+  * `--magnify`:
+    Display a magnifying glass when --opengl is also enabled.  (default=off)
+
+  * `--magstrength=FLOAT`:
+    Sets how many times the magnification window size is multiplied.  (default=`4')
+
+  * `--magpixels=INT`:
+    Sets how many pixels are displayed in the magnification. The less pixels the bigger the magnification.  (default=`64')
+
+  * `--theme=STRING`:
+    Sets the theme of the selection, using textures from ~/.config/slop/ or /usr/share/. (default=`none')
+
+  * `--shader=STRING`:
+    Sets the shader to load and use from ~/.config/slop/ or /usr/share/. (default=`simple')
+
 ## EXAMPLES
 Screenshot the active window
 

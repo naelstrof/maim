@@ -118,6 +118,30 @@ Set the maximum output of width or height values\. Setting min and max to the sa
 \fB\-l\fR, \fB\-\-highlight\fR
 Instead of outlining selections, slop highlights it\. This is only useful when \fB\-\-color\fR is set to a transparent color\. (default=off)
 .
+.TP
+\fB\-\-opengl\fR
+Enable hardware acceleration\. Only works with modern systems that are also running a compositor\. (default=off)
+.
+.TP
+\fB\-\-magnify\fR
+Display a magnifying glass when \-\-opengl is also enabled\. (default=off)
+.
+.TP
+\fB\-\-magstrength=FLOAT\fR
+Sets how many times the magnification window size is multiplied\. (default=`4\')
+.
+.TP
+\fB\-\-magpixels=INT\fR
+Sets how many pixels are displayed in the magnification\. The less pixels the bigger the magnification\. (default=`64\')
+.
+.TP
+\fB\-\-theme=STRING\fR
+Sets the theme of the selection, using textures from ~/\.config/slop/ or /usr/share/\. (default=`none\')
+.
+.TP
+\fB\-\-shader=STRING\fR
+Sets the shader to load and use from ~/\.config/slop/ or /usr/share/\. (default=`simple\')
+.
 .SH "EXAMPLES"
 Screenshot the active window
 .
