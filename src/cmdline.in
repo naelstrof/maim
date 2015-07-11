@@ -102,6 +102,22 @@ struct gengetopt_args_info
   const char *max_help; /**< @brief Set the maximum output of width or height values. Setting min and max to the same value disables drag selections. help description.  */
   int highlight_flag;	/**< @brief Instead of outlining selections, slop highlights it. This is only useful when --color is set to a transparent color. (default=off).  */
   const char *highlight_help; /**< @brief Instead of outlining selections, slop highlights it. This is only useful when --color is set to a transparent color. help description.  */
+  int opengl_flag;	/**< @brief Enable hardware acceleration. Only works with modern systems that are also running a compositor. (default=off).  */
+  const char *opengl_help; /**< @brief Enable hardware acceleration. Only works with modern systems that are also running a compositor. help description.  */
+  int magnify_flag;	/**< @brief Display a magnifying glass when --opengl is also enabled. (default=off).  */
+  const char *magnify_help; /**< @brief Display a magnifying glass when --opengl is also enabled. help description.  */
+  float magstrength_arg;	/**< @brief Sets how many times the magnification window size is multiplied. (default='4').  */
+  char * magstrength_orig;	/**< @brief Sets how many times the magnification window size is multiplied. original value given at command line.  */
+  const char *magstrength_help; /**< @brief Sets how many times the magnification window size is multiplied. help description.  */
+  int magpixels_arg;	/**< @brief Sets how many pixels are displayed in the magnification. The less pixels the bigger the magnification. (default='64').  */
+  char * magpixels_orig;	/**< @brief Sets how many pixels are displayed in the magnification. The less pixels the bigger the magnification. original value given at command line.  */
+  const char *magpixels_help; /**< @brief Sets how many pixels are displayed in the magnification. The less pixels the bigger the magnification. help description.  */
+  char * theme_arg;	/**< @brief Sets the theme of the selection, using textures from ~/.config/slop/ or /usr/share/. (default='none').  */
+  char * theme_orig;	/**< @brief Sets the theme of the selection, using textures from ~/.config/slop/ or /usr/share/. original value given at command line.  */
+  const char *theme_help; /**< @brief Sets the theme of the selection, using textures from ~/.config/slop/ or /usr/share/. help description.  */
+  char * shader_arg;	/**< @brief Sets the shader to load and use from ~/.config/slop/ or /usr/share/. (default='simple').  */
+  char * shader_orig;	/**< @brief Sets the shader to load and use from ~/.config/slop/ or /usr/share/. original value given at command line.  */
+  const char *shader_help; /**< @brief Sets the shader to load and use from ~/.config/slop/ or /usr/share/. help description.  */
   
   unsigned int help_given ;	/**< @brief Whether help was given.  */
   unsigned int version_given ;	/**< @brief Whether version was given.  */
@@ -128,6 +144,12 @@ struct gengetopt_args_info
   unsigned int min_given ;	/**< @brief Whether min was given.  */
   unsigned int max_given ;	/**< @brief Whether max was given.  */
   unsigned int highlight_given ;	/**< @brief Whether highlight was given.  */
+  unsigned int opengl_given ;	/**< @brief Whether opengl was given.  */
+  unsigned int magnify_given ;	/**< @brief Whether magnify was given.  */
+  unsigned int magstrength_given ;	/**< @brief Whether magstrength was given.  */
+  unsigned int magpixels_given ;	/**< @brief Whether magpixels was given.  */
+  unsigned int theme_given ;	/**< @brief Whether theme was given.  */
+  unsigned int shader_given ;	/**< @brief Whether shader was given.  */
 
   char **inputs ; /**< @brief unamed options (options without names) */
   unsigned inputs_num ; /**< @brief unamed options number */

@@ -146,6 +146,16 @@ int slop( gengetopt_args_info options, int* x, int* y, int* w, int* h, Window* w
     if ( options.highlight_flag ) {
         slopcommand << " -l";
     }
+    if ( options.opengl_flag ) {
+        slopcommand << " --opengl";
+        if ( options.magnify_flag ) {
+            slopcommand << " --magnify";
+        }
+        slopcommand << " --magstrength=" << options.magstrength_arg;
+        slopcommand << " --magpixels=" << options.magpixels_arg;
+        slopcommand << " --theme=" << options.theme_arg;
+        slopcommand << " --shader=" << options.shader_arg;
+    }
     slopcommand << "\n";
     std::string result;
     int err = exec( slopcommand.str(), &result );
@@ -354,11 +364,7 @@ int app( int argc, char** argv ) {
         if ( checkMask( options.mask_arg, x, y, w, h, window ) ) {
             imengine->mask( x, y, w, h );
         }
-        if ( options.format_given ) {
-            err = imengine->save( file, options.format_arg );
-        } else {
-            err = imengine->save( file, "" );
-        }
+        err = imengine->save( file, options.format_arg );
         cmdline_parser_free( &options );
         if ( err != EXIT_SUCCESS ) {
             fprintf( stderr, "Failed to take screenshot.\n" );

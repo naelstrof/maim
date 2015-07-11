@@ -61,6 +61,12 @@ const char *gengetopt_args_info_help[] = {
   "      --min=INT                 Set the minimum output of width or height\n                                  values. This is useful to avoid outputting 0.\n                                  Setting min and max to the same value\n                                  disables drag selections.  (default=`0')",
   "      --max=INT                 Set the maximum output of width or height\n                                  values. Setting min and max to the same value\n                                  disables drag selections.  (default=`0')",
   "  -l, --highlight               Instead of outlining selections, slop\n                                  highlights it. This is only useful when\n                                  --color is set to a transparent color.\n                                  (default=off)",
+  "      --opengl                  Enable hardware acceleration. Only works with\n                                  modern systems that are also running a\n                                  compositor.  (default=off)",
+  "      --magnify                 Display a magnifying glass when --opengl is\n                                  also enabled.  (default=off)",
+  "      --magstrength=FLOAT       Sets how many times the magnification window\n                                  size is multiplied.  (default=`4')",
+  "      --magpixels=INT           Sets how many pixels are displayed in the\n                                  magnification. The less pixels the bigger the\n                                  magnification.  (default=`64')",
+  "      --theme=STRING            Sets the theme of the selection, using textures\n                                  from ~/.config/slop/ or /usr/share/.\n                                  (default=`none')",
+  "      --shader=STRING           Sets the shader to load and use from\n                                  ~/.config/slop/ or /usr/share/.\n                                  (default=`simple')",
   "\nExamples\n    $ # Screenshot the active window\n    $ maim -i $(xdotool getactivewindow)\n\n    $ # Prompt a transparent red selection to screenshot.\n    $ maim -s -c 1,0,0,0.6\n\n    $ # Save a dated screenshot.\n    $ maim ~/$(date +%F-%T).png\n\n    $ # Output screenshot to stdout.\n    $ maim --format png /dev/stdout\n\n",
     0
 };
@@ -69,6 +75,7 @@ typedef enum {ARG_NO
   , ARG_FLAG
   , ARG_STRING
   , ARG_INT
+  , ARG_FLOAT
 } cmdline_parser_arg_type;
 
 static
@@ -114,6 +121,12 @@ void clear_given (struct gengetopt_args_info *args_info)
   args_info->min_given = 0 ;
   args_info->max_given = 0 ;
   args_info->highlight_given = 0 ;
+  args_info->opengl_given = 0 ;
+  args_info->magnify_given = 0 ;
+  args_info->magstrength_given = 0 ;
+  args_info->magpixels_given = 0 ;
+  args_info->theme_given = 0 ;
+  args_info->shader_given = 0 ;
 }
 
 static
@@ -155,6 +168,16 @@ void clear_args (struct gengetopt_args_info *args_info)
   args_info->max_arg = 0;
   args_info->max_orig = NULL;
   args_info->highlight_flag = 0;
+  args_info->opengl_flag = 0;
+  args_info->magnify_flag = 0;
+  args_info->magstrength_arg = 4;
+  args_info->magstrength_orig = NULL;
+  args_info->magpixels_arg = 64;
+  args_info->magpixels_orig = NULL;
+  args_info->theme_arg = gengetopt_strdup ("none");
+  args_info->theme_orig = NULL;
+  args_info->shader_arg = gengetopt_strdup ("simple");
+  args_info->shader_orig = NULL;
   
 }
 
@@ -188,6 +211,12 @@ void init_args_info(struct gengetopt_args_info *args_info)
   args_info->min_help = gengetopt_args_info_help[24] ;
   args_info->max_help = gengetopt_args_info_help[25] ;
   args_info->highlight_help = gengetopt_args_info_help[26] ;
+  args_info->opengl_help = gengetopt_args_info_help[27] ;
+  args_info->magnify_help = gengetopt_args_info_help[28] ;
+  args_info->magstrength_help = gengetopt_args_info_help[29] ;
+  args_info->magpixels_help = gengetopt_args_info_help[30] ;
+  args_info->theme_help = gengetopt_args_info_help[31] ;
+  args_info->shader_help = gengetopt_args_info_help[32] ;
   
 }
 
@@ -298,6 +327,12 @@ cmdline_parser_release (struct gengetopt_args_info *args_info)
   free_string_field (&(args_info->color_orig));
   free_string_field (&(args_info->min_orig));
   free_string_field (&(args_info->max_orig));
+  free_string_field (&(args_info->magstrength_orig));
+  free_string_field (&(args_info->magpixels_orig));
+  free_string_field (&(args_info->theme_arg));
+  free_string_field (&(args_info->theme_orig));
+  free_string_field (&(args_info->shader_arg));
+  free_string_field (&(args_info->shader_orig));
   
   
   for (i = 0; i < args_info->inputs_num; ++i)
@@ -424,6 +459,18 @@ cmdline_parser_dump(FILE *outfile, struct gengetopt_args_info *args_info)
     write_into_file(outfile, "max", args_info->max_orig, 0);
   if (args_info->highlight_given)
     write_into_file(outfile, "highlight", 0, 0 );
+  if (args_info->opengl_given)
+    write_into_file(outfile, "opengl", 0, 0 );
+  if (args_info->magnify_given)
+    write_into_file(outfile, "magnify", 0, 0 );
+  if (args_info->magstrength_given)
+    write_into_file(outfile, "magstrength", args_info->magstrength_orig, 0);
+  if (args_info->magpixels_given)
+    write_into_file(outfile, "magpixels", args_info->magpixels_orig, 0);
+  if (args_info->theme_given)
+    write_into_file(outfile, "theme", args_info->theme_orig, 0);
+  if (args_info->shader_given)
+    write_into_file(outfile, "shader", args_info->shader_orig, 0);
   
 
   i = EXIT_SUCCESS;
@@ -607,6 +654,9 @@ int update_arg(void *field, char **orig_field,
   case ARG_INT:
     if (val) *((int *)field) = strtol (val, &stop_char, 0);
     break;
+  case ARG_FLOAT:
+    if (val) *((float *)field) = (float)strtod (val, &stop_char);
+    break;
   case ARG_STRING:
     if (val) {
       string_field = (char **)field;
@@ -622,6 +672,7 @@ int update_arg(void *field, char **orig_field,
   /* check numeric conversion */
   switch(arg_type) {
   case ARG_INT:
+  case ARG_FLOAT:
     if (val && !(stop_char && *stop_char == '\0')) {
       fprintf(stderr, "%s: invalid numeric value: %s\n", package_name, val);
       return 1; /* failure */
@@ -714,6 +765,12 @@ cmdline_parser_internal (
         { "min",	1, NULL, 0 },
         { "max",	1, NULL, 0 },
         { "highlight",	0, NULL, 'l' },
+        { "opengl",	0, NULL, 0 },
+        { "magnify",	0, NULL, 0 },
+        { "magstrength",	1, NULL, 0 },
+        { "magpixels",	1, NULL, 0 },
+        { "theme",	1, NULL, 0 },
+        { "shader",	1, NULL, 0 },
         { 0,  0, 0, 0 }
       };
 
@@ -1012,6 +1069,86 @@ cmdline_parser_internal (
                 &(local_args_info.max_given), optarg, 0, "0", ARG_INT,
                 check_ambiguity, override, 0, 0,
                 "max", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Enable hardware acceleration. Only works with modern systems that are also running a compositor..  */
+          else if (strcmp (long_options[option_index].name, "opengl") == 0)
+          {
+          
+          
+            if (update_arg((void *)&(args_info->opengl_flag), 0, &(args_info->opengl_given),
+                &(local_args_info.opengl_given), optarg, 0, 0, ARG_FLAG,
+                check_ambiguity, override, 1, 0, "opengl", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Display a magnifying glass when --opengl is also enabled..  */
+          else if (strcmp (long_options[option_index].name, "magnify") == 0)
+          {
+          
+          
+            if (update_arg((void *)&(args_info->magnify_flag), 0, &(args_info->magnify_given),
+                &(local_args_info.magnify_given), optarg, 0, 0, ARG_FLAG,
+                check_ambiguity, override, 1, 0, "magnify", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Sets how many times the magnification window size is multiplied..  */
+          else if (strcmp (long_options[option_index].name, "magstrength") == 0)
+          {
+          
+          
+            if (update_arg( (void *)&(args_info->magstrength_arg), 
+                 &(args_info->magstrength_orig), &(args_info->magstrength_given),
+                &(local_args_info.magstrength_given), optarg, 0, "4", ARG_FLOAT,
+                check_ambiguity, override, 0, 0,
+                "magstrength", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Sets how many pixels are displayed in the magnification. The less pixels the bigger the magnification..  */
+          else if (strcmp (long_options[option_index].name, "magpixels") == 0)
+          {
+          
+          
+            if (update_arg( (void *)&(args_info->magpixels_arg), 
+                 &(args_info->magpixels_orig), &(args_info->magpixels_given),
+                &(local_args_info.magpixels_given), optarg, 0, "64", ARG_INT,
+                check_ambiguity, override, 0, 0,
+                "magpixels", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Sets the theme of the selection, using textures from ~/.config/slop/ or /usr/share/..  */
+          else if (strcmp (long_options[option_index].name, "theme") == 0)
+          {
+          
+          
+            if (update_arg( (void *)&(args_info->theme_arg), 
+                 &(args_info->theme_orig), &(args_info->theme_given),
+                &(local_args_info.theme_given), optarg, 0, "none", ARG_STRING,
+                check_ambiguity, override, 0, 0,
+                "theme", '-',
+                additional_error))
+              goto failure;
+          
+          }
+          /* Sets the shader to load and use from ~/.config/slop/ or /usr/share/..  */
+          else if (strcmp (long_options[option_index].name, "shader") == 0)
+          {
+          
+          
+            if (update_arg( (void *)&(args_info->shader_arg), 
+                 &(args_info->shader_orig), &(args_info->shader_given),
+                &(local_args_info.shader_given), optarg, 0, "simple", ARG_STRING,
+                check_ambiguity, override, 0, 0,
+                "shader", '-',
                 additional_error))
               goto failure;
           

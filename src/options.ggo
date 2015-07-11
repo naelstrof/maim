@@ -120,6 +120,34 @@ option "highlight" l "Instead of outlining selections, slop highlights it. This 
     flag
     off
 
+option "opengl" - "Enable hardware acceleration. Only works with modern systems that are also running a compositor."
+    flag
+    off
+
+option "magnify" - "Display a magnifying glass when --opengl is also enabled."
+    flag
+    off
+
+option "magstrength" - "Sets how many times the magnification window size is multiplied."
+    float
+    default="4"
+    optional
+
+option "magpixels" - "Sets how many pixels are displayed in the magnification. The less pixels the bigger the magnification."
+    int
+    default="64"
+    optional
+
+option "theme" - "Sets the theme of the selection, using textures from ~/.config/slop/ or /usr/share/."
+    string
+    default="none"
+    optional
+
+option "shader" - "Sets the shader to load and use from ~/.config/slop/ or /usr/share/."
+    string
+    default="simple"
+    optional
+
 text "\nExamples\n"
 text "    $ # Screenshot the active window\n"
 text "    $ maim -i $(xdotool getactivewindow)\n"
