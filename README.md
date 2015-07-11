@@ -123,8 +123,8 @@ Options
                                   of the given window, rather than the top-left
                                   100x100 pixels of the root window.
                                   (default=off)
-      --hidecursor              Prevents the system cursor from showing up in
-                                  screenshots.  (default=off)
+      --showcursor              Causes the system cursor to be blended on top
+                                  of the screenshot.  (default=off)
   -m, --mask=STRING             Masks off-screen pixels so they don't show up
                                   in screenshots.  (possible values="auto",
                                   "off", "on" default=`auto')

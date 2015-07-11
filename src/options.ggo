@@ -59,7 +59,7 @@ option "localize" - "Localizes given geometry to the given window. So \"maim -i 
     flag
     off
 
-option "hidecursor" - "Prevents the system cursor from showing up in screenshots."
+option "showcursor" - "Causes the system cursor to be blended on top of the screenshot."
     flag
     off
 

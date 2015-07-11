@@ -348,7 +348,7 @@ int app( int argc, char** argv ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
-        if ( !options.hidecursor_flag ) {
+        if ( options.showcursor_flag ) {
             imengine->blendCursor( window, x, y );
         }
         if ( checkMask( options.mask_arg, x, y, w, h, window ) ) {
@@ -376,7 +376,7 @@ int app( int argc, char** argv ) {
             fprintf( stderr, "Failed to take screenshot.\n" );
             return EXIT_FAILURE;
         }
-        if ( !options.hidecursor_flag ) {
+        if ( options.showcursor_flag ) {
             imengine->blendCursor( window, x, y );
         }
         if ( checkMask( options.mask_arg, x, y, w, h, window ) ) {
@@ -401,7 +401,7 @@ int app( int argc, char** argv ) {
         fprintf( stderr, "Failed to take screenshot.\n" );
         return EXIT_FAILURE;
     }
-    if ( !options.hidecursor_flag ) {
+    if ( options.showcursor_flag ) {
         imengine->blendCursor( window );
     }
     if ( checkMask( options.mask_arg, 0, 0, WidthOfScreen( xengine->m_screen ), HeightOfScreen( xengine->m_screen ), window ) ) {
