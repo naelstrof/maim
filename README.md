@@ -86,7 +86,7 @@ help
 ----
 Join us on irc at freenode in *#maim*.
 ```text
-maim v3.4.44
+maim v3.4.45
 
 Copyright (C) 2014 Dalton Nell, Maim Contributors
 (https://github.com/naelstrof/maim/graphs/contributors)
@@ -125,6 +125,7 @@ Options
                                   (default=off)
       --showcursor              Causes the system cursor to be blended on top
                                   of the screenshot.  (default=off)
+      --hidecursor              Deprecated, does nothing.  (default=off)
   -m, --mask=STRING             Masks off-screen pixels so they don't show up
                                   in screenshots.  (possible values="auto",
                                   "off", "on" default=`auto')
@@ -162,6 +163,22 @@ Slop Options
                                   highlights it. This is only useful when
                                   --color is set to a transparent color.
                                   (default=off)
+      --opengl                  Enable hardware acceleration. Only works with
+                                  modern systems that are also running a
+                                  compositor.  (default=off)
+      --magnify                 Display a magnifying glass when --opengl is
+                                  also enabled.  (default=off)
+      --magstrength=FLOAT       Sets how many times the magnification window
+                                  size is multiplied.  (default=`4')
+      --magpixels=INT           Sets how many pixels are displayed in the
+                                  magnification. The less pixels the bigger the
+                                  magnification.  (default=`64')
+      --theme=STRING            Sets the theme of the selection, using textures
+                                  from ~/.config/slop/ or /usr/share/.
+                                  (default=`none')
+      --shader=STRING           Sets the shader to load and use from
+                                  ~/.config/slop/ or /usr/share/.
+                                  (default=`simple')
 
 Examples
     $ # Screenshot the active window
