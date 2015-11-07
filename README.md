@@ -86,12 +86,6 @@ Special Thanks for Special People
 ----
 [Evan Purkhiser](https://github.com/EvanPurkhiser)
 
-Donate
-----
-Have you bought a programmer a coffee before? Me neither, but some money would help development I'm sure.
-
-<span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=JFPY6S86YUNZJ" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
-
 Help
 ----
 Join us on irc at freenode in *#maim*.
