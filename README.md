@@ -90,7 +90,7 @@ Help
 ----
 Join us on irc at freenode in *#maim*.
 ```text
-maim v3.4.46
+maim v3.4.47
 
 Copyright (C) 2014 Dalton Nell, Maim Contributors
 (https://github.com/naelstrof/maim/graphs/contributors)

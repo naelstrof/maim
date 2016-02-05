@@ -65,8 +65,17 @@ int maim::IMEngine::screenshot( Window id ) {
         fprintf( stderr, "Error: Failed to grab window geometry of window id: %lu\n", id );
         return EXIT_FAILURE;
     }
-    Window junk;
-    XTranslateCoordinates( xengine->m_display, xengine->m_root, id, x, y, &x, &y, &junk );
+    Window junk, parent, *children = NULL;
+    unsigned int num_children;
+
+    if(!XQueryTree( xengine->m_display, id, &junk, &parent, &children, &num_children ) ) {
+        return EXIT_FAILURE;
+    }
+    
+    if ( parent == None ) {
+        parent = xengine->m_root;
+    }
+    XTranslateCoordinates( xengine->m_display, parent, id, x, y, &x, &y, &junk );
 
     return screenshot (id, x, y, w, h);
 }

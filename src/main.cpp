@@ -281,12 +281,6 @@ int app( int argc, char** argv ) {
     Window window = xengine->m_root;
     if ( options.windowid_given ) {
         window = (Window)options.windowid_arg;
-        // Since we have a window we need to turn root coords into our local window coords.
-        // but only if the user wants us to.
-        if ( !options.localize_flag && window != None ) {
-            Window junk;
-            XTranslateCoordinates( xengine->m_display, xengine->m_root, window, x, y, &x, &y, &junk );
-        }
     }
     // Get our file name
     std::string file = "";
