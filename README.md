@@ -67,6 +67,7 @@ In review, maim does one thing and does it well: it takes a screenshot of what y
 * [OpenBSD: graphics/maim](http://openports.se/graphics/maim)
 * [CRUX: 6c37/maim](https://github.com/6c37/crux-ports/tree/3.2/maim)
 * [Gentoo: media-gfx/maim::fkmclane](https://github.com/fkmclane/overlay/tree/master/media-gfx/maim)
+* [NixOS: maim](https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/graphics/maim/default.nix)
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
 
