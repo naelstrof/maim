@@ -1,4 +1,4 @@
-/* x.hpp: initializes x11
+/* cimg.hpp: cimg helper
  *
  * Copyright (C) 2014: Dalton Nell, Maim Contributors (https://github.com/naelstrof/slop/graphs/contributors).
  *
@@ -18,24 +18,23 @@
  * along with Maim.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef N_X_H_
-#define N_X_H_
+#ifndef N_CIMG_H_
+#define N_CIMG_H_
 
 #include <iostream>
-#include <X11/Xlib.h>
-#include <string>
 #include <stdexcept>
+#include <CImg.h>
 
-class X11 {
-public:
-    X11( std::string displayName );
-    ~X11();
-    Display* display;
-    Visual* visual;
-    Screen* screen;
-    Window root;
-};
+static inline int get_shift (int mask) {
+    int shift = 0;
+    while (mask) {
+        if (mask & 1) { break; }
+        shift++;
+        mask >>= 1;
+    }
+    return shift;
+}
 
-extern X11* x11;
+cimg_library::CImg<unsigned char> cimg_from_x11( XImage* image );
 
 #endif

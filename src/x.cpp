@@ -1,101 +1,16 @@
-/* x.cpp: Handles starting and managing X
- *
- * Copyright (C) 2014: Dalton Nell, Maim Contributors (https://github.com/naelstrof/maim/graphs/contributors).
- *
- * This file is part of Maim.
- *
- * Maim is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Maim is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Maim.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "x.hpp"
 
-maim::XEngine* xengine = new maim::XEngine();
-
-maim::XEngine::XEngine() {
-    m_display = NULL;
-    m_visual = NULL;
-    m_screen = NULL;
-    m_res = NULL;
-    m_good = false;
-}
-
-maim::XEngine::~XEngine() {
-    if ( !m_good ) {
-        return;
-    }
-
-    if ( m_res ) {
-        XRRFreeScreenResources( m_res );
-    }
-
-    XCloseDisplay( m_display );
-}
-
-int maim::XEngine::init( std::string display ) {
+X11::X11( std::string displayName ) {
     // Initialize display
-    m_display = XOpenDisplay( display.c_str() );
-    if ( !m_display ) {
-        fprintf( stderr, "Error: Failed to open X display %s\n", display.c_str() );
-        return 1;
+    display = XOpenDisplay( displayName.c_str() );
+    if ( !display ) {
+        throw new std::runtime_error(std::string("Error: Failed to open X display: ") + displayName );
     }
-    m_screen    = ScreenOfDisplay( m_display, DefaultScreen( m_display ) );
-    m_visual    = DefaultVisual  ( m_display, XScreenNumberOfScreen( m_screen ) );
-    m_colormap  = DefaultColormap( m_display, XScreenNumberOfScreen( m_screen ) );
-    m_root      = RootWindow     ( m_display, XScreenNumberOfScreen( m_screen ) );
-    //m_root      = DefaultRootWindow( m_display );
-
-    // We ignore X errors since we don't care if we fail to get
-    // the physical monitor positions.
-    XErrorHandler originalHandler = XSetErrorHandler( maim::IgnoreErrorHandler );
-    m_res = XRRGetScreenResourcesCurrent( m_display, m_root);
-    XSetErrorHandler( originalHandler );
-    if ( !m_res ) {
-        fprintf( stderr, "Warning: Failed to get screen resources. Multi-monitor X screens won't have garbage visual data removed.\n" );
-    }
-
-    m_good = true;
-    return EXIT_SUCCESS;
+    screen = ScreenOfDisplay( display, DefaultScreen( display ) );
+    visual = DefaultVisual( display, XScreenNumberOfScreen( screen ) );
+    root = DefaultRootWindow( display );
 }
 
-Window maim::XEngine::getWindowByID( int id ) {
-    // There's actually no way to check if the id is valid...
-    return (Window)id;
-    // The only thing we can do is use it and see if we get a BadWindow error later.
-}
-
-// This stuff is used to detect which pixels we can actually see with
-// the physical monitor positions.
-// It's useful for people with multimonitor setups where the monitors
-// don't fit together well since we can black out the pixels that are
-// generally just garbage.
-std::vector<XRRCrtcInfo*> maim::XEngine::getCRTCS() {
-    std::vector<XRRCrtcInfo*> monitors;
-    if ( !m_res ) {
-        return monitors;
-    }
-    for ( int i=0;i<m_res->ncrtc;i++ ) {
-        monitors.push_back( XRRGetCrtcInfo( m_display, m_res, m_res->crtcs[ i ] ) );
-    }
-    return monitors;
-}
-
-void maim::XEngine::freeCRTCS( std::vector<XRRCrtcInfo*> monitors ) {
-    for ( unsigned int i=0;i<monitors.size();i++ ) {
-        XRRFreeCrtcInfo( monitors[ i ] );
-    }
-}
-
-int maim::IgnoreErrorHandler( Display* dpy, XErrorEvent* event ) {
-    return EXIT_SUCCESS;
+X11::~X11() {
+    XCloseDisplay( display );
 }
