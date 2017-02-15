@@ -1,10 +1,12 @@
 #include <iostream>
 #include <slop.hpp>
 #include <glm/glm.hpp>
+#include <fstream>
 
 #include "x.hpp"
 #include "options.hpp"
 #include "image.hpp"
+#include "windowhelper.hpp"
 
 class MaimOptions {
 public:
@@ -14,7 +16,11 @@ public:
     Window window;
     glm::vec4 geometry;
     float delay;
+    bool select;
     bool hideCursor;
+    bool geometryGiven;
+    bool windowGiven;
+    bool savepathGiven;
 };
 
 MaimOptions::MaimOptions() {
@@ -23,18 +29,20 @@ MaimOptions::MaimOptions() {
     window = None;
     delay = 0;
     hideCursor = false;
+    geometryGiven = false;
+    savepathGiven = false;
+    windowGiven = false;
 }
 
 MaimOptions* getMaimOptions( Options& options ) {
     MaimOptions* foo = new MaimOptions();
-    options.getWindow("window", 'i', foo->window);
-    options.getGeometry("geometry", 'g', foo->geometry);
+    foo->windowGiven = options.getWindow("window", 'i', foo->window);
+    foo->geometryGiven = options.getGeometry("geometry", 'g', foo->geometry);
     options.getFloat("delay", 'd', foo->delay);
     options.getBool("hidecursor", 'u', foo->hideCursor);
+    options.getBool("select", 's', foo->select);
     options.getString("format", 'f', foo->format);
-    if (!options.getFloatingString(0, foo->savepath)) {
-        foo->savepath = "/dev/stdout";
-    }
+    foo->savepathGiven = options.getFloatingString(0, foo->savepath);
     return foo;
 }
 
@@ -47,7 +55,7 @@ SlopOptions* getSlopOptions( Options& options ) {
     options.getColor("color", 'c', color);
     options.getBool("nokeyboard", 'k', foo->nokeyboard);
     options.getString( "xdisplay", 'x', foo->xdisplay );
-    options.getString( "shader", 's', foo->shader );
+    options.getString( "shader", 'r', foo->shader );
     foo->r = color.r;
     foo->g = color.g;
     foo->b = color.b;
@@ -62,15 +70,69 @@ int app( int argc, char** argv ) {
     SlopOptions* slopOptions = getSlopOptions( options );
     MaimOptions* maimOptions = getMaimOptions( options );
     bool cancelled = false;
-    SlopSelection selection = SlopSelect(slopOptions, &cancelled, false);
-    if ( cancelled ) {
-        return 1;
+    SlopSelection selection(0,0,0,0,0);
+
+    if ( maimOptions->geometryGiven && maimOptions->select && maimOptions->windowGiven ) {
+        throw new std::invalid_argument( "You can't specify geometry, or a window ID and enable select mode at the same time!\n" );
     }
 
+    if ( maimOptions->select ) {
+        selection = SlopSelect(slopOptions, &cancelled, false);
+        if ( cancelled ) {
+            return 1;
+        }
+    }
+
+    // Boot up x11
     X11* x11 = new X11(slopOptions->xdisplay);
-    XImage* image = XGetImage( x11->display, x11->root, selection.x, selection.y, selection.w, selection.h, 0xffffffff, ZPixmap );
+
+    if ( !maimOptions->windowGiven ) {
+        maimOptions->window = x11->root;
+    }
+    if ( !maimOptions->geometryGiven ) {
+        maimOptions->geometry = glm::vec4( 0, 0, WidthOfScreen( x11->screen ), HeightOfScreen( x11->screen ) );
+    }
+    if ( !maimOptions->select ) {
+        selection.x = maimOptions->geometry.x;
+        selection.y = maimOptions->geometry.y;
+        selection.w = maimOptions->geometry.z;
+        selection.h = maimOptions->geometry.w;
+        selection.id = maimOptions->window;
+    }
+    std::ostream* out;
+    if ( maimOptions->savepathGiven ) {
+        std::ofstream* file = new std::ofstream();
+        file->open(maimOptions->savepath.c_str());
+        out = file;
+    } else {
+        out = &std::cout;
+    }
+
+    // Ok we have our guaranteed selection area, and output stream.
+    // First we need to clamp the selection to fit within the
+    // provided window.
+    glm::vec4 sourceGeo = getWindowGeometry( x11, selection.id );
+    selection.x = glm::max( selection.x, sourceGeo.x );
+    selection.y = glm::max( selection.y, sourceGeo.y );
+    selection.w = glm::min( selection.w, sourceGeo.z );
+    selection.h = glm::min( selection.h, sourceGeo.w );
+
+    XWindowAttributes attr;         
+    XGetWindowAttributes( x11->display, selection.id, &attr );
+    // Move the selection into our local coordinates
+    selection.x -= attr.x;
+    selection.y -= attr.y;
+    // Then we grab the pixel buffer of the provided window/selection.
+    XImage* image = XGetImage( x11->display, selection.id, selection.x, selection.y, selection.w, selection.h, AllPlanes, ZPixmap );
+    // Convert it to an RGBA format
     RGBAImage convert(image);
-    convert.writePNG(std::cout);
+    // Then output it in the desired format.
+    convert.writePNG(*out);
+    if ( maimOptions->savepathGiven ) {
+        std::ofstream* file = (std::ofstream*)out;
+        file->close();
+        delete (std::ofstream*)out;
+    }
     delete x11;
     delete maimOptions;
     delete slopOptions;
