@@ -36,6 +36,4 @@ public:
     Window root;
 };
 
-extern X11* x11;
-
 #endif

@@ -107,6 +107,8 @@ void Options::validate( int argc, char** argv ) {
             if ( floatingValues.size() > maxFloatingValues ) {
                 throw new std::invalid_argument("Unexpected floating value `" + argument + "`. Forget to specify an option?" );
             }
+            i++;
+            continue;
         }
         if ( argument[0] == '-' && argument[1] == '-' ) {
             i += validateStringOption( argc, argv, i );
@@ -211,6 +213,83 @@ bool Options::getBool( std::string name, char namec, bool& found ) {
             found = true;
             return true;
         }
+    }
+    return false;
+}
+
+bool Options::getGeometry( std::string name, char namec, glm::vec4& found ) {
+    for( unsigned int i=0;i<arguments.size();i++ ) {
+        if ( arguments[i] == name || arguments[i] == std::string("")+namec ) {
+            std::string::size_type sz = 0;
+            std::string value = values[i];
+            glm::vec2 dim(0,0);
+            int curpos = 0;
+            glm::vec2 pos(0,0);
+            try {
+                if ( std::count(value.begin(), value.end(), '+') > 2 ) {
+                    throw "dur";
+                }
+                if ( std::count(value.begin(), value.end(), 'x') > 1 ) {
+                    throw "dur";
+                }
+                while( value != "" ) {
+                    switch( value[sz] ) {
+                        case 'x':
+                            dim.y = std::stof(value,&sz);
+                            break;
+                        case '+':
+                            pos[curpos++] = std::stof(value, &sz);
+                            break;
+                        default:
+                            dim.x = std::stof(value,&sz);
+                            break;
+                    }
+                    value = value.substr(sz);
+                }
+            } catch ( ... ) {
+                throw new std::invalid_argument("Unable to parse `" + arguments[i] + "`'s value `" + values[i] + "` as a geometry. Should be in the format wxh+x+y, +x+y, or wxh. Like 600x400+10+20");
+            }
+            found.x = pos.x;
+            found.y = pos.y;
+            found.z = dim.x;
+            found.w = dim.y;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Options::getWindow( std::string name, char namec, Window& found ) {
+    for( unsigned int i=0;i<arguments.size();i++ ) {
+        if ( arguments[i] == name || arguments[i] == std::string("")+namec ) {
+            if ( arguments[i].size() > 1 && arguments[i].find("=") == std::string::npos ) {
+                throw new std::invalid_argument("Expected `=` after " + arguments[i]);
+            }
+            std::string::size_type sz;
+            float retvar;
+            try {
+                retvar = std::stoi(values[i],&sz);
+            } catch ( ... ) {
+                try {
+                    retvar = std::stoul(values[i],&sz,16);
+                } catch ( ... ) {
+                    throw new std::invalid_argument("Unable to parse " + arguments[i] + "'s value " + values[i] + " as an integer or hex.");
+                }
+            }
+            if ( sz != values[i].length() ) {
+                throw new std::invalid_argument("Unable to parse " + arguments[i] + "'s value " + values[i] + " as an integer or hex.");
+            }
+            found = retvar;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Options::getFloatingString( int index, std::string& found ) {
+    if ( index >= 0 && index < floatingValues.size() && floatingValues.size() > 0 ) {
+        found = floatingValues[index];
+        return true;
     }
     return false;
 }

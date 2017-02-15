@@ -23,16 +23,18 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <exception>
 #include <stdexcept>
 #include <vector>
 #include <glm/glm.hpp>
+#include <X11/Xlib.h>
 
-static std::string validStringArguments[] = { "bordersize", "padding", "color", "shader", "highlight", "format", "tolerance", "nodecorations", "nokeyboard", "help", "xdisplay", "version" };
-static char validCharArguments[] = { 'b', 'p', 'c', 's', 'l', 'f', 't', 'n', 'k', 'h', 'x', 'v' };
-static unsigned int isFlagArgument[] = { false, false, false, false, true, false, false, true, true, true, false, true };
-static unsigned int validArgumentCount = 12;
-static unsigned int maxFloatingValues = 0;
+static std::string validStringArguments[] = { "bordersize", "padding", "color", "shader", "highlight", "format", "tolerance", "nodecorations", "nokeyboard", "help", "xdisplay", "version", "quiet", "window", "geometry", "delay", "hidecursor" };
+static char validCharArguments[] = { 'b', 'p', 'c', 'r', 'l', 'f', 't', 'n', 'k', 'h', 'x', 'v', 'q', 'i', 'g', 'd', 'u' };
+static unsigned int isFlagArgument[] = { false, false, false, false, true, false, false, false, true, true, false, true, true, false, false, false, false, true };
+static unsigned int validArgumentCount = 17;
+static unsigned int maxFloatingValues = 1;
 
 class Options {
 private:
@@ -51,6 +53,9 @@ public:
     bool getString( std::string name, char namec, std::string& found );
     bool getColor( std::string name, char namec, glm::vec4& found );
     bool getBool( std::string name, char namec, bool& found );
+    bool getGeometry( std::string name, char namec, glm::vec4& found );
+    bool getWindow( std::string name, char namec, Window& found );
+    bool getFloatingString( int index, std::string& found );
 };
 
 #endif // N_OPTIONS_H_

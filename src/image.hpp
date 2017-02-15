@@ -1,4 +1,4 @@
-/* cimg.hpp: cimg helper
+/* image.hpp: image helper
  *
  * Copyright (C) 2014: Dalton Nell, Maim Contributors (https://github.com/naelstrof/slop/graphs/contributors).
  *
@@ -18,12 +18,13 @@
  * along with Maim.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef N_CIMG_H_
-#define N_CIMG_H_
+#ifndef N_IMAGE_H_
+#define N_IMAGE_H_
 
 #include <iostream>
+#include <png.h>
+#include <X11/Xlib.h>
 #include <stdexcept>
-#include <CImg.h>
 
 static inline int get_shift (int mask) {
     int shift = 0;
@@ -35,6 +36,15 @@ static inline int get_shift (int mask) {
     return shift;
 }
 
-cimg_library::CImg<unsigned char> cimg_from_x11( XImage* image );
+class RGBAImage {
+private:
+    char* data;
+    unsigned int width;
+    unsigned int height;
+public:
+    RGBAImage( XImage* image );
+    ~RGBAImage();
+    void writePNG( std::ostream& streamout );
+};
 
 #endif
