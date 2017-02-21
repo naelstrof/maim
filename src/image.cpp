@@ -1,67 +1,59 @@
 #include "image.hpp"
 
-RGBAImage::~RGBAImage() {
+ARGBImage::~ARGBImage() {
+    delete data;
 }
 
-RGBAImage::RGBAImage( XImage* image ) {
+ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect ) {
+    glm::ivec2 spos = glm::ivec2( selectionrect.x, selectionrect.y );
+    glm::ivec2 ssize = glm::ivec2( selectionrect.z, selectionrect.w );
+    glm::ivec2 offset = spos-iloc;
     long long int alpha_mask = ~(image->red_mask|image->green_mask|image->blue_mask);
     long long int roffset = get_shift(image->red_mask);
     long long int goffset = get_shift(image->green_mask);
     long long int boffset = get_shift(image->blue_mask);
     long long int aoffset = get_shift(alpha_mask);
 
-    const void* ptrs = image->data;
-    data = new char[image->width*image->height*4];
-    char* crawler = data;
+    // Zero our data.
+    data = new unsigned char[ssize.x*ssize.y*4];
+    for ( unsigned int i = 0; i < ssize.x*ssize.y*4; i++ ) {
+        data[i] = 0;
+    }
 
-    width = image->width;
-    height = image->height;
-	switch( image->bits_per_pixel ) {
-		case 32:
-            for ( uint off = (image->width*image->height); off>0; --off ) {
-                unsigned int real = *static_cast<const unsigned int*>(ptrs);
-                *(crawler++) = (real & image->red_mask) >> roffset;
-                *(crawler++) = (real & image->green_mask) >> goffset;
-                *(crawler++) = (real & image->blue_mask) >> boffset;
-                *(crawler++) = (real & alpha_mask) >> aoffset;
-                ptrs = static_cast<const unsigned int*>(ptrs) + 1;
+    // Find the intersection of the rectangles.
+    int maxx = glm::max( offset.x, 0 );
+    int maxy = glm::max( offset.y, 0 );
+    int minw = glm::min( offset.x+ssize.x, image->width );
+    int minh = glm::min( offset.y+ssize.y, image->height );
+
+    width = ssize.x;
+    height = ssize.y;
+    if ( aoffset >= image->depth ) {
+        // Loop only through the intersecting parts, copying everything.
+        for ( unsigned int y = maxy; y < minh; y++ ) {
+            for ( unsigned int x = maxx; x < minw; x++ ) {
+                unsigned int real = XGetPixel(image, x, y);
+                int curpixel = ((y-offset.y)*ssize.x+((x-offset.x)))*4;
+                data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+                data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+                data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+                data[curpixel+3] = 255;
             }
-            break;
-        case 16:
-            for ( uint off = (image->width*image->height); off>0; --off ) {
-                unsigned short real = *static_cast<const unsigned short*>(ptrs);
-                *(crawler++) = (real & image->red_mask) >> roffset;
-                *(crawler++) = (real & image->green_mask) >> goffset;
-                *(crawler++) = (real & image->blue_mask) >> boffset;
-                *(crawler++) = (real & alpha_mask) >> aoffset;
-                ptrs = static_cast<const unsigned short*>(ptrs) + 1;
+        }
+    } else {
+        // Loop only through the intersecting parts, copying everything.
+        for ( unsigned int y = maxy; y < minh; y++ ) {
+            for ( unsigned int x = maxx; x < minw; x++ ) {
+                unsigned int real = XGetPixel(image, x, y);
+                int curpixel = ((y-offset.y)*ssize.x+(x-offset.x))*4;
+                data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+                data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+                data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+                data[curpixel+3] = (unsigned char)((real & alpha_mask) >> aoffset);
             }
-            break;
-        // Oh god this sucks, who thought 24 bits was a good idea?
-        case 24:
-            for ( uint off = (image->width*image->height); off>0; --off ) {
-                unsigned int real = *static_cast<const unsigned char*>(ptrs);
-                real = real << 4;
-                real = real | *static_cast<const unsigned char*>(ptrs)+1;
-                real = real << 4;
-                real = real | *static_cast<const unsigned char*>(ptrs)+2;
-                real = real << 4;
-                real = real | *static_cast<const unsigned char*>(ptrs)+3;
-                real = real << 4;
-                real = real | *static_cast<const unsigned char*>(ptrs)+4;
-                real = real << 4;
-                real = real | *static_cast<const unsigned char*>(ptrs)+5;
-                *(crawler++) = (real & image->red_mask) >> roffset;
-                *(crawler++) = (real & image->green_mask) >> goffset;
-                *(crawler++) = (real & image->blue_mask) >> boffset;
-                *(crawler++) = (real & alpha_mask) >> aoffset;
-                ptrs = static_cast<const unsigned char*>(ptrs) + 6;
-            }
-        default:
-            throw new std::runtime_error("Encountered an screen format maim doesn't understand!\n");
+        }
     }
 }
-
 
 void png_write_ostream(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -85,7 +77,7 @@ void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
     std::cerr << warning_msg << "\n";
 }
 
-void RGBAImage::writePNG( std::ostream& streamout ) {
+void ARGBImage::writePNG( std::ostream& streamout ) {
     png_structp png = NULL;
 	png_infop info = NULL;
 	png_bytep *rows = new png_bytep[height];

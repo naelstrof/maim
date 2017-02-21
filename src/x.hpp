@@ -23,10 +23,18 @@
 
 #include <iostream>
 #include <X11/Xlib.h>
+#include <X11/extensions/XShm.h>
+#include <X11/extensions/Xrender.h>
+#include <X11/extensions/Xcomposite.h>
+#include <sys/shm.h>
 #include <string>
 #include <stdexcept>
+#include <glm/glm.hpp>
 
 class X11 {
+private:
+    bool haveXShm;
+    XImage* getImageShm( Window d, int x, int y, int w, int h );
 public:
     X11( std::string displayName );
     ~X11();
@@ -34,6 +42,9 @@ public:
     Visual* visual;
     Screen* screen;
     Window root;
+    XImage* getImage( Window d, int x, int y, int w, int h, glm::ivec2& imageloc );
 };
+
+glm::vec4 getWindowGeometry( X11* x11, Window win );
 
 #endif

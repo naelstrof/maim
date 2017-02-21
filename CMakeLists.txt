@@ -10,7 +10,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 set( source
      src/x.cpp
      src/image.cpp
-     src/windowhelper.cpp
      src/options.cpp
      src/main.cpp )
 

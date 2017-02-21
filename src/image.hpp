@@ -24,7 +24,9 @@
 #include <iostream>
 #include <png.h>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include <stdexcept>
+#include <glm/glm.hpp>
 
 static inline int get_shift (int mask) {
     int shift = 0;
@@ -36,14 +38,14 @@ static inline int get_shift (int mask) {
     return shift;
 }
 
-class RGBAImage {
+class ARGBImage {
 private:
-    char* data;
+    unsigned char* data;
     unsigned int width;
     unsigned int height;
 public:
-    RGBAImage( XImage* image );
-    ~RGBAImage();
+    ARGBImage( XImage* image, glm::ivec2 imageloc, glm::ivec4 selectionrect );
+    ~ARGBImage();
     void writePNG( std::ostream& streamout );
 };
 

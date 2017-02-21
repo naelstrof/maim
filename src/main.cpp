@@ -2,11 +2,11 @@
 #include <slop.hpp>
 #include <glm/glm.hpp>
 #include <fstream>
+#include <X11/extensions/shape.h>
 
 #include "x.hpp"
 #include "options.hpp"
 #include "image.hpp"
-#include "windowhelper.hpp"
 
 class MaimOptions {
 public:
@@ -46,8 +46,8 @@ MaimOptions* getMaimOptions( Options& options ) {
     return foo;
 }
 
-SlopOptions* getSlopOptions( Options& options ) {
-    SlopOptions* foo = new SlopOptions();
+slop::SlopOptions* getSlopOptions( Options& options ) {
+    slop::SlopOptions* foo = new slop::SlopOptions();
     options.getFloat("bordersize", 'b', foo->borderSize);
     options.getFloat("padding", 'p', foo->padding);
     options.getFloat("tolerance", 't', foo->tolerance);
@@ -67,10 +67,10 @@ SlopOptions* getSlopOptions( Options& options ) {
 
 int app( int argc, char** argv ) {
     Options options( argc, argv );
-    SlopOptions* slopOptions = getSlopOptions( options );
+    slop::SlopOptions* slopOptions = getSlopOptions( options );
     MaimOptions* maimOptions = getMaimOptions( options );
     bool cancelled = false;
-    SlopSelection selection(0,0,0,0,0);
+    slop::SlopSelection selection(0,0,0,0,0);
 
     if ( maimOptions->geometryGiven && maimOptions->select && maimOptions->windowGiven ) {
         throw new std::invalid_argument( "You can't specify geometry, or a window ID and enable select mode at the same time!\n" );
@@ -108,24 +108,17 @@ int app( int argc, char** argv ) {
         out = &std::cout;
     }
 
-    // Ok we have our guaranteed selection area, and output stream.
-    // First we need to clamp the selection to fit within the
-    // provided window.
-    glm::vec4 sourceGeo = getWindowGeometry( x11, selection.id );
-    selection.x = glm::max( selection.x, sourceGeo.x );
-    selection.y = glm::max( selection.y, sourceGeo.y );
-    selection.w = glm::min( selection.w, sourceGeo.z );
-    selection.h = glm::min( selection.h, sourceGeo.w );
-
-    XWindowAttributes attr;         
+    XWindowAttributes attr, rattr;
     XGetWindowAttributes( x11->display, selection.id, &attr );
     // Move the selection into our local coordinates
     selection.x -= attr.x;
     selection.y -= attr.y;
+
     // Then we grab the pixel buffer of the provided window/selection.
-    XImage* image = XGetImage( x11->display, selection.id, selection.x, selection.y, selection.w, selection.h, AllPlanes, ZPixmap );
-    // Convert it to an RGBA format
-    RGBAImage convert(image);
+    glm::ivec2 imageloc;
+    XImage* image = x11->getImage( selection.id, selection.x, selection.y, selection.w, selection.h, imageloc);
+    // Convert it to an ARGB format, clipping it to the selection.
+    ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h) );
     // Then output it in the desired format.
     convert.writePNG(*out);
     if ( maimOptions->savepathGiven ) {
