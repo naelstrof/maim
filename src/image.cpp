@@ -13,27 +13,77 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect )
     long long int goffset = get_shift(image->green_mask);
     long long int boffset = get_shift(image->blue_mask);
     long long int aoffset = get_shift(alpha_mask);
+    width = ssize.x;
+    height = ssize.y;
+    data = new unsigned char[width*height*4];
 
-    // Zero our data.
-    data = new unsigned char[ssize.x*ssize.y*4];
-    for ( unsigned int i = 0; i < ssize.x*ssize.y*4; i++ ) {
-        data[i] = 0;
+    int* crawler = (int*)data;
+    // Clear necessary stuff
+    // Top rect
+    for ( unsigned int y = 0; y < -offset.y;y++ ) {
+        for ( unsigned int x = 0; x < width;x++ ) {
+            crawler[y*width+x] = 0;
+        }
+    }
+    // Left rect
+    for ( unsigned int y = 0; y < height;y++ ) {
+        for ( unsigned int x = 0; x < -offset.x;x++ ) {
+            crawler[y*width+x] = 0;
+        }
+    }
+    // Bot rect
+    for ( unsigned int y=-offset.y+image->height; y<height; y++ ) {
+        for ( unsigned int x = 0; x < width;x++ ) {
+            crawler[y*width+x] = 0;
+        }
+    }
+    // Right rect
+    for ( unsigned int y = 0; y < height;y++ ) {
+        for ( unsigned int x = -offset.x+image->width; x<width; x++ ) {
+            crawler[y*width+x] = 0;
+        }
     }
 
     // Find the intersection of the rectangles.
     int maxx = glm::max( offset.x, 0 );
     int maxy = glm::max( offset.y, 0 );
-    int minw = glm::min( offset.x+ssize.x, image->width );
-    int minh = glm::min( offset.y+ssize.y, image->height );
+    int minw = glm::min( (int)(offset.x+width), image->width );
+    int minh = glm::min( (int)(offset.y+height), image->height );
 
-    width = ssize.x;
-    height = ssize.y;
+    // Loop only through the intersecting parts, copying everything.
+    // Also check if we have any useful alpha data.
     if ( aoffset >= image->depth ) {
-        // Loop only through the intersecting parts, copying everything.
-        for ( unsigned int y = maxy; y < minh; y++ ) {
-            for ( unsigned int x = maxx; x < minw; x++ ) {
+        int x = maxx;
+        int y = maxy;
+        for(int i = maxy; i < minh-CACHESIZE; i+=CACHESIZE) {
+            for(int j = maxx; j < minw-CACHESIZE; j+=CACHESIZE) {
+                for(y = i; y < i+CACHESIZE; y++) {
+                    for(x = j; x < j+CACHESIZE; x++) {
+                        unsigned int real = XGetPixel(image, x, y);
+                        int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
+                        data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+                        data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+                        data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+                        data[curpixel+3] = 255;
+                    }
+                }
+            }
+        }
+        int xmem = x;
+        for (; y < minh; y++ ) {
+            for (x = maxx; x < minw; x++ ) {
                 unsigned int real = XGetPixel(image, x, y);
-                int curpixel = ((y-offset.y)*ssize.x+((x-offset.x)))*4;
+                int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
+                data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+                data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+                data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+                data[curpixel+3] = 255;
+            }
+        }
+        for (y=maxy; y < minh; y++ ) {
+            for (x=xmem; x < minw; x++ ) {
+                unsigned int real = XGetPixel(image, x, y);
+                int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
                 data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
                 data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
                 data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
@@ -41,11 +91,37 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect )
             }
         }
     } else {
-        // Loop only through the intersecting parts, copying everything.
-        for ( unsigned int y = maxy; y < minh; y++ ) {
-            for ( unsigned int x = maxx; x < minw; x++ ) {
+        int x = maxx;
+        int y = maxy;
+        for(int i = maxy; i < minh-CACHESIZE; i+=CACHESIZE) {
+            for(int j = maxx; j < minw-CACHESIZE; j+=CACHESIZE) {
+                for(y = i; y < i+CACHESIZE; y++) {
+                    for(x = j; x < j+CACHESIZE; x++) {
+                        unsigned int real = XGetPixel(image, x, y);
+                        int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
+                        data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+                        data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+                        data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+                        data[curpixel+3] = (unsigned char)((real & alpha_mask) >> aoffset);
+                    }
+                }
+            }
+        }
+        int xmem = x;
+        for (; y < minh; y++ ) {
+            for (x = maxx; x < minw; x++ ) {
                 unsigned int real = XGetPixel(image, x, y);
-                int curpixel = ((y-offset.y)*ssize.x+(x-offset.x))*4;
+                int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
+                data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+                data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+                data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+                data[curpixel+3] = (unsigned char)((real & alpha_mask) >> aoffset);
+            }
+        }
+        for (y=maxy; y < minh; y++ ) {
+            for (x=xmem; x < minw; x++ ) {
+                unsigned int real = XGetPixel(image, x, y);
+                int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
                 data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
                 data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
                 data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);

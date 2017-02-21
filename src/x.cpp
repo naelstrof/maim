@@ -1,5 +1,12 @@
 #include "x.hpp"
 
+static char _x_err = 0;
+static int
+TmpXError(Display * d, XErrorEvent * ev) {
+    _x_err = 1;
+    return 0;
+}
+
 glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XWindowAttributes attr;         
     XGetWindowAttributes( x11->display, win, &attr );
@@ -46,7 +53,13 @@ XImage* X11::getImage( Window draw, int x, int y, int w, int h, glm::ivec2& imag
     imageloc = glm::ivec2(x,y);
 
     if ( haveXShm ) {
-        return getImageShm( draw, x, y, w, h );
+        // Try to grab the image through shared memory, if we fail try another method.
+        XErrorHandler ph = XSetErrorHandler(TmpXError);
+        XImage* image = getImageShm( draw, x, y, w, h );
+        XSetErrorHandler(ph);
+        if ( _x_err || image == None ) {
+            return XGetImage( display, draw, x, y, w, h, AllPlanes, ZPixmap );
+        }
     }
     return XGetImage( display, draw, x, y, w, h, AllPlanes, ZPixmap );
 }
@@ -65,9 +78,6 @@ XImage* X11::getImageShm(Window draw, int x, int y, int w, int h) {
 		return None;
 	}
 
-	/* setup a temporary error handler */
-	//XErrorHandler ph = XSetErrorHandler(TmpXError);
-
 	/* get an shm id of this image */
 	thing.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0666);
 	/* if the get succeeds */
@@ -85,11 +95,7 @@ XImage* X11::getImageShm(Window draw, int x, int y, int w, int h) {
 		/* get failed - out of shm id's or shm segment too big ? */
 		/* remove the shm id we created */
 		shmctl(thing.shmid, IPC_RMID, 0);
+        shmdt(thing.shmaddr);
 	}
-
-	/* couldnt create SHM image ? */
-	/* destroy previous image */
-	//XDestroyImage(xim);
-
 	return None;
 }
