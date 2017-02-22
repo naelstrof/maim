@@ -19,7 +19,7 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, 
 
     // Clear necessary stuff
     // Top rect
-    for ( unsigned int y = 0; y < -offset.y;y++ ) {
+    for ( unsigned int y = 0; y < glm::min(-offset.y,(int)height);y++ ) {
         for ( unsigned int x = 0; x < width;x++ ) {
             for ( unsigned int c = 0; c < channels;c++ ) {
                 data[(y*width+x)*channels+c] = 0;
@@ -28,7 +28,7 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, 
     }
     // Left rect
     for ( unsigned int y = 0; y < height;y++ ) {
-        for ( unsigned int x = 0; x < -offset.x;x++ ) {
+        for ( unsigned int x = 0; x < glm::min(-offset.x,(int)width);x++ ) {
             for ( unsigned int c = 0; c < channels;c++ ) {
                 data[(y*width+x)*channels+c] = 0;
             }

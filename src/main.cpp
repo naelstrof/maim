@@ -34,6 +34,9 @@ MaimOptions::MaimOptions() {
     quality = 10;
     delay = 0;
     encoding = "png";
+    version = false;
+    help = false;
+    select = false;
     hideCursor = false;
     geometryGiven = false;
     savepathGiven = false;

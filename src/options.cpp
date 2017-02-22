@@ -251,16 +251,25 @@ bool Options::getGeometry( std::string name, char namec, glm::vec4& found ) {
                 if ( std::count(value.begin(), value.end(), '+') > 2 ) {
                     throw "dur";
                 }
+                if ( std::count(value.begin(), value.end(), '-') > 2 ) {
+                    throw "dur";
+                }
                 if ( std::count(value.begin(), value.end(), 'x') > 1 ) {
                     throw "dur";
                 }
                 while( value != "" ) {
-                    switch( value[sz] ) {
+                    switch( value[0] ) {
                         case 'x':
-                            dim.y = std::stof(value,&sz);
+                            dim.y = std::stof(value.substr(1),&sz);
+                            sz++;
                             break;
                         case '+':
-                            pos[curpos++] = std::stof(value, &sz);
+                            pos[curpos++] = std::stof(value.substr(1), &sz);
+                            sz++;
+                            break;
+                        case '-':
+                            pos[curpos++] = -std::stof(value.substr(1), &sz);
+                            sz++;
                             break;
                         default:
                             dim.x = std::stof(value,&sz);
