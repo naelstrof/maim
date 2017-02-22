@@ -1,19 +1,43 @@
 #include "options.hpp"
 
+Options::Options( int argc, char** argv ) {
+    validArguments.push_back( Argument( "bordersize",   'b', false ) );
+    validArguments.push_back( Argument( "padding",      'p', false ) );
+    validArguments.push_back( Argument( "color",        'c', false ) );
+    validArguments.push_back( Argument( "shader",       'r', false ) );
+    validArguments.push_back( Argument( "highlight",    'h', true ) );
+    validArguments.push_back( Argument( "format",       'f', false ) );
+    validArguments.push_back( Argument( "tolerance",    't', false ) );
+    validArguments.push_back( Argument( "nodecorations", 'n', false ) );
+    validArguments.push_back( Argument( "nokeyboard",   'k', true ) );
+    validArguments.push_back( Argument( "help",         'h', true ) );
+    validArguments.push_back( Argument( "xdisplay",     'x', false ) );
+    validArguments.push_back( Argument( "version",      'v', true ) );
+    validArguments.push_back( Argument( "quiet",        'q', true ) );
+    validArguments.push_back( Argument( "window",       'i', false ) );
+    validArguments.push_back( Argument( "geometry",     'g', false ) );
+    validArguments.push_back( Argument( "delay",        'd', false ) );
+    validArguments.push_back( Argument( "hidecursor",   'u', true ) );
+    validArguments.push_back( Argument( "select",       's', true ) );
+    validArguments.push_back( Argument( "quality",      'm', false ) );
+    validate( argc, argv );
+}
+
+
 int Options::validateStringOption( int argc, char** argv, int argumentIndex ) {
     std::string argument = argv[argumentIndex];
     unsigned int index = 0;
-    while( index < validArgumentCount ) {
-        std::string& check = validStringArguments[index];
-        for( unsigned int i=0;i<check.length();i++ ) {
-            if ( check[i] != argument[i+2] ) {
+    while( index < validArguments.size() ) {
+        Argument& check = validArguments[index];
+        for( unsigned int i=0;i<check.name.length();i++ ) {
+            if ( check.name[i] != argument[i+2] ) {
                 break;
             }
-            if ( i == check.length()-1 ) {
-                if ( !isFlagArgument[index] && argument.find("=") == std::string::npos ) {
+            if ( i == check.name.length()-1 ) {
+                if ( !check.isFlagArgument && argument.find("=") == std::string::npos ) {
                     throw new std::invalid_argument("Expected `=` after " + arguments[i]);
                 }
-                if ( isFlagArgument[index] && i+3 != argument.length() ) {
+                if ( check.isFlagArgument && i+3 != argument.length() ) {
                     throw new std::invalid_argument("Trailing characters on flag " + argument );
                 }
                 return parseStringOption( argc, argv, argumentIndex, index );
@@ -27,16 +51,17 @@ int Options::validateStringOption( int argc, char** argv, int argumentIndex ) {
 
 int Options::parseCharOption( int argc, char** argv, int argumentIndex, int validIndex ) {
     std::string argument = argv[argumentIndex];
+    Argument& check = validArguments[validIndex];
     // If we're a flag, we take no arguments, nor do we allow = signs or whatever.
-    if ( isFlagArgument[validIndex] ) {
-        if ( argument != std::string()+"-"+validCharArguments[validIndex] ) {
+    if ( check.isFlagArgument ) {
+        if ( argument != std::string()+"-"+check.cname ) {
             for( int o=1;o<argument.length();o++ ) {
                 bool isValid = false;
-                for( int i=0;i<validArgumentCount&&!isValid;i++ ) {
-                    if ( argument[o] == validCharArguments[i] ) {
-                        if ( isFlagArgument[i] ) {
+                for( int i=0;i<validArguments.size()&&!isValid;i++ ) {
+                    if ( argument[o] == check.cname ) {
+                        if ( check.isFlagArgument ) {
                             isValid = true;
-                            arguments.push_back( std::string()+validCharArguments[i] );
+                            arguments.push_back( std::string()+check.cname );
                             values.push_back("");
                             break;
                         } else {
@@ -57,7 +82,7 @@ int Options::parseCharOption( int argc, char** argv, int argumentIndex, int vali
     }
     arguments.push_back( std::string()+argument[1] );
     // If they supplied the parameters with spaces
-    if ( argument == std::string()+"-"+validCharArguments[validIndex] ) {
+    if ( argument == std::string()+"-"+check.cname ) {
         values.push_back(argv[argumentIndex+1]);
         return 2;
     }
@@ -72,7 +97,7 @@ int Options::parseCharOption( int argc, char** argv, int argumentIndex, int vali
 
 int Options::parseStringOption( int argc, char** argv, int argumentIndex, int validIndex ) {
     std::string argument = argv[argumentIndex];
-    if ( isFlagArgument[validIndex] ) {
+    if ( validArguments[validIndex].isFlagArgument ) {
         arguments.push_back( argument.substr(2) );
         values.push_back("");
         return 1;
@@ -85,8 +110,8 @@ int Options::parseStringOption( int argc, char** argv, int argumentIndex, int va
 int Options::validateCharOption( int argc, char** argv, int argumentIndex ) {
     std::string argument = argv[argumentIndex];
     unsigned int index = 0;
-    while( index < validArgumentCount ) {
-        char check = validCharArguments[index];
+    while( index < validArguments.size() ) {
+        char check = validArguments[index].cname;
         if ( argument.length() < 2 ) {
             continue;
         }
@@ -116,10 +141,6 @@ void Options::validate( int argc, char** argv ) {
         }
         i += validateCharOption( argc, argv, i );
     }
-}
-
-Options::Options( int argc, char** argv ) {
-    validate( argc, argv );
 }
 
 bool Options::getFloat( std::string name, char namec, float& found ) {

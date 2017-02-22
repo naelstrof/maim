@@ -28,6 +28,7 @@ MaimOptions::MaimOptions() {
     savepath = "";
     format = "";
     window = None;
+    quality = 10;
     delay = 0;
     hideCursor = false;
     geometryGiven = false;
@@ -43,7 +44,10 @@ MaimOptions* getMaimOptions( Options& options ) {
     options.getBool("hidecursor", 'u', foo->hideCursor);
     options.getBool("select", 's', foo->select);
     options.getString("format", 'f', foo->format);
-    options.getInt("quality", 'y', foo->quality);
+    options.getInt("quality", 'm', foo->quality);
+    if ( foo->quality > 10 || foo->quality < 1 ) {
+        throw new std::invalid_argument("Quality argument must be between 1 and 10");
+    }
     foo->savepathGiven = options.getFloatingString(0, foo->savepath);
     return foo;
 }
@@ -120,9 +124,9 @@ int app( int argc, char** argv ) {
     glm::ivec2 imageloc;
     XImage* image = x11->getImage( selection.id, selection.x, selection.y, selection.w, selection.h, imageloc);
     // Convert it to an ARGB format, clipping it to the selection.
-    ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h) );
+    ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 3 );
     // Then output it in the desired format.
-    convert.writePNG(*out, maimOptions->quality );
+    convert.writeJPEG(*out, maimOptions->quality );
     if ( maimOptions->savepathGiven ) {
         std::ofstream* file = (std::ofstream*)out;
         file->close();

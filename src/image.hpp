@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <png.h>
+#include <jpeglib.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <stdexcept>
@@ -30,13 +31,22 @@
 
 static inline unsigned char computeRGBPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int width, glm::ivec2 offset ) {
     unsigned int real = XGetPixel(image, x, y);
+    int curpixel = ((y-offset.y)*width+((x-offset.x)))*3;
+    data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+    data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+    data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+}
+
+static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int aoffset, int width, glm::ivec2 offset ) {
+    unsigned int real = XGetPixel(image, x, y);
     int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
     data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
     data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
     data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
-    data[curpixel+3] = 255;
+    data[curpixel+3] = (unsigned char)(real >> aoffset);
 }
-static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int aoffset, int width, glm::ivec2 offset ) {
+
+static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int width, glm::ivec2 offset ) {
     unsigned int real = XGetPixel(image, x, y);
     int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
     data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
@@ -60,10 +70,12 @@ private:
     unsigned char* data;
     unsigned int width;
     unsigned int height;
+    unsigned int channels;
 public:
-    ARGBImage( XImage* image, glm::ivec2 imageloc, glm::ivec4 selectionrect );
+    ARGBImage( XImage* image, glm::ivec2 imageloc, glm::ivec4 selectionrect, int channels );
     ~ARGBImage();
     void writePNG( std::ostream& streamout, int quality );
+    void writeJPEG( std::ostream& streamout, int quality );
 };
 
 #endif

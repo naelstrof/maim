@@ -30,10 +30,16 @@
 #include <glm/glm.hpp>
 #include <X11/Xlib.h>
 
-static std::string validStringArguments[] = { "bordersize", "padding", "color", "shader", "highlight", "format", "tolerance", "nodecorations", "nokeyboard", "help", "xdisplay", "version", "quiet", "window", "geometry", "delay", "hidecursor", "select", "quality" };
-static char validCharArguments[] = { 'b', 'p', 'c', 'r', 'l', 'f', 't', 'n', 'k', 'h', 'x', 'v', 'q', 'i', 'g', 'd', 'u', 's', 'y'};
-static unsigned int isFlagArgument[] = { false, false, false, false, true, false, false, false, true, true, false, true, true, false, false, false, false, true, true, true };
-static unsigned int validArgumentCount = 18;
+class Argument {
+public:
+    std::string name;
+    char cname;
+    bool isFlagArgument;
+    Argument( std::string name, char cname, bool isFlagArgument ) : name(name), cname(cname), isFlagArgument(isFlagArgument) {}
+};
+
+static std::vector<Argument> validArguments;
+
 static unsigned int maxFloatingValues = 1;
 
 class Options {
