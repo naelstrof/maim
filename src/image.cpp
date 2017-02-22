@@ -6,15 +6,14 @@ ARGBImage::~ARGBImage() {
 
 ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect ) {
     glm::ivec2 spos = glm::ivec2( selectionrect.x, selectionrect.y );
-    glm::ivec2 ssize = glm::ivec2( selectionrect.z, selectionrect.w );
     glm::ivec2 offset = spos-iloc;
     long long int alpha_mask = ~(image->red_mask|image->green_mask|image->blue_mask);
     long long int roffset = get_shift(image->red_mask);
     long long int goffset = get_shift(image->green_mask);
     long long int boffset = get_shift(image->blue_mask);
     long long int aoffset = get_shift(alpha_mask);
-    width = ssize.x;
-    height = ssize.y;
+    width = selectionrect.z;
+    height = selectionrect.w;
     data = new unsigned char[width*height*4];
 
     int* crawler = (int*)data;
@@ -53,79 +52,15 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect )
     // Loop only through the intersecting parts, copying everything.
     // Also check if we have any useful alpha data.
     if ( aoffset >= image->depth ) {
-        int x = maxx;
-        int y = maxy;
-        for(int i = maxy; i < minh-CACHESIZE; i+=CACHESIZE) {
-            for(int j = maxx; j < minw-CACHESIZE; j+=CACHESIZE) {
-                for(y = i; y < i+CACHESIZE; y++) {
-                    for(x = j; x < j+CACHESIZE; x++) {
-                        unsigned int real = XGetPixel(image, x, y);
-                        int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
-                        data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
-                        data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
-                        data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
-                        data[curpixel+3] = 255;
-                    }
-                }
-            }
-        }
-        int xmem = x;
-        for (; y < minh; y++ ) {
-            for (x = maxx; x < minw; x++ ) {
-                unsigned int real = XGetPixel(image, x, y);
-                int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
-                data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
-                data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
-                data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
-                data[curpixel+3] = 255;
-            }
-        }
-        for (y=maxy; y < minh; y++ ) {
-            for (x=xmem; x < minw; x++ ) {
-                unsigned int real = XGetPixel(image, x, y);
-                int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
-                data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
-                data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
-                data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
-                data[curpixel+3] = 255;
+        for(int y = maxy; y < minh; y++) {
+            for(int x = maxx; x < minw; x++) {
+                computeRGBPixel( data, image, x, y, roffset, goffset, boffset, width, offset );
             }
         }
     } else {
-        int x = maxx;
-        int y = maxy;
-        for(int i = maxy; i < minh-CACHESIZE; i+=CACHESIZE) {
-            for(int j = maxx; j < minw-CACHESIZE; j+=CACHESIZE) {
-                for(y = i; y < i+CACHESIZE; y++) {
-                    for(x = j; x < j+CACHESIZE; x++) {
-                        unsigned int real = XGetPixel(image, x, y);
-                        int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
-                        data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
-                        data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
-                        data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
-                        data[curpixel+3] = (unsigned char)((real & alpha_mask) >> aoffset);
-                    }
-                }
-            }
-        }
-        int xmem = x;
-        for (; y < minh; y++ ) {
-            for (x = maxx; x < minw; x++ ) {
-                unsigned int real = XGetPixel(image, x, y);
-                int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
-                data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
-                data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
-                data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
-                data[curpixel+3] = (unsigned char)((real & alpha_mask) >> aoffset);
-            }
-        }
-        for (y=maxy; y < minh; y++ ) {
-            for (x=xmem; x < minw; x++ ) {
-                unsigned int real = XGetPixel(image, x, y);
-                int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
-                data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
-                data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
-                data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
-                data[curpixel+3] = (unsigned char)((real & alpha_mask) >> aoffset);
+        for(int y = maxy; y < minh; y++) {
+            for(int x = maxx; x < minw; x++) {
+                computeRGBAPixel( data, image, x, y, roffset, goffset, boffset, aoffset, width, offset );
             }
         }
     }
@@ -153,7 +88,7 @@ void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
     std::cerr << warning_msg << "\n";
 }
 
-void ARGBImage::writePNG( std::ostream& streamout ) {
+void ARGBImage::writePNG( std::ostream& streamout, int quality ) {
     png_structp png = NULL;
 	png_infop info = NULL;
 	png_bytep *rows = new png_bytep[height];
@@ -164,7 +99,7 @@ void ARGBImage::writePNG( std::ostream& streamout ) {
 	if(!info) throw new std::runtime_error( "Failed to write png image" );
     png_set_error_fn(png, png_get_error_ptr(png), user_error_fn, user_warning_fn);
     png_set_write_fn(png, &streamout, png_write_ostream, png_flush_ostream);
-	png_set_compression_level(png, 9);
+	png_set_compression_level(png, quality);
 	png_set_IHDR(png, info, width, height,
        8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
        PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);

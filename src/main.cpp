@@ -16,6 +16,7 @@ public:
     Window window;
     glm::vec4 geometry;
     float delay;
+    int quality;
     bool select;
     bool hideCursor;
     bool geometryGiven;
@@ -42,6 +43,7 @@ MaimOptions* getMaimOptions( Options& options ) {
     options.getBool("hidecursor", 'u', foo->hideCursor);
     options.getBool("select", 's', foo->select);
     options.getString("format", 'f', foo->format);
+    options.getInt("quality", 'y', foo->quality);
     foo->savepathGiven = options.getFloatingString(0, foo->savepath);
     return foo;
 }
@@ -120,7 +122,7 @@ int app( int argc, char** argv ) {
     // Convert it to an ARGB format, clipping it to the selection.
     ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h) );
     // Then output it in the desired format.
-    convert.writePNG(*out);
+    convert.writePNG(*out, maimOptions->quality );
     if ( maimOptions->savepathGiven ) {
         std::ofstream* file = (std::ofstream*)out;
         file->close();

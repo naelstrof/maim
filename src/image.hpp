@@ -21,46 +21,29 @@
 #ifndef N_IMAGE_H_
 #define N_IMAGE_H_
 
-// Not meant to be exact, all this variable does it tweak the processing chunk size.
-// It's meant to cause a lot more HITS on the cache.
-
-// Here's some testing on my ThinkPad X220, using CACHESIZE=1 as a control group.
-// Theres a variance depending on width of the image. CACHESIZEs that line up
-// with the image width will benefit slightly more compared to ones that
-// don't.
-// Once the cache size gets bigger than one of the dimensions, it loses all optimization benefits.
-// Though I don't understand why it gets worse than when the cache size is set to 1, since they
-// should be nearly identical operations...
-// CACHESIZE=1 probably still benefits from the optimized matrix loops.
-
-// The image size working here is 1366x768
-
-// CACHESIZE    CEst    Speedup
-// INT_MAX      10.13   ~50% speedDOWN
-// 1024         10.21   ~50% speedDOWN
-// 824          10.16   ~50% speedDOWN
-// 712          5.77    ~21%
-// 512          6.04    ~15%
-// 256          5.65    ~23%
-// 128          5.66    ~23%
-// 64           5.59    ~25%
-// 32           5.56    ~25%
-// 16           5.69    ~22%
-// 8            5.64    ~24%
-// 4            5.78    ~21%
-// 2            6.15    ~13%
-// 1            6.97    0%
-#define CACHESIZE (int)32
-
-// 32 seems like a pretty safe number, padded on both sides by similar scores.
-// I did test each setting multiple times, but only with my crappy laptop...
-
 #include <iostream>
 #include <png.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <stdexcept>
 #include <glm/glm.hpp>
+
+static inline unsigned char computeRGBPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int width, glm::ivec2 offset ) {
+    unsigned int real = XGetPixel(image, x, y);
+    int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
+    data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+    data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+    data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+    data[curpixel+3] = 255;
+}
+static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int aoffset, int width, glm::ivec2 offset ) {
+    unsigned int real = XGetPixel(image, x, y);
+    int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
+    data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
+    data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
+    data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+    data[curpixel+3] = 255;
+}
 
 static inline int get_shift (int mask) {
     int shift = 0;
@@ -80,7 +63,7 @@ private:
 public:
     ARGBImage( XImage* image, glm::ivec2 imageloc, glm::ivec4 selectionrect );
     ~ARGBImage();
-    void writePNG( std::ostream& streamout );
+    void writePNG( std::ostream& streamout, int quality );
 };
 
 #endif
