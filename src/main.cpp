@@ -21,6 +21,7 @@ public:
     bool hideCursor;
     bool geometryGiven;
     bool windowGiven;
+    bool encodingGiven;
     bool version;
     bool help;
     bool savepathGiven;
@@ -41,6 +42,7 @@ MaimOptions::MaimOptions() {
     geometryGiven = false;
     savepathGiven = false;
     windowGiven = false;
+    encodingGiven = false;
 }
 
 MaimOptions* getMaimOptions( Options& options ) {
@@ -114,6 +116,12 @@ int app( int argc, char** argv ) {
     // Boot up x11
     X11* x11 = new X11(slopOptions->xdisplay);
 
+    if ( !maimOptions->encodingGiven && maimOptions->savepathGiven && maimOptions->savepath.find_last_of(".") != std::string::npos ) {
+        maimOptions->encoding = maimOptions->savepath.substr(maimOptions->savepath.find_last_of(".")+1);
+        if ( maimOptions->encoding != "png" && maimOptions->encoding != "jpg" && maimOptions->encoding != "jpeg" ) {
+            throw new std::invalid_argument("Unknown encode type: `" + maimOptions->encoding + "`, only `png` or `jpg` is allowed." );
+        }
+    }
     if ( !maimOptions->windowGiven ) {
         maimOptions->window = x11->root;
     }
