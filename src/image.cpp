@@ -1,7 +1,7 @@
 #include "image.hpp"
 
 ARGBImage::~ARGBImage() {
-    delete data;
+    delete[] data;
 }
 
 ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, int channels ) {
@@ -17,30 +17,37 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, 
     height = selectionrect.w;
     data = new unsigned char[width*height*channels];
 
-    int* crawler = (int*)data;
     // Clear necessary stuff
     // Top rect
     for ( unsigned int y = 0; y < -offset.y;y++ ) {
         for ( unsigned int x = 0; x < width;x++ ) {
-            crawler[y*width+x] = 0;
+            for ( unsigned int c = 0; c < channels;c++ ) {
+                data[(y*width+x)*channels+c] = 0;
+            }
         }
     }
     // Left rect
     for ( unsigned int y = 0; y < height;y++ ) {
         for ( unsigned int x = 0; x < -offset.x;x++ ) {
-            crawler[y*width+x] = 0;
+            for ( unsigned int c = 0; c < channels;c++ ) {
+                data[(y*width+x)*channels+c] = 0;
+            }
         }
     }
     // Bot rect
     for ( unsigned int y=-offset.y+image->height; y<height; y++ ) {
         for ( unsigned int x = 0; x < width;x++ ) {
-            crawler[y*width+x] = 0;
+            for ( unsigned int c = 0; c < channels;c++ ) {
+                data[(y*width+x)*channels+c] = 0;
+            }
         }
     }
     // Right rect
     for ( unsigned int y = 0; y < height;y++ ) {
         for ( unsigned int x = -offset.x+image->width; x<width; x++ ) {
-            crawler[y*width+x] = 0;
+            for ( unsigned int c = 0; c < channels;c++ ) {
+                data[(y*width+x)*channels+c] = 0;
+            }
         }
     }
 
@@ -57,6 +64,7 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, 
             if ( aoffset >= image->depth ) {
                 for(int y = maxy; y < minh; y++) {
                     for(int x = maxx; x < minw; x++) {
+                        // This is where we just have RGB but require an RGBA image.
                         computeRGBAPixel( data, image, x, y, roffset, goffset, boffset, width, offset );
                     }
                 }
@@ -192,4 +200,5 @@ void ARGBImage::writeJPEG( std::ostream& streamout, int quality ) {
 	jpeg_finish_compress(&cinfo);
  
     streamout.write( (const char*)out_buffer, cinfo.dest->next_output_byte - out_buffer );
+    delete[] out_buffer;
 }

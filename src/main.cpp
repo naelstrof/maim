@@ -22,6 +22,7 @@ public:
     bool geometryGiven;
     bool windowGiven;
     bool savepathGiven;
+    std::string encoding;
 };
 
 MaimOptions::MaimOptions() {
@@ -30,6 +31,7 @@ MaimOptions::MaimOptions() {
     window = None;
     quality = 10;
     delay = 0;
+    encoding = "png";
     hideCursor = false;
     geometryGiven = false;
     savepathGiven = false;
@@ -48,6 +50,11 @@ MaimOptions* getMaimOptions( Options& options ) {
     if ( foo->quality > 10 || foo->quality < 1 ) {
         throw new std::invalid_argument("Quality argument must be between 1 and 10");
     }
+    options.getString("encoding", 'e', foo->encoding);
+    if ( foo->encoding != "png" && foo->encoding != "jpg" && foo->encoding != "jpeg" ) {
+        throw new std::invalid_argument("Unknown encode type: `" + foo->encoding + "`, only `png` or `jpg` is allowed." );
+    }
+
     foo->savepathGiven = options.getFloatingString(0, foo->savepath);
     return foo;
 }
@@ -123,10 +130,18 @@ int app( int argc, char** argv ) {
     // Then we grab the pixel buffer of the provided window/selection.
     glm::ivec2 imageloc;
     XImage* image = x11->getImage( selection.id, selection.x, selection.y, selection.w, selection.h, imageloc);
-    // Convert it to an ARGB format, clipping it to the selection.
-    ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 3 );
-    // Then output it in the desired format.
-    convert.writeJPEG(*out, maimOptions->quality );
+    if ( maimOptions->encoding == "png" ) {
+        // Convert it to an ARGB format, clipping it to the selection.
+        ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 4 );
+        // Then output it in the desired format.
+        convert.writePNG(*out, maimOptions->quality );
+    } else if ( maimOptions->encoding == "jpg" || maimOptions->encoding == "jpeg" ) {
+        // Convert it to a RGB format, clipping it to the selection.
+        ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 3 );
+        // Then output it in the desired format.
+        convert.writeJPEG(*out, maimOptions->quality );
+    }
+
     if ( maimOptions->savepathGiven ) {
         std::ofstream* file = (std::ofstream*)out;
         file->close();

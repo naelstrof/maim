@@ -20,6 +20,7 @@ Options::Options( int argc, char** argv ) {
     validArguments.push_back( Argument( "hidecursor",   'u', true ) );
     validArguments.push_back( Argument( "select",       's', true ) );
     validArguments.push_back( Argument( "quality",      'm', false ) );
+    validArguments.push_back( Argument( "encoding",     'e', false ) );
     validate( argc, argv );
 }
 
