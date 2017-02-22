@@ -21,6 +21,8 @@ public:
     bool hideCursor;
     bool geometryGiven;
     bool windowGiven;
+    bool version;
+    bool help;
     bool savepathGiven;
     std::string encoding;
 };
@@ -45,6 +47,8 @@ MaimOptions* getMaimOptions( Options& options ) {
     options.getFloat("delay", 'd', foo->delay);
     options.getBool("hidecursor", 'u', foo->hideCursor);
     options.getBool("select", 's', foo->select);
+    options.getBool("version", 'v', foo->version);
+    options.getBool("help", 'h', foo->help);
     options.getString("format", 'f', foo->format);
     options.getInt("quality", 'm', foo->quality);
     if ( foo->quality > 10 || foo->quality < 1 ) {
@@ -82,6 +86,14 @@ int app( int argc, char** argv ) {
     Options options( argc, argv );
     slop::SlopOptions* slopOptions = getSlopOptions( options );
     MaimOptions* maimOptions = getMaimOptions( options );
+    if ( maimOptions->version ) {
+        std::cout << MAIM_VERSION << "\n";
+        return 0;
+    }
+    if ( maimOptions->help ) {
+        std::cout << "sorry not implemented yet" << "\n";
+        return 0;
+    }
     bool cancelled = false;
     slop::SlopSelection selection(0,0,0,0,0);
 
