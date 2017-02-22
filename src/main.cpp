@@ -117,9 +117,11 @@ int app( int argc, char** argv ) {
     if ( !maimOptions->windowGiven ) {
         maimOptions->window = x11->root;
     }
+
     if ( !maimOptions->geometryGiven ) {
-        maimOptions->geometry = glm::vec4( 0, 0, WidthOfScreen( x11->screen ), HeightOfScreen( x11->screen ) );
+        maimOptions->geometry = getWindowGeometry( x11, maimOptions->window );
     }
+
     if ( !maimOptions->select ) {
         selection.x = maimOptions->geometry.x;
         selection.y = maimOptions->geometry.y;
