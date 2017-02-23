@@ -21,6 +21,23 @@ glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     return glm::vec4( x, y, width, height );
 }
 
+std::vector<XRRCrtcInfo*> X11::getCRTCS() {
+    std::vector<XRRCrtcInfo*> monitors;                                            
+    if ( !res ) {            
+        return monitors;       
+    }
+    for ( int i=0;i<res->ncrtc;i++ ) {                                           
+        monitors.push_back( XRRGetCrtcInfo( display, res, res->crtcs[ i ] ) );   
+    }
+    return monitors;           
+}   
+    
+void X11::freeCRTCS( std::vector<XRRCrtcInfo*> monitors ) {              
+    for ( unsigned int i=0;i<monitors.size();i++ ) {
+        XRRFreeCrtcInfo( monitors[ i ] );
+    }
+}
+
 X11::X11( std::string displayName ) {
 	// Initialize display
 	display = XOpenDisplay( displayName.c_str() );
@@ -35,6 +52,12 @@ X11::X11( std::string displayName ) {
     Bool pixmaps = true;
     haveXShm = XShmQueryVersion( display, &major, &minor, &pixmaps );
     haveXShm = (haveXShm && pixmaps );
+    major = 0;
+    minor = 0;
+    haveXRR = XRRQueryVersion( display, &major, &minor );
+    if ( haveXRR ) {
+        res = XRRGetScreenResourcesCurrent( display, root );
+    }
 }
 
 X11::~X11() {

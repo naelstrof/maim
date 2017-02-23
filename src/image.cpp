@@ -4,7 +4,9 @@ ARGBImage::~ARGBImage() {
     delete[] data;
 }
 
-ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, int channels ) {
+ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, int channels, X11* x11 ) {
+    this->imagex = iloc.x;
+    this->imagey = iloc.y;
     this->channels = channels;
     glm::ivec2 spos = glm::ivec2( selectionrect.x, selectionrect.y );
     glm::ivec2 offset = spos-iloc;
@@ -200,4 +202,66 @@ void ARGBImage::writeJPEG( std::ostream& streamout, int quality ) {
  
     streamout.write( (const char*)out_buffer, cinfo.dest->next_output_byte - out_buffer );
     delete[] out_buffer;
+}
+
+bool ARGBImage::intersect( XRRCrtcInfo* a, glm::vec4 b ) {
+    if (a->x < b.x + b.z &&
+        a->x + a->width > b.x &&
+        a->y < b.y + b.w &&
+        a->height + a->y > b.y) {
+        return true;
+    }
+    return false;
+}
+
+bool ARGBImage::containsCompletely( XRRCrtcInfo* a, glm::vec4 b ) {
+    if ( b.x >= a->x && b.y >= a->y && b.x+b.z <= a->x+a->width && b.y+b.w <= a->y+a->height ) {
+        return true;
+    }
+    return false;
+}
+
+void ARGBImage::mask(X11* x11) {
+    if ( !x11->haveXRR ) {
+        return;
+    }
+    std::vector<XRRCrtcInfo*> physicalMonitors = x11->getCRTCS();
+    // Make sure a masking needs to happen, it's not a perfect detection,
+    // but will detect most situations where a masking actually needs to happen.
+    for ( int i=0;i<physicalMonitors.size();i++ ) {
+        XRRCrtcInfo* m = physicalMonitors[i];
+        if ( intersect(m, glm::vec4(imagex, imagey, width, height ) ) ) {
+            if ( containsCompletely(m, glm::vec4( imagex, imagey, width, height ) ) ) {
+                x11->freeCRTCS(physicalMonitors);
+                return;
+            }
+        }
+    }
+    unsigned char* copy = new unsigned char[width*height*channels];
+    // Zero out our copy
+    for ( int y = 0; y < height;y++ ) {
+        for ( int x = 0; x < width;x++ ) {
+            for ( int c = 0; c < channels;c++ ) {
+                copy[(y*width+x)*channels+c] = 0;
+            }
+        }
+    }
+    for ( int i=0;i<physicalMonitors.size();i++ ) {
+        // Make sure we're intersecting
+        XRRCrtcInfo* m = physicalMonitors[i];
+        if ( !intersect(m, glm::vec4(imagex, imagey, width, height ) ) ) {
+            continue;
+        }
+        // Copy over data within the intersecting areas.
+        for ( int y = glm::max(0,m->y-imagey); y<glm::min(height,m->y+m->height-imagey);y++ ) {
+            for ( int x = glm::max(0,m->x-imagex); x < glm::min(width,m->x+m->width-imagex);x++ ) {
+                for ( int c = 0; c < channels;c++ ) {
+                    copy[(y*width+x)*channels+c] = data[(y*width+x)*channels+c];
+                }
+            }
+        }
+    }
+    x11->freeCRTCS(physicalMonitors);
+    delete[] data;
+    data = copy;
 }

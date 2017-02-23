@@ -297,12 +297,20 @@ int app( int argc, char** argv ) {
     selection.y -= sourceGeo.y;
     if ( maimOptions->format == "png" ) {
         // Convert it to an ARGB format, clipping it to the selection.
-        ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 4 );
+        ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 4, x11 );
+        // Mask it if we're taking a picture of root
+        if ( selection.id == x11->root ) {
+            convert.mask(x11);
+        }
         // Then output it in the desired format.
         convert.writePNG(*out, maimOptions->quality );
     } else if ( maimOptions->format == "jpg" || maimOptions->format == "jpeg" ) {
         // Convert it to a RGB format, clipping it to the selection.
-        ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 3 );
+        ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 3, x11 );
+        // Mask it if we're taking a picture of root
+        if ( selection.id == x11->root ) {
+            convert.mask(x11);
+        }
         // Then output it in the desired format.
         convert.writeJPEG(*out, maimOptions->quality );
     }

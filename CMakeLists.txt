@@ -50,12 +50,14 @@ include_directories( ${XRANDR_INCLUDE_DIR}
                      ${X11_INCLUDE_DIR}
                      ${SLOP_INCLUDE_DIR}
                      ${JPEG_INCLUDE_DIR}
+                     ${XRANDR_INCLUDE_DIR}
                      ${PNG_INCLUDE_DIRS} )
 
 # Libraries
 target_link_libraries( ${BIN_TARGET}
                        ${X11_LIBRARIES}
                        ${PNG_LIBRARIES}
+                       ${XRANDR_LIBRARY}
                        ${JPEG_LIBRARIES}
                        ${SLOP_LIBRARIES} )
 

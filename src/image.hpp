@@ -29,6 +29,8 @@
 #include <stdexcept>
 #include <glm/glm.hpp>
 
+#include "x.hpp"
+
 static inline unsigned char computeRGBPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int width, glm::ivec2 offset ) {
     unsigned int real = XGetPixel(image, x, y);
     int curpixel = ((y-offset.y)*width+((x-offset.x)))*3;
@@ -71,8 +73,12 @@ private:
     unsigned int width;
     unsigned int height;
     unsigned int channels;
+    int imagex, imagey;
+    bool intersect( XRRCrtcInfo* a, glm::vec4 b );
+    bool containsCompletely( XRRCrtcInfo* a, glm::vec4 b );
 public:
-    ARGBImage( XImage* image, glm::ivec2 imageloc, glm::ivec4 selectionrect, int channels );
+    void mask(X11* x11);
+    ARGBImage( XImage* image, glm::ivec2 imageloc, glm::ivec4 selectionrect, int channels, X11* x11 );
     ~ARGBImage();
     void writePNG( std::ostream& streamout, int quality );
     void writeJPEG( std::ostream& streamout, int quality );

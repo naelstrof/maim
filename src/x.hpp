@@ -26,8 +26,10 @@
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xrender.h>
 #include <X11/extensions/Xcomposite.h>
+#include <X11/extensions/Xrandr.h>
 #include <sys/shm.h>
 #include <string>
+#include <vector>
 #include <stdexcept>
 #include <glm/glm.hpp>
 
@@ -36,6 +38,7 @@ private:
     bool haveXShm;
     XImage* getImageShm( Window d, int x, int y, int w, int h );
 public:
+    bool haveXRR;
     X11( std::string displayName );
     ~X11();
     Display* display;
@@ -43,6 +46,9 @@ public:
     Screen* screen;
     Window root;
     XImage* getImage( Window d, int x, int y, int w, int h, glm::ivec2& imageloc );
+    XRRScreenResources* res;
+    std::vector<XRRCrtcInfo*> getCRTCS();
+    void freeCRTCS( std::vector<XRRCrtcInfo*> monitors );
 };
 
 glm::vec4 getWindowGeometry( X11* x11, Window win );
