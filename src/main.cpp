@@ -202,7 +202,7 @@ std::cout << "\n";
 std::cout << "       Prompt for a region to screenshot. Add a fancy shadow to it, then save it\n";
 std::cout << "       to shadow.png.\n";
 std::cout << "\n";
-std::cout << "              maim -s | convert - +clone -background black -shadow 80x3+5+5  +swap -background none -layers merge +repage shadow.png\n";
+std::cout << "              maim -s | convert - \\( +clone -background black -shadow 80x3+5+5 \\) +swap -background none -layers merge +repage shadow.png\n";
 }
 
 int app( int argc, char** argv ) {
