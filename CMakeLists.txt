@@ -18,7 +18,7 @@ else()
     set( MANTARGET "maim.1" )
 endif()
 
-add_definitions(-DMAIM_VERSION="v4.4.47")
+add_definitions(-DMAIM_VERSION="v4.4.48")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 

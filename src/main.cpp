@@ -78,6 +78,7 @@ slop::SlopOptions* getSlopOptions( Options& options ) {
     options.getBool("nokeyboard", 'k', foo->nokeyboard);
     options.getString( "xdisplay", 'x', foo->xdisplay );
     options.getString( "shader", 'r', foo->shader );
+    options.getBool( "noopengl", 'o', foo->noopengl );
     foo->r = color.r;
     foo->g = color.g;
     foo->b = color.b;
@@ -187,6 +188,9 @@ std::cout << "              won't print.\n";
 std::cout << "\n";
 std::cout << "       -k, --nokeyboard\n";
 std::cout << "              Disables the ability to cancel selections with the keyboard.\n";
+std::cout << "\n";
+std::cout << "       -o, --noopengl\n";
+std::cout << "              Disables graphics hardware acceleration.\n";
 std::cout << "\n";
 std::cout << "EXAMPLES\n";
 std::cout << "       Screenshot the active window and save it to the clipboard for quick past‐\n";

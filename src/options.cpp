@@ -18,6 +18,7 @@ Options::Options( int argc, char** argv ) {
     validArguments.push_back( Argument( "geometry",     'g', false ) );
     validArguments.push_back( Argument( "delay",        'd', false ) );
     validArguments.push_back( Argument( "hidecursor",   'u', true ) );
+    validArguments.push_back( Argument( "noopengl",     'o', true ) );
     validArguments.push_back( Argument( "select",       's', true ) );
     validArguments.push_back( Argument( "quality",      'm', false ) );
     validate( argc, argv );
