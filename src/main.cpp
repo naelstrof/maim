@@ -23,21 +23,19 @@ public:
     bool geometryGiven;
     bool quiet;
     bool windowGiven;
-    bool encodingGiven;
+    bool formatGiven;
     bool version;
     bool help;
     bool savepathGiven;
-    std::string encoding;
 };
 
 MaimOptions::MaimOptions() {
     savepath = "";
-    format = "";
     window = None;
     quality = 10;
     quiet = false;
     delay = 0;
-    encoding = "png";
+    format = "png";
     version = false;
     help = false;
     select = false;
@@ -45,7 +43,7 @@ MaimOptions::MaimOptions() {
     geometryGiven = false;
     savepathGiven = false;
     windowGiven = false;
-    encodingGiven = false;
+    formatGiven = false;
 }
 
 MaimOptions* getMaimOptions( Options& options ) {
@@ -59,15 +57,13 @@ MaimOptions* getMaimOptions( Options& options ) {
     options.getBool("help", 'h', foo->help);
     options.getBool("quiet", 'q', foo->quiet);
     options.getString("format", 'f', foo->format);
+    if ( foo->format != "png" && foo->format != "jpg" && foo->format != "jpeg" ) {
+        throw new std::invalid_argument("Unknown format type: `" + foo->format + "`, only `png` or `jpg` is allowed." );
+    }
     options.getInt("quality", 'm', foo->quality);
     if ( foo->quality > 10 || foo->quality < 1 ) {
         throw new std::invalid_argument("Quality argument must be between 1 and 10");
     }
-    options.getString("encoding", 'e', foo->encoding);
-    if ( foo->encoding != "png" && foo->encoding != "jpg" && foo->encoding != "jpeg" ) {
-        throw new std::invalid_argument("Unknown encode type: `" + foo->encoding + "`, only `png` or `jpg` is allowed." );
-    }
-
     foo->savepathGiven = options.getFloatingString(0, foo->savepath);
     return foo;
 }
@@ -123,10 +119,10 @@ int app( int argc, char** argv ) {
     // Boot up x11
     X11* x11 = new X11(slopOptions->xdisplay);
 
-    if ( !maimOptions->encodingGiven && maimOptions->savepathGiven && maimOptions->savepath.find_last_of(".") != std::string::npos ) {
-        maimOptions->encoding = maimOptions->savepath.substr(maimOptions->savepath.find_last_of(".")+1);
-        if ( maimOptions->encoding != "png" && maimOptions->encoding != "jpg" && maimOptions->encoding != "jpeg" ) {
-            throw new std::invalid_argument("Unknown encode type: `" + maimOptions->encoding + "`, only `png` or `jpg` is allowed." );
+    if ( !maimOptions->formatGiven && maimOptions->savepathGiven && maimOptions->savepath.find_last_of(".") != std::string::npos ) {
+        maimOptions->format = maimOptions->savepath.substr(maimOptions->savepath.find_last_of(".")+1);
+        if ( maimOptions->format != "png" && maimOptions->format != "jpg" && maimOptions->format != "jpeg" ) {
+            throw new std::invalid_argument("Unknown format type: `" + maimOptions->format + "`, only `png` or `jpg` is allowed." );
         }
     }
     if ( !maimOptions->windowGiven ) {
@@ -181,12 +177,12 @@ int app( int argc, char** argv ) {
     }
     glm::ivec2 imageloc;
     XImage* image = x11->getImage( selection.id, selection.x, selection.y, selection.w, selection.h, imageloc);
-    if ( maimOptions->encoding == "png" ) {
+    if ( maimOptions->format == "png" ) {
         // Convert it to an ARGB format, clipping it to the selection.
         ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 4 );
         // Then output it in the desired format.
         convert.writePNG(*out, maimOptions->quality );
-    } else if ( maimOptions->encoding == "jpg" || maimOptions->encoding == "jpeg" ) {
+    } else if ( maimOptions->format == "jpg" || maimOptions->format == "jpeg" ) {
         // Convert it to a RGB format, clipping it to the selection.
         ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 3 );
         // Then output it in the desired format.
