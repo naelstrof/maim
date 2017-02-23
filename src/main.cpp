@@ -2,6 +2,7 @@
 #include <slop.hpp>
 #include <glm/glm.hpp>
 #include <fstream>
+#include <thread>
 #include <X11/extensions/shape.h>
 
 #include "x.hpp"
@@ -20,6 +21,7 @@ public:
     bool select;
     bool hideCursor;
     bool geometryGiven;
+    bool quiet;
     bool windowGiven;
     bool encodingGiven;
     bool version;
@@ -33,6 +35,7 @@ MaimOptions::MaimOptions() {
     format = "";
     window = None;
     quality = 10;
+    quiet = false;
     delay = 0;
     encoding = "png";
     version = false;
@@ -54,6 +57,7 @@ MaimOptions* getMaimOptions( Options& options ) {
     options.getBool("select", 's', foo->select);
     options.getBool("version", 'v', foo->version);
     options.getBool("help", 'h', foo->help);
+    options.getBool("quiet", 'q', foo->quiet);
     options.getString("format", 'f', foo->format);
     options.getInt("quality", 'm', foo->quality);
     if ( foo->quality > 10 || foo->quality < 1 ) {
@@ -107,7 +111,7 @@ int app( int argc, char** argv ) {
     }
 
     if ( maimOptions->select ) {
-        selection = SlopSelect(slopOptions, &cancelled, false);
+        selection = SlopSelect(slopOptions, &cancelled, maimOptions->quiet);
         if ( cancelled ) {
             return 1;
         }
@@ -153,6 +157,25 @@ int app( int argc, char** argv ) {
     selection.y -= attr.y;
 
     // Then we grab the pixel buffer of the provided window/selection.
+    if ( maimOptions->delay ) {
+        if ( !maimOptions->quiet ) {
+            std::cerr << "Snapshotting in...";
+        }
+        while ( maimOptions->delay > 0 ) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(glm::clamp(glm::min(1000,(int)(maimOptions->delay*1000)),0,1000)));
+            maimOptions->delay-=1;
+            if ( !maimOptions->quiet ) {
+                if ( maimOptions->delay <= 0 ) {
+                    std::cerr << "☺";
+                } else {
+                    std::cerr << maimOptions->delay << " ";
+                }
+            }
+        }
+        if ( !maimOptions->quiet ) {
+            std::cerr << "\n";
+        }
+    }
     glm::ivec2 imageloc;
     XImage* image = x11->getImage( selection.id, selection.x, selection.y, selection.w, selection.h, imageloc);
     if ( maimOptions->encoding == "png" ) {

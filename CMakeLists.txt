@@ -42,6 +42,9 @@ find_package( XRandr    REQUIRED )
 find_package( X11       REQUIRED )
 find_package( SLOP      REQUIRED )
 
+set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
+
 # Includes
 include_directories( ${XRANDR_INCLUDE_DIR}
                      ${X11_INCLUDE_DIR}
