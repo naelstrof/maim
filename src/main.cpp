@@ -113,6 +113,9 @@ int app( int argc, char** argv ) {
     if ( maimOptions->select ) {
         selection = SlopSelect(slopOptions, &cancelled, maimOptions->quiet);
         if ( cancelled ) {
+            if ( !maimOptions->quiet ) {
+                std::cerr << "Selection was cancelled by keystroke or right-click.\n";
+            }
             return 1;
         }
     }
