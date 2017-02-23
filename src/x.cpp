@@ -42,9 +42,12 @@ X11::~X11() {
 }
 
 XImage* X11::getImage( Window draw, int x, int y, int w, int h, glm::ivec2& imageloc ) {
+    glm::ivec4 sourceGeo = getWindowGeometry( this, draw );
+    // First we localize the geometry
+    x -= sourceGeo.x;
+    y -= sourceGeo.y;
     // We need to clamp the selection to fit within the
     // provided window.
-    glm::ivec4 sourceGeo = getWindowGeometry( this, draw );
     x = glm::clamp( x, 0, sourceGeo.z-1 );
     y = glm::clamp( y, 0, sourceGeo.w-1 );
     w = glm::clamp( w, 1, sourceGeo.z-x );

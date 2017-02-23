@@ -2,15 +2,16 @@
 
 A WIP remake of maim that uses cimg instead of imlib2.
 
-- [X] Convert X11 formats to a ARGB format.
-- [X] Link with slop library.
+- [x] Convert X11 formats to a ARGB format.
+- [x] Link with slop library.
 - [x] Option parsing.
 - [x] Smartly constraining selection to prevent crashing.
 - [ ] Masking off-screen buffers.
-- [ ] Man-pages.
+- [x] Man-pages.
 - [x] Actual std::cout support.
 - [x] PNG support
 - [x] JPEG support
+- [ ] Cursor blending
 - [ ] ? support
 
 To install:

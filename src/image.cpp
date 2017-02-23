@@ -16,36 +16,35 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, 
     width = selectionrect.z;
     height = selectionrect.w;
     data = new unsigned char[width*height*channels];
-
     // Clear necessary stuff
     // Top rect
-    for ( unsigned int y = 0; y < glm::min(-offset.y,(int)height);y++ ) {
-        for ( unsigned int x = 0; x < width;x++ ) {
-            for ( unsigned int c = 0; c < channels;c++ ) {
+    for ( int y = 0; y < glm::min(-offset.y,(int)height);y++ ) {
+        for ( int x = 0; x < width;x++ ) {
+            for ( int c = 0; c < channels;c++ ) {
                 data[(y*width+x)*channels+c] = 0;
             }
         }
     }
     // Left rect
-    for ( unsigned int y = 0; y < height;y++ ) {
-        for ( unsigned int x = 0; x < glm::min(-offset.x,(int)width);x++ ) {
-            for ( unsigned int c = 0; c < channels;c++ ) {
+    for ( int y = 0; y < height;y++ ) {
+        for ( int x = 0; x < glm::min(-offset.x,(int)width);x++ ) {
+            for ( int c = 0; c < channels;c++ ) {
                 data[(y*width+x)*channels+c] = 0;
             }
         }
     }
     // Bot rect
-    for ( unsigned int y=-offset.y+image->height; y<height; y++ ) {
-        for ( unsigned int x = 0; x < width;x++ ) {
-            for ( unsigned int c = 0; c < channels;c++ ) {
+    for ( int y=-offset.y+image->height; y<height; y++ ) {
+        for ( int x = 0; x < width;x++ ) {
+            for ( int c = 0; c < channels;c++ ) {
                 data[(y*width+x)*channels+c] = 0;
             }
         }
     }
     // Right rect
-    for ( unsigned int y = 0; y < height;y++ ) {
-        for ( unsigned int x = -offset.x+image->width; x<width; x++ ) {
-            for ( unsigned int c = 0; c < channels;c++ ) {
+    for ( int y = 0; y < height;y++ ) {
+        for ( int x = -offset.x+image->width; x<width; x++ ) {
+            for ( int c = 0; c < channels;c++ ) {
                 data[(y*width+x)*channels+c] = 0;
             }
         }
