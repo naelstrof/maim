@@ -136,8 +136,8 @@ std::cout << "       -m, --quality\n";
 std::cout << "              An integer from 1 to 10 that determines the compression quality. 1\n";
 std::cout << "              is  the  highest (and lossiest) compression available for the pro‐\n";
 std::cout << "              vided format. For example a setting of `1` with  png  (a  lossless\n";
-std::cout << "              format)  would just increase filesize. While a setting of `1` on a\n";
-std::cout << "              jpeg would create a pixel mush.\n";
+std::cout << "              format)  would increase filesize and speed up encoding dramatical-\n";
+std::cout << "              ly. While a setting of `1` on a jpeg would create a pixel mush.\n";
 std::cout << "\n";
 std::cout << "       -s, --select\n";
 std::cout << "              Enables an interactive selection mode where  you  may  select  the\n";
@@ -298,6 +298,9 @@ int app( int argc, char** argv ) {
     if ( maimOptions->format == "png" ) {
         // Convert it to an ARGB format, clipping it to the selection.
         ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 4, x11 );
+        if ( !maimOptions->hideCursor ) {
+            convert.blendCursor( x11 );
+        }
         // Mask it if we're taking a picture of root
         if ( selection.id == x11->root ) {
             convert.mask(x11);
@@ -307,6 +310,9 @@ int app( int argc, char** argv ) {
     } else if ( maimOptions->format == "jpg" || maimOptions->format == "jpeg" ) {
         // Convert it to a RGB format, clipping it to the selection.
         ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 3, x11 );
+        if ( !maimOptions->hideCursor ) {
+            convert.blendCursor( x11 );
+        }
         // Mask it if we're taking a picture of root
         if ( selection.id == x11->root ) {
             convert.mask(x11);

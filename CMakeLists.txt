@@ -39,6 +39,7 @@ set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/modules" )
 find_package( PNG       REQUIRED )
 find_package( JPEG      REQUIRED )
 find_package( XRandr    REQUIRED )
+find_package( XFixes    REQUIRED )
 find_package( X11       REQUIRED )
 find_package( SLOP      REQUIRED )
 
@@ -49,6 +50,7 @@ set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 include_directories( ${XRANDR_INCLUDE_DIR}
                      ${X11_INCLUDE_DIR}
                      ${SLOP_INCLUDE_DIR}
+                     ${XFIXES_INCLUDE_DIR}
                      ${JPEG_INCLUDE_DIR}
                      ${XRANDR_INCLUDE_DIR}
                      ${PNG_INCLUDE_DIRS} )
@@ -57,6 +59,7 @@ include_directories( ${XRANDR_INCLUDE_DIR}
 target_link_libraries( ${BIN_TARGET}
                        ${X11_LIBRARIES}
                        ${PNG_LIBRARIES}
+                       ${XFIXES_LIBRARY}
                        ${XRANDR_LIBRARY}
                        ${JPEG_LIBRARIES}
                        ${SLOP_LIBRARIES} )

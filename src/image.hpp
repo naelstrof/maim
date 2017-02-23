@@ -77,6 +77,7 @@ private:
     bool intersect( XRRCrtcInfo* a, glm::vec4 b );
     bool containsCompletely( XRRCrtcInfo* a, glm::vec4 b );
 public:
+    void blendCursor( X11* x11 );
     void mask(X11* x11);
     ARGBImage( XImage* image, glm::ivec2 imageloc, glm::ivec4 selectionrect, int channels, X11* x11 );
     ~ARGBImage();
