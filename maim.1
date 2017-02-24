@@ -21,11 +21,14 @@ Sets the xdisplay to use.
 .BR \-f ", " \-\-format=\fISTRING\fR
 Sets the desired output format, by default maim will attempt to determine the desired output format automatically from the output file. If that fails it defaults to a lossless png format. Currently only supports `png` or `jpg`.
 .TP
-.BR \-i ", " \-\-window=\fIINT\fR
-Sets the desired window to capture, defaults to the root window.
+.BR \-i ", " \-\-window=\fIWINDOW\fR
+Sets the desired window to capture, defaults to the root window. Allows for an integer, hex, or `root` for input.
 .TP
 .BR \-g ", " \-\-geometry=\fIGEOMETRY\fR
 Sets the region to capture, uses local coordinates from the given window. So -g10x30-5+0 would represent the rectangle wxh+x+y where w=10, h=30, x=-5, and y=0. x and y are the upper left location of this rectangle.
+.TP
+.BR \-w ", " \-\-parent=\fIWINDOW\fR
+By default, maim assumes the --geometry values are in respect to the provided --window (or root if not provided). This parameter overrides this behavior by making the geometry be in respect to whatever window you provide to --parent. Allows for an integer, hex, or `root` for input.
 .TP
 .BR \-d ", " \-\-delay=\fIFLOAT\fR
 Sets the time in seconds to wait before taking a screenshot. Prints a simple message to show how many seconds are left before a screenshot is taken. See \-\-quiet for muting this message.
@@ -55,7 +58,7 @@ Sets the selection rectangle's color. Supports RGB or RGBA input. Depending on t
 .BR \-r ", " \-\-shader=\fISTRING\fR
 This sets the vertex shader, and fragment shader combo to use when drawing the final framebuffer to the screen. This obviously only works when OpenGL is enabled. The shaders are loaded from ~/.config/maim. See https://github.com/naelstrof/slop for more information on how to create your own shaders.
 .TP
-.BR \-n ", " \-\-nodecorations=INT
+.BR \-n ", " \-\-nodecorations=\fIINT\fR
 Sets the level of aggressiveness when trying to remove window decroations. `0' is off, `1' will try lightly to remove decorations, and `2' will recursively descend into the root tree until it gets the deepest available visible child under the mouse. Defaults to `0'.
 .TP
 .BR \-l ", " \-\-highlight

@@ -60,7 +60,7 @@ public:
     bool getColor( std::string name, char namec, glm::vec4& found );
     bool getBool( std::string name, char namec, bool& found );
     bool getGeometry( std::string name, char namec, glm::vec4& found );
-    bool getWindow( std::string name, char namec, Window& found );
+    bool getWindow( std::string name, char namec, Window& found, Window root );
     bool getFloatingString( int index, std::string& found );
 };
 

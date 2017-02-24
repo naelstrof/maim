@@ -21,6 +21,7 @@ Options::Options( int argc, char** argv ) {
     validArguments.push_back( Argument( "noopengl",     'o', true ) );
     validArguments.push_back( Argument( "select",       's', true ) );
     validArguments.push_back( Argument( "quality",      'm', false ) );
+    validArguments.push_back( Argument( "parent",       'w', false ) );
     validate( argc, argv );
 }
 
@@ -290,11 +291,12 @@ bool Options::getGeometry( std::string name, char namec, glm::vec4& found ) {
     return false;
 }
 
-bool Options::getWindow( std::string name, char namec, Window& found ) {
+bool Options::getWindow( std::string name, char namec, Window& found, Window root ) {
     for( unsigned int i=0;i<arguments.size();i++ ) {
         if ( arguments[i] == name || arguments[i] == std::string("")+namec ) {
-            if ( arguments[i].size() > 1 && arguments[i].find("=") == std::string::npos ) {
-                throw new std::invalid_argument("Expected `=` after " + arguments[i]);
+            if ( values[i] == "root" ) {
+                found = root;
+                return true;
             }
             std::string::size_type sz;
             float retvar;

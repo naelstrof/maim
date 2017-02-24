@@ -15,6 +15,7 @@ public:
     std::string savepath;
     std::string format;
     Window window;
+    Window parent;
     glm::vec4 geometry;
     float delay;
     int quality;
@@ -23,6 +24,7 @@ public:
     bool geometryGiven;
     bool quiet;
     bool windowGiven;
+    bool parentGiven;
     bool formatGiven;
     bool version;
     bool help;
@@ -32,6 +34,7 @@ public:
 MaimOptions::MaimOptions() {
     savepath = "";
     window = None;
+    parent = None;
     quality = 10;
     quiet = false;
     delay = 0;
@@ -39,6 +42,7 @@ MaimOptions::MaimOptions() {
     version = false;
     help = false;
     select = false;
+    parentGiven = false;
     hideCursor = false;
     geometryGiven = false;
     savepathGiven = false;
@@ -46,9 +50,10 @@ MaimOptions::MaimOptions() {
     formatGiven = false;
 }
 
-MaimOptions* getMaimOptions( Options& options ) {
+MaimOptions* getMaimOptions( Options& options, X11* x11 ) {
     MaimOptions* foo = new MaimOptions();
-    foo->windowGiven = options.getWindow("window", 'i', foo->window);
+    foo->parentGiven = options.getWindow("parent", 'w', foo->parent, x11->root);
+    foo->windowGiven = options.getWindow("window", 'i', foo->window, x11->root);
     foo->geometryGiven = options.getGeometry("geometry", 'g', foo->geometry);
     options.getFloat("delay", 'd', foo->delay);
     options.getBool("hidecursor", 'u', foo->hideCursor);
@@ -145,6 +150,12 @@ std::cout << "              Enables an interactive selection mode where  you  ma
 std::cout << "              desired region or window before a screenshot is captured. Uses the\n";
 std::cout << "              settings below to determine the visuals and settings of slop.\n";
 std::cout << "\n";
+std::cout << "       -w, --parent=WINDOW\n";
+std::cout << "              By  default, maim assumes the --geometry values are in respect to the provided --window\n";
+std::cout << "              (or root if not provided). This parameter overrides this behavior by making the  geome‐\n";
+std::cout << "              try  be  in  respect to whatever window you provide to --parent. Allows for an integer,\n";
+std::cout << "              hex, or `root` for input.\n";
+std::cout << "\n";
 std::cout << "SLOP OPTIONS\n";
 std::cout << "       -b, --bordersize=FLOAT\n";
 std::cout << "              Sets the selection rectangle's thickness.\n";
@@ -212,7 +223,9 @@ std::cout << "              maim -s | convert - \\( +clone -background black -sh
 int app( int argc, char** argv ) {
     Options options( argc, argv );
     slop::SlopOptions* slopOptions = getSlopOptions( options );
-    MaimOptions* maimOptions = getMaimOptions( options );
+    // Boot up x11
+    X11* x11 = new X11(slopOptions->xdisplay);
+    MaimOptions* maimOptions = getMaimOptions( options, x11 );
     if ( maimOptions->version ) {
         std::cout << MAIM_VERSION << "\n";
         return 0;
@@ -224,11 +237,10 @@ int app( int argc, char** argv ) {
     bool cancelled = false;
     slop::SlopSelection selection(0,0,0,0,0);
 
-    if ( maimOptions->geometryGiven && maimOptions->select && maimOptions->windowGiven ) {
-        throw new std::invalid_argument( "You can't specify geometry, or a window ID and enable select mode at the same time!\n" );
-    }
-
     if ( maimOptions->select ) {
+        if ( maimOptions->windowGiven || maimOptions->parentGiven || maimOptions->geometryGiven ) {
+            throw new std::invalid_argument( "Interactive mode (--select) doesn't support the following parameters: --window, --parent, --geometry." );
+        }
         selection = SlopSelect(slopOptions, &cancelled, maimOptions->quiet);
         if ( cancelled ) {
             if ( !maimOptions->quiet ) {
@@ -237,9 +249,6 @@ int app( int argc, char** argv ) {
             return 1;
         }
     }
-
-    // Boot up x11
-    X11* x11 = new X11(slopOptions->xdisplay);
 
     if ( !maimOptions->formatGiven && maimOptions->savepathGiven && maimOptions->savepath.find_last_of(".") != std::string::npos ) {
         maimOptions->format = maimOptions->savepath.substr(maimOptions->savepath.find_last_of(".")+1);
@@ -250,12 +259,16 @@ int app( int argc, char** argv ) {
     if ( !maimOptions->windowGiven ) {
         maimOptions->window = x11->root;
     }
-
-
-
+    if ( !maimOptions->parentGiven ) {
+        maimOptions->parent = maimOptions->window;
+    }
     if ( !maimOptions->geometryGiven ) {
         maimOptions->geometry = getWindowGeometry( x11, maimOptions->window );
     }
+
+    glm::vec4 parentGeo = getWindowGeometry( x11, maimOptions->parent );
+    maimOptions->geometry.x += parentGeo.x;
+    maimOptions->geometry.y += parentGeo.y;
 
     if ( !maimOptions->select ) {
         selection.x = maimOptions->geometry.x;
