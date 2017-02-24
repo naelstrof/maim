@@ -66,6 +66,11 @@ $ maim -i$(xdotool getactivewindow) ~/mypicture.jpg
 $ maim ~/Pictures/$(date +%s).png
 ```
 
+* This one overlays a still of your desktop, then allows you to crop it. Doesn't play well with multiple monitors, but I'm sure if it did it wouldn't look this pretty and simple.
+```bash
+$ maim | feh - -x & maim -s cropped.png
+```
+
 * Finally with the [help your friendly neighborhood scripter](https://github.com/tremby/imgur.sh), pictures can automatically be uploaded and their URLs copied to the clipboard with this basic command.
 ```bash
 $ maim -s /tmp/screenshot.png; imgurbash.sh /tmp/screenshot.png
