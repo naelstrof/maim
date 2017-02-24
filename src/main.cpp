@@ -268,6 +268,9 @@ int app( int argc, char** argv ) {
     if ( maimOptions->savepathGiven ) {
         std::ofstream* file = new std::ofstream();
         file->open(maimOptions->savepath.c_str());
+        if ( !file->is_open() ) {
+            throw new std::runtime_error( "Failed to open file for writing: `" + maimOptions->savepath + "`." );
+        }
         out = file;
     } else {
         out = &std::cout;
