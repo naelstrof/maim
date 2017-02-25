@@ -5,7 +5,7 @@ Options::Options( int argc, char** argv ) {
     validArguments.push_back( Argument( "padding",      'p', false ) );
     validArguments.push_back( Argument( "color",        'c', false ) );
     validArguments.push_back( Argument( "shader",       'r', false ) );
-    validArguments.push_back( Argument( "highlight",    'h', true ) );
+    validArguments.push_back( Argument( "highlight",    'l', true ) );
     validArguments.push_back( Argument( "format",       'f', false ) );
     validArguments.push_back( Argument( "tolerance",    't', false ) );
     validArguments.push_back( Argument( "nodecorations", 'n', false ) );
