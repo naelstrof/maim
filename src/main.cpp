@@ -269,6 +269,20 @@ int app( int argc, char** argv ) {
     }
     if ( !maimOptions->windowGiven ) {
         maimOptions->window = x11->root;
+    } else {
+        XWindowAttributes attr;
+        XGetWindowAttributes(x11->display, maimOptions->window, &attr);
+        if (attr.backing_store == NotUseful) {
+            Window root, parent;
+            parent = None;
+            Window* children;
+            unsigned int nchildren;
+            Window selectedWindow;
+            XQueryTree( x11->display, maimOptions->window, &root, &parent, &children, &nchildren );
+            if ( parent != None ) {
+                maimOptions->window = parent;
+            }
+        }
     }
     if ( !maimOptions->parentGiven ) {
         maimOptions->parent = maimOptions->window;
@@ -276,10 +290,6 @@ int app( int argc, char** argv ) {
     if ( !maimOptions->geometryGiven ) {
         maimOptions->geometry = getWindowGeometry( x11, maimOptions->window );
     }
-
-    glm::vec4 parentGeo = getWindowGeometry( x11, maimOptions->parent );
-    maimOptions->geometry.x += parentGeo.x;
-    maimOptions->geometry.y += parentGeo.y;
 
     if ( !maimOptions->select ) {
         selection.x = maimOptions->geometry.x;
@@ -326,6 +336,9 @@ int app( int argc, char** argv ) {
     glm::ivec4 sourceGeo = getWindowGeometry( x11, selection.id );
     selection.x -= sourceGeo.x;
     selection.y -= sourceGeo.y;
+    glm::vec4 parentGeo = getWindowGeometry( x11, maimOptions->parent );
+    selection.x += parentGeo.x;
+    selection.y += parentGeo.y;
     if ( maimOptions->format == "png" ) {
         // Convert it to an ARGB format, clipping it to the selection.
         ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 4, x11 );
