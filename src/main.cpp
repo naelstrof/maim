@@ -89,7 +89,18 @@ slop::SlopOptions* getSlopOptions( Options& options ) {
     foo->b = color.b;
     foo->a = color.a;
     options.getBool("highlight", 'l', foo->highlight);
-    options.getInt("nodecorations", 'n', foo->nodecorations);
+    try {
+        bool test = false;
+        options.getBool("nodecorations", 'n', test);
+        if ( test ) {
+            foo->nodecorations = 1;
+        }
+    } catch( ... ) {
+        options.getInt("nodecorations", 'n', foo->nodecorations);
+    }
+    if ( foo->nodecorations < 0 || foo->nodecorations > 2 ) {
+        throw new std::invalid_argument( "--nodecorations must be between 0 and 2. Or be used as a flag." );
+    }
     return foo;
 }
 

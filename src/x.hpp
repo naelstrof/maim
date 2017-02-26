@@ -52,6 +52,6 @@ public:
 };
 
 glm::vec4 getWindowGeometry( X11* x11, Window win );
-glm::vec4 getWindowGeometryWithoutBorder( X11* x11, Window win );
+//glm::vec4 getWindowGeometryWithoutBorder( X11* x11, Window win );
 
 #endif

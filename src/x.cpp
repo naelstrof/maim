@@ -7,7 +7,7 @@ TmpXError(Display * d, XErrorEvent * ev) {
     return 0;
 }
 
-glm::vec4 getWindowGeometryWithoutBorder( X11* x11, Window win ) {
+glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XWindowAttributes attr;         
     XGetWindowAttributes( x11->display, win, &attr );
     unsigned int width = attr.width;           
@@ -19,7 +19,7 @@ glm::vec4 getWindowGeometryWithoutBorder( X11* x11, Window win ) {
     return glm::vec4( x, y, width, height );
 }
 
-glm::vec4 getWindowGeometry( X11* x11, Window win ) {
+/*glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XWindowAttributes attr;         
     XGetWindowAttributes( x11->display, win, &attr );
     unsigned int width = attr.width;           
@@ -31,7 +31,7 @@ glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     width += border*2;
     height += border*2;
     return glm::vec4( x, y, width, height );
-}
+}*/
 
 std::vector<XRRCrtcInfo*> X11::getCRTCS() {
     std::vector<XRRCrtcInfo*> monitors;                                            
@@ -77,7 +77,7 @@ X11::~X11() {
 }
 
 XImage* X11::getImage( Window draw, int x, int y, int w, int h, glm::ivec2& imageloc ) {
-    glm::ivec4 sourceGeo = getWindowGeometryWithoutBorder( this, draw );
+    glm::ivec4 sourceGeo = getWindowGeometry( this, draw );
     // First we localize the geometry
     x -= sourceGeo.x;
     y -= sourceGeo.y;
@@ -88,8 +88,7 @@ XImage* X11::getImage( Window draw, int x, int y, int w, int h, glm::ivec2& imag
     w = glm::clamp( w, 1, sourceGeo.z-x );
     h = glm::clamp( h, 1, sourceGeo.w-y );
 
-    glm::ivec4 sourceGeob = getWindowGeometry( this, draw );
-    imageloc = glm::ivec2( sourceGeo.x-sourceGeob.x+x, sourceGeo.y-sourceGeob.y+y );
+    imageloc = glm::ivec2( x, y );
 
     if ( haveXShm ) {
         // Try to grab the image through shared memory, if we fail try another method.

@@ -1,6 +1,7 @@
 #include "options.hpp"
 
 Options::Options( int argc, char** argv ) {
+    validArguments.push_back( Argument( "nodecorations", 'n', true ) );
     validArguments.push_back( Argument( "bordersize",   'b', false ) );
     validArguments.push_back( Argument( "padding",      'p', false ) );
     validArguments.push_back( Argument( "color",        'c', false ) );
@@ -8,7 +9,6 @@ Options::Options( int argc, char** argv ) {
     validArguments.push_back( Argument( "highlight",    'l', true ) );
     validArguments.push_back( Argument( "format",       'f', false ) );
     validArguments.push_back( Argument( "tolerance",    't', false ) );
-    validArguments.push_back( Argument( "nodecorations", 'n', false ) );
     validArguments.push_back( Argument( "nokeyboard",   'k', true ) );
     validArguments.push_back( Argument( "help",         'h', true ) );
     validArguments.push_back( Argument( "xdisplay",     'x', false ) );
@@ -22,7 +22,15 @@ Options::Options( int argc, char** argv ) {
     validArguments.push_back( Argument( "select",       's', true ) );
     validArguments.push_back( Argument( "quality",      'm', false ) );
     validArguments.push_back( Argument( "parent",       'w', false ) );
-    validate( argc, argv );
+    try { 
+        validate( argc, argv );
+    } catch(...) {
+        arguments.clear();
+        values.clear();
+        floatingValues.clear();
+        validArguments[0].isFlagArgument = false;
+        validate( argc, argv );
+    }
 }
 
 
@@ -85,7 +93,11 @@ int Options::parseCharOption( int argc, char** argv, int argumentIndex, int vali
     arguments.push_back( std::string()+argument[1] );
     // If they supplied the parameters with spaces
     if ( argument == std::string()+"-"+check.cname ) {
-        values.push_back(argv[argumentIndex+1]);
+        if ( argumentIndex+1 < argc ) {
+            values.push_back(argv[argumentIndex+1]);
+        } else {
+            values.push_back("");
+        }
         return 2;
     }
     // If they didn't supply the parameters with spaces
