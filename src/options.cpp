@@ -184,7 +184,7 @@ bool Options::getInt( std::string name, char namec, int& found ) {
                 throw new std::invalid_argument("Expected `=` after " + arguments[i]);
             }
             std::string::size_type sz;
-            float retvar;
+            int retvar;
             try {
                 retvar = std::stoi(values[i],&sz);
             } catch ( ... ) {
@@ -311,7 +311,7 @@ bool Options::getWindow( std::string name, char namec, Window& found, Window roo
                 return true;
             }
             std::string::size_type sz;
-            float retvar;
+            int retvar;
             try {
                 retvar = std::stoi(values[i],&sz);
             } catch ( ... ) {

@@ -286,9 +286,13 @@ int app( int argc, char** argv ) {
     }
     if ( !maimOptions->parentGiven ) {
         maimOptions->parent = maimOptions->window;
+    } else if ( !maimOptions->geometryGiven ) {
+        throw new std::invalid_argument( "Relative mode (--parent) requires --geometry." );
     }
     if ( !maimOptions->geometryGiven ) {
         maimOptions->geometry = getWindowGeometry( x11, maimOptions->window );
+        maimOptions->geometry.x = 0;
+        maimOptions->geometry.y = 0;
     }
 
     if ( !maimOptions->select ) {
