@@ -45,7 +45,7 @@ int Options::validateStringOption( int argc, char** argv, int argumentIndex ) {
             }
             if ( i == check.name.length()-1 ) {
                 if ( !check.isFlagArgument && argument.find("=") == std::string::npos ) {
-                    throw new std::invalid_argument("Expected `=` after " + arguments[i]);
+                    throw new std::invalid_argument("Expected `=` after " + argument);
                 }
                 if ( check.isFlagArgument && i+3 != argument.length() ) {
                     throw new std::invalid_argument("Trailing characters on flag " + argument );
