@@ -272,7 +272,7 @@ int app( int argc, char** argv ) {
     } else {
         XWindowAttributes attr;
         XGetWindowAttributes(x11->display, maimOptions->window, &attr);
-        if (attr.backing_store == NotUseful) {
+        if (attr.backing_store == NotUseful && attr.width == 1 && attr.height == 1) {
             Window root, parent;
             parent = None;
             Window* children;
