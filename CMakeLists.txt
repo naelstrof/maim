@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.1.3 )
 
 project( "maim" )
 
@@ -18,7 +18,7 @@ else()
     set( MANTARGET "maim.1" )
 endif()
 
-add_definitions(-DMAIM_VERSION="v4.4.59")
+add_definitions(-DMAIM_VERSION="v4.4.60")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 
@@ -43,8 +43,8 @@ find_package( XFixes    REQUIRED )
 find_package( X11       REQUIRED )
 find_package( SLOP      REQUIRED )
 
-set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
 
 # Includes
 include_directories( ${XRANDR_INCLUDE_DIR}
