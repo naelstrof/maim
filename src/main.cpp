@@ -334,18 +334,16 @@ int app( int argc, char** argv ) {
             std::cerr << "\n";
         }
     }
+    // Localize to our parent
+    int px, py;
+    Window junk;
+    XTranslateCoordinates( x11->display, maimOptions->parent, selection.id, (int)selection.x, (int)selection.y, &px, &py, &junk );
     glm::ivec2 imageloc;
-    XImage* image = x11->getImage( selection.id, selection.x, selection.y, selection.w, selection.h, imageloc);
-    // localize our selection now
-    glm::ivec4 sourceGeo = getWindowGeometry( x11, selection.id );
-    selection.x -= sourceGeo.x;
-    selection.y -= sourceGeo.y;
-    glm::vec4 parentGeo = getWindowGeometry( x11, maimOptions->parent );
-    selection.x += parentGeo.x;
-    selection.y += parentGeo.y;
+    // Snapshot the image
+    XImage* image = x11->getImage( selection.id, px, py, selection.w, selection.h, imageloc);
     if ( maimOptions->format == "png" ) {
         // Convert it to an ARGB format, clipping it to the selection.
-        ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 4, x11 );
+        ARGBImage convert(image, imageloc, glm::vec4(px, py, selection.w, selection.h), 4, x11 );
         if ( !maimOptions->hideCursor ) {
             convert.blendCursor( x11 );
         }
@@ -357,7 +355,7 @@ int app( int argc, char** argv ) {
         convert.writePNG(*out, maimOptions->quality );
     } else if ( maimOptions->format == "jpg" || maimOptions->format == "jpeg" ) {
         // Convert it to a RGB format, clipping it to the selection.
-        ARGBImage convert(image, imageloc, glm::vec4(selection.x, selection.y, selection.w, selection.h), 3, x11 );
+        ARGBImage convert(image, imageloc, glm::vec4(px, py, selection.w, selection.h), 3, x11 );
         if ( !maimOptions->hideCursor ) {
             convert.blendCursor( x11 );
         }
