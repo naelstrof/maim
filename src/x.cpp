@@ -8,7 +8,7 @@ TmpXError(Display * d, XErrorEvent * ev) {
 }
 
 glm::vec4 getWindowGeometry( X11* x11, Window win ) {
-    XWindowAttributes attr;         
+    XWindowAttributes attr;
     XGetWindowAttributes( x11->display, win, &attr );
     unsigned int width = attr.width;           
     unsigned int height = attr.height;         
@@ -17,7 +17,7 @@ glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     Window junk;
     XTranslateCoordinates( x11->display, win, attr.root, 0, 0, &x, &y, &junk );
     return glm::vec4( x, y, width, height );
-}
+} 
 
 /*glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XWindowAttributes attr;         

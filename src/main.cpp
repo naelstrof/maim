@@ -2,12 +2,28 @@
 #include <slop.hpp>
 #include <glm/glm.hpp>
 #include <fstream>
+#include <sstream>
 #include <thread>
 #include <X11/extensions/shape.h>
 
 #include "x.hpp"
 #include "options.hpp"
 #include "image.hpp"
+
+template<typename Out>
+static void split(const std::string &s, char delim, Out result) {
+    std::stringstream ss;
+    ss.str(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        *(result++) = item;
+    }
+}
+static std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
+}
 
 class MaimOptions {
 public:
@@ -82,7 +98,9 @@ slop::SlopOptions* getSlopOptions( Options& options ) {
     options.getColor("color", 'c', color);
     options.getBool("nokeyboard", 'k', foo->nokeyboard);
     options.getString( "xdisplay", 'x', foo->xdisplay );
-    options.getString( "shader", 'r', foo->shader );
+	std::string shaders = "textured";
+    options.getString( "shader", 'r', shaders );
+    foo->shaders = split( shaders, ',' );
     options.getBool( "noopengl", 'o', foo->noopengl );
     foo->r = color.r;
     foo->g = color.g;
