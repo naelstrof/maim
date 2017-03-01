@@ -280,8 +280,8 @@ void ARGBImage::blendCursor( X11* x11 ) {
     xcursor->x -= xcursor->xhot;
     for ( int y = glm::max(0,xcursor->y-imagey); y<glm::min((int)height,xcursor->y+xcursor->height-imagey);y++ ) {
         for ( int x = glm::max(0,xcursor->x-imagex); x < glm::min((int)width,xcursor->x+xcursor->width-imagex);x++ ) {
-            int cx = x-xcursor->x;
-            int cy = y-xcursor->y;
+            int cx = x-(xcursor->x-imagex);
+            int cy = y-(xcursor->y-imagey);
             float alpha = (float)pixels[(cy*xcursor->width+cx)*4+3]/255.f;
             data[(y*width+x)*channels] = data[(y*width+x)*channels]*(1-alpha) + pixels[(cy*xcursor->width+cx)*4]*alpha;
             data[(y*width+x)*channels+1] = data[(y*width+x)*channels+1]*(1-alpha) + pixels[(cy*xcursor->width+cx)*4+1]*alpha;
