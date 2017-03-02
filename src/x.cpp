@@ -6,7 +6,7 @@ TmpXError(Display * d, XErrorEvent * ev) {
     _x_err = 1;
     return 0;
 }
-
+/*
 glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XWindowAttributes attr;
     XGetWindowAttributes( x11->display, win, &attr );
@@ -18,8 +18,8 @@ glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XTranslateCoordinates( x11->display, win, attr.root, 0, 0, &x, &y, &junk );
     return glm::vec4( x, y, width, height );
 } 
-
-/*glm::vec4 getWindowGeometry( X11* x11, Window win ) {
+*/
+glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XWindowAttributes attr;         
     XGetWindowAttributes( x11->display, win, &attr );
     unsigned int width = attr.width;           
@@ -31,7 +31,7 @@ glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     width += border*2;
     height += border*2;
     return glm::vec4( x, y, width, height );
-}*/
+}
 
 std::vector<XRRCrtcInfo*> X11::getCRTCS() {
     std::vector<XRRCrtcInfo*> monitors;                                            
