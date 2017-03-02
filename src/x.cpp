@@ -6,7 +6,7 @@ TmpXError(Display * d, XErrorEvent * ev) {
     _x_err = 1;
     return 0;
 }
-
+/*
 glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XWindowAttributes attr;
     XGetWindowAttributes( x11->display, win, &attr );
@@ -18,8 +18,8 @@ glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XTranslateCoordinates( x11->display, win, attr.root, 0, 0, &x, &y, &junk );
     return glm::vec4( x, y, width, height );
 } 
-
-/*glm::vec4 getWindowGeometry( X11* x11, Window win ) {
+*/
+glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     XWindowAttributes attr;         
     XGetWindowAttributes( x11->display, win, &attr );
     unsigned int width = attr.width;           
@@ -31,7 +31,7 @@ glm::vec4 getWindowGeometry( X11* x11, Window win ) {
     width += border*2;
     height += border*2;
     return glm::vec4( x, y, width, height );
-}*/
+}
 
 std::vector<XRRCrtcInfo*> X11::getCRTCS() {
     std::vector<XRRCrtcInfo*> monitors;                                            
@@ -80,12 +80,15 @@ XImage* X11::getImage( Window draw, int x, int y, int w, int h, glm::ivec2& imag
     glm::ivec4 sourceGeo = getWindowGeometry( this, draw );
     // We need to clamp the selection to fit within the
     // provided window.
-    x = glm::clamp( x, 0, sourceGeo.z-1 );
-    y = glm::clamp( y, 0, sourceGeo.w-1 );
-    w = glm::clamp( w, 1, sourceGeo.z-x );
-    h = glm::clamp( h, 1, sourceGeo.w-y );
+    x = glm::clamp( x, sourceGeo.x, sourceGeo.x+sourceGeo.z );
+    y = glm::clamp( y, sourceGeo.y, sourceGeo.y+sourceGeo.w );
+    w = glm::clamp( w, 1, sourceGeo.x+sourceGeo.z-x );
+    h = glm::clamp( h, 1, sourceGeo.y+sourceGeo.w-y );
 
     imageloc = glm::ivec2( x, y );
+
+    Window junk;
+    XTranslateCoordinates( this->display, this->root, draw, x, y, &x, &y, &junk);
 
     if ( haveXShm ) {
         // Try to grab the image through shared memory, if we fail try another method.

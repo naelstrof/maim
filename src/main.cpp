@@ -308,9 +308,10 @@ int app( int argc, char** argv ) {
         throw new std::invalid_argument( "Relative mode (--parent) requires --geometry." );
     }
     if ( !maimOptions->geometryGiven ) {
-        maimOptions->geometry = getWindowGeometry( x11, maimOptions->window );
-        maimOptions->geometry.x = 0;
-        maimOptions->geometry.y = 0;
+        Window junk;
+        glm::ivec4 geometry = getWindowGeometry( x11, maimOptions->window );
+        XTranslateCoordinates(x11->display, x11->root, maimOptions->window, geometry.x, geometry.y, &geometry.x, &geometry.y, &junk);
+        maimOptions->geometry = geometry;
     }
 
     if ( !maimOptions->select ) {
@@ -355,7 +356,7 @@ int app( int argc, char** argv ) {
     // Localize to our parent
     int px, py;
     Window junk;
-    XTranslateCoordinates( x11->display, maimOptions->parent, selection.id, (int)selection.x, (int)selection.y, &px, &py, &junk );
+    XTranslateCoordinates( x11->display, maimOptions->parent, x11->root, (int)selection.x, (int)selection.y, &px, &py, &junk);
     glm::ivec2 imageloc;
     // Snapshot the image
     XImage* image = x11->getImage( selection.id, px, py, selection.w, selection.h, imageloc);
