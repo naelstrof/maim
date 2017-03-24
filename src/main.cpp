@@ -77,7 +77,7 @@ MaimOptions* getMaimOptions( Options& options, X11* x11 ) {
     options.getBool("version", 'v', foo->version);
     options.getBool("help", 'h', foo->help);
     options.getBool("quiet", 'q', foo->quiet);
-    options.getString("format", 'f', foo->format);
+    foo->formatGiven = options.getString("format", 'f', foo->format);
     if ( foo->format != "png" && foo->format != "jpg" && foo->format != "jpeg" ) {
         throw new std::invalid_argument("Unknown format type: `" + foo->format + "`, only `png` or `jpg` is allowed." );
     }

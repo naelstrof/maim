@@ -116,8 +116,8 @@ int Options::parseStringOption( int argc, char** argv, int argumentIndex, int va
         values.push_back("");
         return 1;
     }
-    arguments.push_back( argument.substr(2,argument.find_first_of('=')) );
-    values.push_back(argument.substr(argument.find_first_of('=')));
+    arguments.push_back( argument.substr(2,argument.find_first_of('=')-2) );
+    values.push_back(argument.substr(argument.find_first_of('=')+1));
     return 1;
 }
 
