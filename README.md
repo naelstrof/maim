@@ -40,6 +40,7 @@ cmake -DCMAKE_INSTALL_PREFIX="/usr" ./
 make && sudo make install
 cd ..
 git clone https://github.com/naelstrof/maim.git
+cd maim
 cmake -DCMAKE_INSTALL_PREFIX="/usr" ./
 make && sudo make install
 ```
