@@ -87,53 +87,53 @@ XImage* X11::getImage( Window draw, int x, int y, int w, int h, glm::ivec2& imag
 
     imageloc = glm::ivec2( x, y );
 
-    Window junk;
-    XTranslateCoordinates( this->display, this->root, draw, x, y, &x, &y, &junk);
 
     if ( haveXShm ) {
         // Try to grab the image through shared memory, if we fail try another method.
         XErrorHandler ph = XSetErrorHandler(TmpXError);
         XImage* image = getImageShm( draw, x, y, w, h );
         XSetErrorHandler(ph);
-        if ( _x_err || image == None ) {
-            return XGetImage( display, draw, x, y, w, h, AllPlanes, ZPixmap );
+        if ( !_x_err && image != None ) {
+          return image;
         }
     }
+    Window junk;
+    XTranslateCoordinates( this->display, this->root, draw, x, y, &x, &y, &junk);
     return XGetImage( display, draw, x, y, w, h, AllPlanes, ZPixmap );
 }
 
 // Basically a faster image grabber.
 XImage* X11::getImageShm(Window draw, int x, int y, int w, int h) {
-	XImage* xim;
-	XShmSegmentInfo thing;
+  XImage* xim;
+  XShmSegmentInfo thing;
 
-    XWindowAttributes xattr;
-    Status s = XGetWindowAttributes (display, draw, &xattr);
+  XWindowAttributes xattr;
+  Status s = XGetWindowAttributes (display, draw, &xattr);
 
-	/* try create an shm image */
-	xim = XShmCreateImage(display, xattr.visual, xattr.depth, ZPixmap, 0, &thing, w, h);
-	if (!xim) {
-		return None;
-	}
+  /* try create an shm image */
+  xim = XShmCreateImage(display, xattr.visual, xattr.depth, ZPixmap, 0, &thing, w, h);
+  if (!xim) {
+    return None;
+  }
 
-	/* get an shm id of this image */
-	thing.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0666);
-	/* if the get succeeds */
-	if (thing.shmid != -1) {
-		/* set the params for the shm segment */
-		thing.readOnly = False;
-		thing.shmaddr = xim->data = (char*)shmat(thing.shmid, 0, 0);
-		/* get the shm addr for this data chunk */
-		if (xim->data != (char *)-1) {
-			XShmAttach(display, &thing);
-            XShmGetImage(display, draw, xim, x, y, 0xffffffff);
-            return xim;
-			//shmdt(thing.shmaddr);
-		}
-		/* get failed - out of shm id's or shm segment too big ? */
-		/* remove the shm id we created */
-		shmctl(thing.shmid, IPC_RMID, 0);
-        shmdt(thing.shmaddr);
-	}
-	return None;
+  /* get an shm id of this image */
+  thing.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0666);
+  /* if the get succeeds */
+  if (thing.shmid != -1) {
+    /* set the params for the shm segment */
+    thing.readOnly = False;
+    thing.shmaddr = xim->data = (char*)shmat(thing.shmid, 0, 0);
+    /* get the shm addr for this data chunk */
+    if (xim->data != (char *)-1) {
+      XShmAttach(display, &thing);
+      XShmGetImage(display, draw, xim, x, y, 0xffffffff);
+      return xim;
+      //shmdt(thing.shmaddr);
+    }
+    /* get failed - out of shm id's or shm segment too big ? */
+    /* remove the shm id we created */
+    shmctl(thing.shmid, IPC_RMID, 0);
+    shmdt(thing.shmaddr);
+  }
+  return None;
 }
