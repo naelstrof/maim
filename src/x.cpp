@@ -88,17 +88,21 @@ XImage* X11::getImage( Window draw, int x, int y, int w, int h, glm::ivec2& imag
     imageloc = glm::ivec2( x, y );
 
 
+    // This is a HUGE no-no, but it keeps the image from changing under our feet.
+    XGrabServer(display);
     if ( haveXShm ) {
         // Try to grab the image through shared memory, if we fail try another method.
         XErrorHandler ph = XSetErrorHandler(TmpXError);
         XImage* image = getImageShm( draw, x, y, w, h );
         XSetErrorHandler(ph);
         if ( !_x_err && image != None ) {
+          XUngrabServer(display);
           return image;
         }
     }
     Window junk;
     XTranslateCoordinates( this->display, this->root, draw, x, y, &x, &y, &junk);
+    XUngrabServer(display);
     return XGetImage( display, draw, x, y, w, h, AllPlanes, ZPixmap );
 }
 
