@@ -18,7 +18,7 @@ else()
     set( MANTARGET "maim.1" )
 endif()
 
-add_definitions(-DMAIM_VERSION="v4.4.62")
+add_definitions(-DMAIM_VERSION="v5.4.62")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 
@@ -26,7 +26,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 set( source
      src/x.cpp
      src/image.cpp
-     src/options.cpp
      src/main.cpp )
 
 set( BIN_TARGET     "${PROJECT_NAME}" )

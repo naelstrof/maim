@@ -55,17 +55,17 @@ $ maim -s | xclip -selection clipboard -t image/png
 
 * This messy command forces a user to select a window to screenshot, then applies a shadow effect using *imagemagick*, then saves it to shadow.png. It looks really nice on windows that support an alpha channel.
 ```bash
-$ maim -t9999999 -s | convert - \( +clone -background black -shadow 80x3+5+5 \) +swap -background none -layers merge +repage shadow.png
+$ maim -st 9999999 | convert - \( +clone -background black -shadow 80x3+5+5 \) +swap -background none -layers merge +repage shadow.png
 ```
 
 * This command is a particular favorite of mine, invented by a friend. It simply prints the RGB values of the selected pixel. A basic color picker that has the additional ability to average out the pixel values of an area. If used cleverly with the geometry and window flag, the return color might warn you of a found counter-strike match...
 ```bash
-$ maim -t0 -s | convert - -resize 1x1\! -format '%[pixel:p{0,0}]' info:-
+$ maim -st 0 | convert - -resize 1x1\! -format '%[pixel:p{0,0}]' info:-
 ```
 
 * This is a basic, but useful command that simply screenshots the current active window.
 ```bash
-$ maim -i$(xdotool getactivewindow) ~/mypicture.jpg
+$ maim -i $(xdotool getactivewindow) ~/mypicture.jpg
 ```
 
 * This is another basic command, but I find it necessary to describe the usefulness of date. This particular command creates a full screenshot, and names it as the number of seconds that passed since 1970. Guaranteed unique, already sorted, and easily read.
