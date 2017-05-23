@@ -51,7 +51,7 @@ MaimOptions::MaimOptions() {
     savepath = "";
     window = None;
     parent = None;
-    quality = 10;
+    quality = 7;
     quiet = false;
     delay = 0;
     format = "png";
