@@ -81,6 +81,7 @@ Window parseWindow( std::string win, X11* x11 ) {
             throw new std::invalid_argument("Unable to parse value " + win + " as a window. Expecting integer, hex, or `root`.");
         }
     }
+    return retwin;
 }
 
 glm::vec4 parseColor( std::string value ) {
