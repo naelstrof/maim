@@ -32,7 +32,7 @@ maim (Make Image) is a utility that takes screenshots of your desktop. It's mean
 * [GNU Guix: maim](https://www.gnu.org/software/guix/packages/#maim)
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
-### Install using CMake (Requires CMake, git, libXrander, libXfixes)
+### Install using CMake (Requires CMake, git, libXrander, libXfixes, libGLM)
 ```bash
 git clone https://github.com/naelstrof/slop.git
 cd slop
