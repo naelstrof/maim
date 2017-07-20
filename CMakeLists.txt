@@ -18,7 +18,7 @@ else()
     set( MANTARGET "maim.1" )
 endif()
 
-add_definitions(-DMAIM_VERSION="v5.4.63")
+add_definitions(-DMAIM_VERSION="v5.4.64")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 
@@ -41,6 +41,7 @@ find_package( XRandr    REQUIRED )
 find_package( XFixes    REQUIRED )
 find_package( X11       REQUIRED )
 find_package( SLOP      REQUIRED )
+find_package( Threads   REQUIRED )
 
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
@@ -56,6 +57,7 @@ include_directories( ${XRANDR_INCLUDE_DIR}
 
 # Libraries
 target_link_libraries( ${BIN_TARGET}
+                       ${CMAKE_THREAD_LIBS_INIT}
                        ${X11_LIBRARIES}
                        ${PNG_LIBRARIES}
                        ${XFIXES_LIBRARY}
