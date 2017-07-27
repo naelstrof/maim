@@ -45,7 +45,6 @@ find_package( X11        REQUIRED )
 find_package( SLOP       REQUIRED )
 find_package( Threads    REQUIRED )
 
-find_package( Meta       REQUIRED )
 find_package( Cairo      REQUIRED )
 find_package( Clutter    REQUIRED )
 find_package( GLIB       REQUIRED )
@@ -53,6 +52,7 @@ find_package( Cogl       REQUIRED )
 find_package( Pango      REQUIRED )
 find_package( ATK        REQUIRED )
 find_package( JsonGlib   REQUIRED )
+find_package( ShadowFactory   REQUIRED )
 
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
@@ -73,7 +73,7 @@ include_directories( ${XRANDR_INCLUDE_DIR}
                      ${ATK_INCLUDE_DIRS}
                      ${COGL_INCLUDE_DIRS}
                      ${JSONGLIB_INCLUDE_DIR}
-                     ${Meta_INCLUDE_DIR}
+                     ${SHADOWFACTORY_INCLUDE_DIR}
                      ${PNG_INCLUDE_DIRS} )
 
 # Libraries
