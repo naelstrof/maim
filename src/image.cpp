@@ -116,16 +116,16 @@ void ARGBImage::writePNG( std::ostream& streamout, int quality ) {
         throw new std::invalid_argument("Quality argument must be between 1 and 10");
     }
     png_structp png = NULL;
-	png_infop info = NULL;
-	png_bytep *rows = new png_bytep[height];
+    png_infop info = NULL;
+    png_bytep *rows = new png_bytep[height];
 
-	png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if(!png) throw new std::runtime_error( "Failed to write png image" );
-	info = png_create_info_struct(png);
-	if(!info) throw new std::runtime_error( "Failed to write png image" );
+    png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    if(!png) throw new std::runtime_error( "Failed to write png image" );
+    info = png_create_info_struct(png);
+    if(!info) throw new std::runtime_error( "Failed to write png image" );
     png_set_error_fn(png, png_get_error_ptr(png), user_error_fn, user_warning_fn);
     png_set_write_fn(png, &streamout, png_write_ostream, png_flush_ostream);
-	png_set_compression_level(png, quality-1);
+    png_set_compression_level(png, quality-1);
     if ( channels == 4 ) {
         png_set_IHDR(png, info, width, height,
            8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
@@ -150,7 +150,7 @@ void init_buffer(jpeg_compress_struct* cinfo) {}
  * happen since we allocated our buffer to be big to start with
  */
 boolean empty_buffer(jpeg_compress_struct* cinfo) {
-	return TRUE;
+    return TRUE;
 }
  
 /* finalize the buffer and do any cleanup stuff */
@@ -160,45 +160,45 @@ void ARGBImage::writeJPEG( std::ostream& streamout, int quality ) {
     if ( channels != 3 ) {
         throw new std::runtime_error( "JPEG tried to save image with more than 3 channels." );
     }
-	struct jpeg_compress_struct cinfo;
-	struct jpeg_error_mgr       jerr;
-	struct jpeg_destination_mgr dmgr;
+    struct jpeg_compress_struct cinfo;
+    struct jpeg_error_mgr       jerr;
+    struct jpeg_destination_mgr dmgr;
  
-	/* create our in-memory output buffer to hold the jpeg */
-	JOCTET * out_buffer   = new JOCTET[width * height *3];
+    /* create our in-memory output buffer to hold the jpeg */
+    JOCTET * out_buffer   = new JOCTET[width * height *3];
  
-	/* here is the magic */
-	dmgr.init_destination    = init_buffer;
-	dmgr.empty_output_buffer = empty_buffer;
-	dmgr.term_destination    = term_buffer;
-	dmgr.next_output_byte    = out_buffer;
-	dmgr.free_in_buffer      = width * height *3;
+    /* here is the magic */
+    dmgr.init_destination    = init_buffer;
+    dmgr.empty_output_buffer = empty_buffer;
+    dmgr.term_destination    = term_buffer;
+    dmgr.next_output_byte    = out_buffer;
+    dmgr.free_in_buffer      = width * height *3;
  
-	cinfo.err = jpeg_std_error(&jerr);
-	jpeg_create_compress(&cinfo);
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_compress(&cinfo);
  
-	/* make sure we tell it about our manager */
-	cinfo.dest = &dmgr;
+    /* make sure we tell it about our manager */
+    cinfo.dest = &dmgr;
  
-	cinfo.image_width      = width;
-	cinfo.image_height     = height;
-	cinfo.input_components = 3;
-	cinfo.in_color_space   = JCS_RGB;
+    cinfo.image_width      = width;
+    cinfo.image_height     = height;
+    cinfo.input_components = 3;
+    cinfo.in_color_space   = JCS_RGB;
  
-	jpeg_set_defaults(&cinfo);
+    jpeg_set_defaults(&cinfo);
     // Convert quality from scale 1-10 to 0-100
-	jpeg_set_quality (&cinfo, (int)((float)quality-1.f)*(100.f/9.f), true);
-	jpeg_start_compress(&cinfo, true);
+    jpeg_set_quality (&cinfo, (int)((float)quality-1.f)*(100.f/9.f), true);
+    jpeg_start_compress(&cinfo, true);
  
-	JSAMPROW row_pointer;
-	unsigned char* buffer    = (unsigned char*)data;
+    JSAMPROW row_pointer;
+    unsigned char* buffer    = (unsigned char*)data;
  
-	/* main code to write jpeg data */
-	while (cinfo.next_scanline < cinfo.image_height) { 		
-		row_pointer = (JSAMPROW) &buffer[cinfo.next_scanline * 3*width];
-		jpeg_write_scanlines(&cinfo, &row_pointer, 1);
-	}
-	jpeg_finish_compress(&cinfo);
+    /* main code to write jpeg data */
+    while (cinfo.next_scanline < cinfo.image_height) {         
+        row_pointer = (JSAMPROW) &buffer[cinfo.next_scanline * 3*width];
+        jpeg_write_scanlines(&cinfo, &row_pointer, 1);
+    }
+    jpeg_finish_compress(&cinfo);
  
     streamout.write( (const char*)out_buffer, cinfo.dest->next_output_byte - out_buffer );
     delete[] out_buffer;

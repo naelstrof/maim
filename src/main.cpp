@@ -561,7 +561,7 @@ int app( int argc, char** argv ) {
     delete maimOptions;
     delete slopOptions;
 
-	return 0;
+    return 0;
 }
 
 int main( int argc, char** argv ) {

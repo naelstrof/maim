@@ -35,13 +35,24 @@ add_executable( "${BIN_TARGET}" ${source} )
 
 # Obtain library paths and make sure they exist.
 set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/modules" )
-find_package( PNG       REQUIRED )
-find_package( JPEG      REQUIRED )
-find_package( XRandr    REQUIRED )
-find_package( XFixes    REQUIRED )
-find_package( X11       REQUIRED )
-find_package( SLOP      REQUIRED )
-find_package( Threads   REQUIRED )
+find_package( PNG        REQUIRED )
+find_package( JPEG       REQUIRED )
+find_package( XRandr     REQUIRED )
+find_package( XRender    REQUIRED )
+find_package( XFixes     REQUIRED )
+find_package( XComposite REQUIRED )
+find_package( X11        REQUIRED )
+find_package( SLOP       REQUIRED )
+find_package( Threads    REQUIRED )
+
+find_package( Meta       REQUIRED )
+find_package( Cairo      REQUIRED )
+find_package( Clutter    REQUIRED )
+find_package( GLIB       REQUIRED )
+find_package( Cogl       REQUIRED )
+find_package( Pango      REQUIRED )
+find_package( ATK        REQUIRED )
+find_package( JsonGlib   REQUIRED )
 
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
@@ -51,8 +62,18 @@ include_directories( ${XRANDR_INCLUDE_DIR}
                      ${X11_INCLUDE_DIR}
                      ${SLOP_INCLUDE_DIR}
                      ${XFIXES_INCLUDE_DIR}
+                     ${XRENDER_INCLUDE_DIR}
+                     ${XCOMPOSITE_INCLUDE_DIR}
                      ${JPEG_INCLUDE_DIR}
                      ${XRANDR_INCLUDE_DIR}
+                     ${CAIRO_INCLUDE_DIRS}
+                     ${GLIB_INCLUDE_DIRS}
+                     ${CLUTTER_INCLUDE_DIR}
+                     ${PANGO_INCLUDE_DIR}
+                     ${ATK_INCLUDE_DIRS}
+                     ${COGL_INCLUDE_DIRS}
+                     ${JSONGLIB_INCLUDE_DIR}
+                     ${Meta_INCLUDE_DIR}
                      ${PNG_INCLUDE_DIRS} )
 
 # Libraries
@@ -61,8 +82,16 @@ target_link_libraries( ${BIN_TARGET}
                        ${X11_LIBRARIES}
                        ${PNG_LIBRARIES}
                        ${XFIXES_LIBRARY}
+                       ${XRENDER_LIBRARY}
+                       ${XCOMPOSITE_LIBRARY}
                        ${XRANDR_LIBRARY}
+                       ${CAIRO_LIBRARIES}
+                       ${GLIB_LIBRARIES}
+                       ${PANGO_LIBRARIES}
+                       ${CLUTTER_LIBRARY}
+                       ${ATK_LIBRARIES}
                        ${JPEG_LIBRARIES}
+                       ${JSONGLIB_LIBRARY}
                        ${SLOP_LIBRARIES} )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")

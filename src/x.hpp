@@ -25,8 +25,10 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xrender.h>
+#include <X11/extensions/shape.h>
 #include <X11/extensions/Xcomposite.h>
 #include <X11/extensions/Xrandr.h>
+#include <mutter/meta/meta-shadow-factory.h>
 #include <sys/shm.h>
 #include <string>
 #include <vector>
@@ -35,8 +37,12 @@
 
 class X11 {
 private:
+    bool hasClipping( Window d );
+    XserverRegion findRegion( Window d );
+    void unionClippingRegions( XserverRegion rootRegion, Window child );
+    void unionBorderRegions( XserverRegion rootRegion, Window d );
     bool haveXShm;
-    XImage* getImageShm( Window d, int x, int y, int w, int h );
+    bool haveXComposite;
 public:
     bool haveXRR;
     X11( std::string displayName );
@@ -52,6 +58,6 @@ public:
 };
 
 glm::ivec4 getWindowGeometry( X11* x11, Window win );
-//glm::ivec4 getWindowGeometryWithoutBorder( X11* x11, Window win );
+glm::ivec4 getWindowGeometryWithoutBorder( X11* x11, Window win );
 
 #endif

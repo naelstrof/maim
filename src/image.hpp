@@ -32,16 +32,17 @@
 #include "x.hpp"
 
 static inline unsigned char computeRGBPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int width, glm::ivec2 offset ) {
-    unsigned int real = XGetPixel(image, x, y);
     int curpixel = ((y-offset.y)*width+((x-offset.x)))*3;
+    unsigned int real = XGetPixel(image, x, y);
     data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
     data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
     data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
 }
 
 static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int aoffset, int width, glm::ivec2 offset ) {
+    int curpixel = ((y-offset.y)*width+(x-offset.x))*4;
+    //unsigned int real = ((unsigned int*)image->data)[curpixel/4];
     unsigned int real = XGetPixel(image, x, y);
-    int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
     data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
     data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
     data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
@@ -49,8 +50,9 @@ static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image,
 }
 
 static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int width, glm::ivec2 offset ) {
-    unsigned int real = XGetPixel(image, x, y);
     int curpixel = ((y-offset.y)*width+((x-offset.x)))*4;
+    //unsigned int real = ((unsigned int*)image->data)[curpixel/4];
+    unsigned int real = XGetPixel(image, x, y);
     data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
     data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
     data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
