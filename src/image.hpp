@@ -76,6 +76,7 @@ private:
     unsigned int height;
     unsigned int channels;
     int imagex, imagey;
+    glm::ivec2 offset;
     bool intersect( XRRCrtcInfo* a, glm::vec4 b );
     bool containsCompletely( XRRCrtcInfo* a, glm::vec4 b );
 public:

@@ -9,7 +9,7 @@ ARGBImage::ARGBImage( XImage* image, glm::ivec2 iloc, glm::ivec4 selectionrect, 
     this->imagey = iloc.y;
     this->channels = channels;
     glm::ivec2 spos = glm::ivec2( selectionrect.x, selectionrect.y );
-    glm::ivec2 offset = spos-iloc;
+    offset = spos-iloc;
     long long int alpha_mask = ~(image->red_mask|image->green_mask|image->blue_mask);
     long long int roffset = get_shift(image->red_mask);
     long long int goffset = get_shift(image->green_mask);
@@ -276,8 +276,8 @@ void ARGBImage::blendCursor( X11* x11 ) {
     for ( unsigned int i=0;i<xcursor->width*xcursor->height;i++ ) {
         ((unsigned int*)pixels)[ i ] = (unsigned int)xcursor->pixels[ i ];
     }
-    xcursor->y -= xcursor->yhot;
-    xcursor->x -= xcursor->xhot;
+    xcursor->y -= xcursor->yhot + offset.x;
+    xcursor->x -= xcursor->xhot + offset.y;
     for ( int y = glm::max(0,xcursor->y-imagey); y<glm::min((int)height,xcursor->y+xcursor->height-imagey);y++ ) {
         for ( int x = glm::max(0,xcursor->x-imagex); x < glm::min((int)width,xcursor->x+xcursor->width-imagex);x++ ) {
             int cx = x-(xcursor->x-imagex);
@@ -286,6 +286,10 @@ void ARGBImage::blendCursor( X11* x11 ) {
             data[(y*width+x)*channels] = data[(y*width+x)*channels]*(1-alpha) + pixels[(cy*xcursor->width+cx)*4+2]*alpha;
             data[(y*width+x)*channels+1] = data[(y*width+x)*channels+1]*(1-alpha) + pixels[(cy*xcursor->width+cx)*4+1]*alpha;
             data[(y*width+x)*channels+2] = data[(y*width+x)*channels+2]*(1-alpha) + pixels[(cy*xcursor->width+cx)*4]*alpha;
+            // If the original image has alpha, we need to override it.
+            if ( channels == 4 ) {
+                data[(y*width+x)*channels+3] = glm::min(data[(y*width+x)*channels+3]+pixels[(cy*xcursor->width+cx)*4+3],255);
+            }
         }
     }
 }
