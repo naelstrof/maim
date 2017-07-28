@@ -23,12 +23,13 @@
 
 #include <iostream>
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xrender.h>
 #include <X11/extensions/shape.h>
 #include <X11/extensions/Xcomposite.h>
 #include <X11/extensions/Xrandr.h>
-#include <mutter/meta/meta-shadow-factory.h>
+//#include <meta/meta-shadow-factory.h>
 #include <sys/shm.h>
 #include <string>
 #include <vector>

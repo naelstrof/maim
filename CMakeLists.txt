@@ -45,15 +45,6 @@ find_package( X11        REQUIRED )
 find_package( SLOP       REQUIRED )
 find_package( Threads    REQUIRED )
 
-find_package( Cairo      REQUIRED )
-find_package( Clutter    REQUIRED )
-find_package( GLIB       REQUIRED )
-find_package( Cogl       REQUIRED )
-find_package( Pango      REQUIRED )
-find_package( ATK        REQUIRED )
-find_package( JsonGlib   REQUIRED )
-find_package( ShadowFactory   REQUIRED )
-
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
 
@@ -66,14 +57,6 @@ include_directories( ${XRANDR_INCLUDE_DIR}
                      ${XCOMPOSITE_INCLUDE_DIR}
                      ${JPEG_INCLUDE_DIR}
                      ${XRANDR_INCLUDE_DIR}
-                     ${CAIRO_INCLUDE_DIRS}
-                     ${GLIB_INCLUDE_DIRS}
-                     ${CLUTTER_INCLUDE_DIR}
-                     ${PANGO_INCLUDE_DIR}
-                     ${ATK_INCLUDE_DIRS}
-                     ${COGL_INCLUDE_DIRS}
-                     ${JSONGLIB_INCLUDE_DIR}
-                     ${SHADOWFACTORY_INCLUDE_DIR}
                      ${PNG_INCLUDE_DIRS} )
 
 # Libraries
@@ -85,13 +68,7 @@ target_link_libraries( ${BIN_TARGET}
                        ${XRENDER_LIBRARY}
                        ${XCOMPOSITE_LIBRARY}
                        ${XRANDR_LIBRARY}
-                       ${CAIRO_LIBRARIES}
-                       ${GLIB_LIBRARIES}
-                       ${PANGO_LIBRARIES}
-                       ${CLUTTER_LIBRARY}
-                       ${ATK_LIBRARIES}
                        ${JPEG_LIBRARIES}
-                       ${JSONGLIB_LIBRARY}
                        ${SLOP_LIBRARIES} )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")

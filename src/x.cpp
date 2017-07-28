@@ -8,29 +8,135 @@ TmpXError(Display * d, XErrorEvent * ev) {
 }
 
 glm::ivec4 getWindowGeometryWithoutBorder( X11* x11, Window win ) {
-    XWindowAttributes attr;
-    XGetWindowAttributes( x11->display, win, &attr );
-    unsigned int width = attr.width;           
-    unsigned int height = attr.height;         
-    unsigned int border = attr.border_width;   
-    int x, y;
-    Window junk;
-    XTranslateCoordinates( x11->display, win, attr.root, 0, 0, &x, &y, &junk );
-    return glm::vec4( x, y, width, height );
-} 
+    // First lets check for if we're a window manager frame.
+    Window root, parent;
+    Window* children;
+    unsigned int num_children;
+    XQueryTree( x11->display, win, &root, &parent, &children, &num_children);
+
+    // To do that, we check if our top level child happens to have the _NET_FRAME_EXTENTS atom.
+    unsigned char *data;
+    Atom type_return;
+    unsigned long nitems_return;
+    unsigned long bytes_after_return;
+    int format_return;
+    bool window_frame = false;
+    Window actualWindow = win;
+    if ( XGetWindowProperty( x11->display, children[num_children-1], XInternAtom( x11->display, "_NET_FRAME_EXTENTS", False),
+                        0, LONG_MAX, False, XA_CARDINAL, &type_return,
+                        &format_return, &nitems_return, &bytes_after_return,
+                        &data) == Success ) {
+        if ((type_return == XA_CARDINAL) && (format_return == 32) && (nitems_return == 4) && (data)) {
+            actualWindow = children[num_children-1];
+            window_frame = true;
+        }
+    }
+
+    // If we're a window frame, we actually get the dimensions of the child window, then add the _NET_FRAME_EXTENTS to it.
+    // (then add the border width of the window frame after that.)
+    if ( window_frame ) {
+        // Then lets grab the dims of the child window.
+        XWindowAttributes attr;
+        XGetWindowAttributes( x11->display, actualWindow, &attr );
+        unsigned int width = attr.width;           
+        unsigned int height = attr.height;         
+        int x, y;
+        // Gotta translate them into root coords
+        Window junk;
+        XTranslateCoordinates( x11->display, win, root, 0, 0, &x, &y, &junk );
+        // Now uh, remember that _NET_FRAME_EXTENTS stuff? That's the window frame information.
+        // We HAVE to do this because mutter likes to mess with window sizes with shadows and stuff.
+        unsigned long* ldata = (unsigned long*)data;
+        width += ldata[0] + ldata[1];
+        height += ldata[2] + ldata[3];
+        x -= ldata[0];
+        y -= ldata[2];
+        return glm::vec4( x, y, width, height );
+    } else {
+        // Either the WM is malfunctioning, or the window specified isn't a window manager frame.
+        // so we just rely on X.
+        XWindowAttributes attr;
+        XGetWindowAttributes( x11->display, win, &attr );
+        unsigned int width = attr.width;           
+        unsigned int height = attr.height;         
+        // We combine both border widths.
+        int x, y;
+        // Gotta translate them into root coords, we can adjust for the border width here.
+        Window junk;
+        XTranslateCoordinates( x11->display, win, root, 0, 0, &x, &y, &junk );
+        return glm::vec4( x, y, width, height );
+    }
+}
 
 glm::ivec4 getWindowGeometry( X11* x11, Window win ) {
-    XWindowAttributes attr;         
-    XGetWindowAttributes( x11->display, win, &attr );
-    unsigned int width = attr.width;           
-    unsigned int height = attr.height;         
-    unsigned int border = attr.border_width;   
-    int x, y;
-    Window junk;
-    XTranslateCoordinates( x11->display, win, attr.root, -attr.border_width, -attr.border_width, &x, &y, &junk );
-    width += border*2;
-    height += border*2;
-    return glm::vec4( x, y, width, height );
+    // First lets check for if we're a window manager frame.
+    Window root, parent;
+    Window* children;
+    unsigned int num_children;
+    XQueryTree( x11->display, win, &root, &parent, &children, &num_children);
+
+    // To do that, we check if our top level child happens to have the _NET_FRAME_EXTENTS atom.
+    unsigned char *data;
+    Atom type_return;
+    unsigned long nitems_return;
+    unsigned long bytes_after_return;
+    int format_return;
+    bool window_frame = false;
+    Window actualWindow = win;
+    if ( XGetWindowProperty( x11->display, children[num_children-1], XInternAtom( x11->display, "_NET_FRAME_EXTENTS", False),
+                        0, LONG_MAX, False, XA_CARDINAL, &type_return,
+                        &format_return, &nitems_return, &bytes_after_return,
+                        &data) == Success ) {
+        if ((type_return == XA_CARDINAL) && (format_return == 32) && (nitems_return == 4) && (data)) {
+            actualWindow = children[num_children-1];
+            window_frame = true;
+        }
+    }
+
+    // If we're a window frame, we actually get the dimensions of the child window, then add the _NET_FRAME_EXTENTS to it.
+    // (then add the border width of the window frame after that.)
+    if ( window_frame ) {
+        // First lets grab the border width.
+        XWindowAttributes frameattr;
+        XGetWindowAttributes( x11->display, win, &frameattr );
+        // Then lets grab the dims of the child window.
+        XWindowAttributes attr;
+        XGetWindowAttributes( x11->display, actualWindow, &attr );
+        unsigned int width = attr.width;           
+        unsigned int height = attr.height;         
+        // We combine both border widths.
+        unsigned int border = attr.border_width+frameattr.border_width;   
+        int x, y;
+        // Gotta translate them into root coords, we can adjust for the border width here.
+        Window junk;
+        XTranslateCoordinates( x11->display, actualWindow, attr.root, -border, -border, &x, &y, &junk );
+        width += border*2;
+        height += border*2;
+        // Now uh, remember that _NET_FRAME_EXTENTS stuff? That's the window frame information.
+        // We HAVE to do this because mutter likes to mess with window sizes with shadows and stuff.
+        unsigned long* ldata = (unsigned long*)data;
+        width += ldata[0] + ldata[1];
+        height += ldata[2] + ldata[3];
+        x -= ldata[0];
+        y -= ldata[2];
+        return glm::vec4( x, y, width, height );
+    } else {
+        // Either the WM is malfunctioning, or the window secified isn't a window manager frame.
+        // so we just rely on X.
+        XWindowAttributes attr;
+        XGetWindowAttributes( x11->display, win, &attr );
+        unsigned int width = attr.width;           
+        unsigned int height = attr.height;         
+        // We combine both border widths.
+        unsigned int border = attr.border_width;   
+        int x, y;
+        // Gotta translate them into root coords, we can adjust for the border width here.
+        Window junk;
+        XTranslateCoordinates( x11->display, win, attr.root, -border, -border, &x, &y, &junk );
+        width += border*2;
+        height += border*2;
+        return glm::vec4( x, y, width, height );
+    }
 }
 
 std::vector<XRRCrtcInfo*> X11::getCRTCS() {
@@ -162,17 +268,18 @@ XserverRegion X11::findRegion( Window d ) {
 
 void X11::unionBorderRegions( XserverRegion rootRegion, Window d ) {
     glm::vec4 bordergeo = getWindowGeometry( this, d );
-    glm::vec4 geo = getWindowGeometryWithoutBorder( this, d );
     XRectangle* rects = new XRectangle[1];
     rects[0].x = bordergeo.x;
     rects[0].y = bordergeo.y;
     rects[0].width = bordergeo.z;
     rects[0].height = bordergeo.w;
     XserverRegion borderRegionRect = XFixesCreateRegion( display, rects, 1 );
-    rects[0].x = geo.x;
-    rects[0].y = geo.y;
-    rects[0].width = geo.z;
-    rects[0].height = geo.w;
+    XWindowAttributes attr;
+    XGetWindowAttributes( display, d, &attr );
+    rects[0].x += attr.border_width;
+    rects[0].y += attr.border_width;
+    rects[0].width -= attr.border_width*2;
+    rects[0].height -= attr.border_width*2;
     XserverRegion regionRect = XFixesCreateRegion( display, rects, 1 );
     XFixesSubtractRegion( display, regionRect, borderRegionRect, regionRect );
     XFixesUnionRegion( display, rootRegion, rootRegion, regionRect );
