@@ -42,9 +42,13 @@ private:
     XserverRegion findRegion( Window d );
     void unionClippingRegions( XserverRegion rootRegion, Window child );
     void unionBorderRegions( XserverRegion rootRegion, Window d );
-    bool haveXShm;
-    bool haveXComposite;
+    XImage* getImageUsingXRender( Window draw, int localx, int localy, int w, int h );
+    XImage* getImageUsingXShm( Window draw, int localx, int localy, int w, int h );
 public:
+    bool haveXComposite;
+    bool haveXRender;
+    bool haveXShm;
+    bool haveXFixes;
     bool haveXRR;
     X11( std::string displayName );
     ~X11();

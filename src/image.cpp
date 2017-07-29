@@ -267,6 +267,9 @@ void ARGBImage::mask(X11* x11) {
 }
 
 void ARGBImage::blendCursor( X11* x11 ) {
+    if ( !x11->haveXFixes ) {
+        return;
+    }
     XFixesCursorImage* xcursor = XFixesGetCursorImage( x11->display );
     if ( !xcursor ) {
         return;

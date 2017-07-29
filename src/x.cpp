@@ -32,6 +32,7 @@ glm::ivec4 getWindowGeometry( X11* x11, Window win ) {
             window_frame = true;
         }
     }
+    XFree( children );
 
     // If we're a window frame, we actually get the dimensions of the child window, then add the _NET_FRAME_EXTENTS to it.
     // (then add the border width of the window frame after that.)
@@ -59,6 +60,7 @@ glm::ivec4 getWindowGeometry( X11* x11, Window win ) {
         height += ldata[2] + ldata[3];
         x -= ldata[0];
         y -= ldata[2];
+        XFree( data );
         return glm::vec4( x, y, width, height );
     } else {
         // Either the WM is malfunctioning, or the window secified isn't a window manager frame.
@@ -108,19 +110,21 @@ X11::X11( std::string displayName ) {
     int major = 0;
     int minor = 0;
     Bool pixmaps = true;
-    haveXShm = XShmQueryVersion( display, &major, &minor, &pixmaps );
+    haveXShm = (True == XShmQueryVersion( display, &major, &minor, &pixmaps ));
     haveXShm = (haveXShm && pixmaps );
+    major = 2;
+    minor = 0;
+    haveXFixes = (True == XFixesQueryVersion ( display, &major, &minor ));
     major = 0;
     minor = 0;
-    haveXRR = XRRQueryVersion( display, &major, &minor );
+    haveXRR = (True == XRRQueryVersion( display, &major, &minor ) );
     major = 0;
     minor = 2;
-    XCompositeQueryVersion( display, &major, &minor );
-    if ( major > 0 || minor >= 2 ) {
-        haveXComposite = true;
-    } else {
-        haveXComposite = false;
-    }
+    haveXComposite = (True == XCompositeQueryVersion( display, &major, &minor ));
+    major = 0;
+    minor = 0;
+    haveXRender = (True == XRenderQueryVersion( display, &major, &minor ));
+
     if ( haveXRR ) {
         res = XRRGetScreenResourcesCurrent( display, root );
     }
@@ -154,7 +158,22 @@ XImage* X11::getImage( Window draw, int x, int y, int w, int h, glm::ivec2& imag
         }
         // We don't have to worry about undoing the redirect, since as soon as maim closes X knows to undo it.
     }
+    if ( haveXRender && haveXFixes ) {
+        return getImageUsingXRender( draw, localx, localy, w, h );
+    }
+    // This stuff doesn't work very well...
+    //if ( haveXShm ) {
+        //XErrorHandler ph = XSetErrorHandler(TmpXError);
+        //XImage* check = getImageUsingXShm( draw, localx, localy, w, h );
+        //XSetErrorHandler(ph);
+        //if ( !_x_err && check != None ) {
+            //return check;
+        //}
+    //}
+    return XGetImage( display, draw, localx, localy, w, h, AllPlanes, ZPixmap );
+}
 
+XImage* X11::getImageUsingXRender( Window draw, int localx, int localy, int w, int h ) {
     // We use XRender to grab the drawable, since it'll save it in a format we like.
     XWindowAttributes attr;
     XGetWindowAttributes( display, draw, &attr );
@@ -256,4 +275,39 @@ void X11::unionClippingRegions( XserverRegion rootRegion, Window child ) {
             unionClippingRegions( rootRegion, children[i] );
         }
     }
+}
+
+XImage* X11::getImageUsingXShm(Window draw, int localx, int localy, int w, int h) {
+    XImage* xim;
+    XShmSegmentInfo thing;
+
+    XWindowAttributes xattr;
+    Status s = XGetWindowAttributes (display, draw, &xattr);
+
+    /* try create an shm image */
+    xim = XShmCreateImage(display, xattr.visual, xattr.depth, ZPixmap, 0, &thing, w, h);
+    if (!xim) {
+        return None;
+    }
+
+    /* get an shm id of this image */
+    thing.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
+    /* if the get succeeds */
+    if (thing.shmid != -1) {
+        /* set the params for the shm segment */
+        thing.readOnly = False;
+        thing.shmaddr = xim->data = (char*)shmat(thing.shmid, 0, 0);
+        /* get the shm addr for this data chunk */
+        if (xim->data != (char *)-1) {
+            XShmAttach(display, &thing);
+            XShmGetImage(display, draw, xim, localx, localy, AllPlanes);
+            return xim;
+            //shmdt(thing.shmaddr);
+        }
+        /* get failed - out of shm id's or shm segment too big ? */
+        /* remove the shm id we created */
+        shmctl(thing.shmid, IPC_RMID, 0);
+        shmdt(thing.shmaddr);
+    }
+    return None;
 }
