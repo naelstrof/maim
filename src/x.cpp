@@ -131,6 +131,9 @@ X11::X11( std::string displayName ) {
 }
 
 X11::~X11() {
+    if ( haveXRR ) {
+        XRRFreeScreenResources( res );
+    }
     XCloseDisplay( display );
 }
 
@@ -241,6 +244,7 @@ void X11::unionBorderRegions( XserverRegion rootRegion, Window d ) {
     rects[0].height -= attr.border_width*2;
     XserverRegion regionRect = XFixesCreateRegion( display, rects, 1 );
     XFixesSubtractRegion( display, regionRect, borderRegionRect, regionRect );
+    delete[] rects;
     XFixesUnionRegion( display, rootRegion, rootRegion, regionRect );
     XFixesDestroyRegion( display, regionRect );
     XFixesDestroyRegion( display, borderRegionRect );
@@ -262,6 +266,7 @@ void X11::unionClippingRegions( XserverRegion rootRegion, Window child ) {
             rects[0].height = geo.w;
             // We have to keep the parent's region from interfering the clipping region.
             XserverRegion clippingWindowRect = XFixesCreateRegion( display, rects, 1 );
+            delete[] rects;
             // So we cut a neat hole the size of the child window where the clipping happens.
             XFixesSubtractRegion( display, rootRegion, rootRegion, clippingWindowRect );
             XFixesDestroyRegion( display, clippingWindowRect );
@@ -275,6 +280,7 @@ void X11::unionClippingRegions( XserverRegion rootRegion, Window child ) {
             unionClippingRegions( rootRegion, children[i] );
         }
     }
+    XFree( children );
 }
 
 XImage* X11::getImageUsingXShm(Window draw, int localx, int localy, int w, int h) {

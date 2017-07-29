@@ -551,6 +551,7 @@ int app( int argc, char** argv ) {
         // Then output it in the desired format.
         convert.writeJPEG(*out, maimOptions->quality );
     }
+    XDestroyImage( image );
 
     if ( maimOptions->savepathGiven ) {
         std::ofstream* file = (std::ofstream*)out;

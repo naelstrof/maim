@@ -71,6 +71,15 @@ target_link_libraries( ${BIN_TARGET}
                        ${JPEG_LIBRARIES}
                        ${SLOP_LIBRARIES} )
 
+find_package(ICU COMPONENTS uc)
+set( MAIM_UNICODE TRUE CACHE BOOL "To enable or disable unicode support." )
+if ( MAIM_UNICODE AND ICU_FOUND )
+    # ICU is required for old nvidia drivers to work for whatever reason.
+    add_definitions(-DCXXOPTS_USE_UNICODE)
+    include_directories( ${ICU_INCLUDE_DIR} )
+    target_link_libraries( ${BIN_TARGET} ${ICU_UC_LIBRARIES} )
+endif()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 install( TARGETS ${BIN_TARGET} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" )
