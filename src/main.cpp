@@ -216,7 +216,7 @@ MaimOptions* getMaimOptions( cxxopts::Options& options, X11* x11 ) {
 slop::SlopOptions* getSlopOptions( cxxopts::Options& options ) {
     slop::SlopOptions* foo = new slop::SlopOptions();
     if ( options.count( "bordersize" ) > 0 ) {
-        foo->borderSize = options["bordersize"].as<float>();
+        foo->border = options["bordersize"].as<float>();
     }
     if ( options.count( "padding" ) > 0 ) {
         foo->padding = options["padding"].as<float>();
@@ -235,16 +235,25 @@ slop::SlopOptions* getSlopOptions( cxxopts::Options& options ) {
     if ( options.count( "nokeyboard" ) > 0 ) {
         foo->nokeyboard = options["nokeyboard"].as<bool>();
     }
-    if ( options.count( "xdisplay" ) > 0 ) {
-        foo->xdisplay = options["xdisplay"].as<std::string>();
-    }
-    std::string shaders = "textured";
-    if ( options.count( "shader" ) > 0 ) {
-        shaders = options["shader"].as<std::string>();
-    }
-    foo->shaders = split( shaders, ',' );
     if ( options.count( "noopengl" ) > 0 ) {
         foo->noopengl = options["noopengl"].as<bool>();
+    }
+    if ( options.count( "xdisplay" ) > 0 ) {
+        std::string xdisplay = options["xdisplay"].as<std::string>();
+        char* cxdisplay = new char[xdisplay.length()+1];
+        memcpy( cxdisplay, xdisplay.c_str(), xdisplay.length() );
+        cxdisplay[xdisplay.length()]='\0';
+        foo->xdisplay = cxdisplay;
+    }
+    if ( options.count( "shader" ) > 0 ) {
+        std::string shaders = options["shader"].as<std::string>();
+        char* cshaders = new char[shaders.length()+1];
+        memcpy( cshaders, shaders.c_str(), shaders.length() );
+        cshaders[shaders.length()]='\0';
+        foo->shaders = cshaders;
+    }
+    if ( options.count( "quiet" ) > 0 ) {
+        foo->quiet = options["quiet"].as<bool>();
     }
     if ( options.count( "highlight" ) > 0 ) {
         foo->highlight = options["highlight"].as<bool>();
@@ -429,15 +438,14 @@ int app( int argc, char** argv ) {
         help();
         return 0;
     }
-    bool cancelled = false;
-    slop::SlopSelection selection(0,0,0,0,0);
+    slop::SlopSelection selection(0,0,0,0,0,true);
 
     if ( maimOptions->select ) {
         if ( maimOptions->windowGiven || maimOptions->parentGiven || maimOptions->geometryGiven ) {
             throw new std::invalid_argument( "Interactive mode (--select) doesn't support the following parameters: --window, --parent, --geometry." );
         }
-        selection = SlopSelect(slopOptions, &cancelled, maimOptions->quiet);
-        if ( cancelled ) {
+        selection = SlopSelect(slopOptions);
+        if ( selection.cancelled ) {
             if ( !maimOptions->quiet ) {
                 std::cerr << "Selection was cancelled by keystroke or right-click.\n";
             }
@@ -560,6 +568,12 @@ int app( int argc, char** argv ) {
     }
     delete x11;
     delete maimOptions;
+    if ( options.count( "xdisplay" ) > 0 ) {
+        delete slopOptions->xdisplay;
+    }
+    if ( options.count( "shader" ) > 0 ) {
+        delete slopOptions->shaders;
+    }
     delete slopOptions;
 
     return 0;
