@@ -18,7 +18,7 @@ else()
     set( MANTARGET "maim.1" )
 endif()
 
-add_definitions(-DMAIM_VERSION="v5.4.66")
+add_definitions(-DMAIM_VERSION="v5.4.67")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 
@@ -53,10 +53,10 @@ include_directories( ${XRANDR_INCLUDE_DIR}
                      ${X11_INCLUDE_DIR}
                      ${SLOP_INCLUDE_DIR}
                      ${XFIXES_INCLUDE_DIR}
-                     ${XRENDER_INCLUDE_DIR}
                      ${XCOMPOSITE_INCLUDE_DIR}
                      ${JPEG_INCLUDE_DIR}
                      ${XRANDR_INCLUDE_DIR}
+                     ${XRENDER_INCLUDE_DIR}
                      ${PNG_INCLUDE_DIRS} )
 
 # Libraries
@@ -65,19 +65,23 @@ target_link_libraries( ${BIN_TARGET}
                        ${X11_LIBRARIES}
                        ${PNG_LIBRARIES}
                        ${XFIXES_LIBRARY}
-                       ${XRENDER_LIBRARY}
                        ${XCOMPOSITE_LIBRARY}
                        ${XRANDR_LIBRARY}
                        ${JPEG_LIBRARIES}
+                       ${XRENDER_LIBRARY}
                        ${SLOP_LIBRARIES} )
 
-find_package(ICU COMPONENTS uc)
-set( MAIM_UNICODE TRUE CACHE BOOL "To enable or disable unicode support." )
-if ( MAIM_UNICODE AND ICU_FOUND )
-    # ICU is required for old nvidia drivers to work for whatever reason.
-    add_definitions(-DCXXOPTS_USE_UNICODE)
-    include_directories( ${ICU_INCLUDE_DIR} )
-    target_link_libraries( ${BIN_TARGET} ${ICU_UC_LIBRARIES} )
+if( CMAKE<3.7 )
+  message( WARNING "CMake version is below 3.7, CMake version >= 3.7 is required for unicode support." )
+else()
+  find_package(ICU COMPONENTS uc)
+  set( MAIM_UNICODE TRUE CACHE BOOL "To enable or disable unicode support." )
+  if ( MAIM_UNICODE AND ICU_FOUND )
+      # ICU is required for old nvidia drivers to work for whatever reason.
+      add_definitions(-DCXXOPTS_USE_UNICODE)
+      include_directories( ${ICU_INCLUDE_DIR} )
+      target_link_libraries( ${BIN_TARGET} ${ICU_UC_LIBRARIES} )
+  endif()
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
