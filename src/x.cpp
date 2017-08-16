@@ -185,10 +185,12 @@ XImage* X11::getImageUsingXRender( Window draw, int localx, int localy, int w, i
     XRenderPictureAttributes pa;
     pa.subwindow_mode = IncludeInferiors;
     Picture picture = XRenderCreatePicture( display, draw, format, CPSubwindowMode, &pa );
-    XserverRegion region = findRegion( draw );
-    // Also we use XRender because of this neato function here.
-    XFixesSetPictureClipRegion( display, picture, 0, 0, region );
-    XFixesDestroyRegion( display, region );
+    if ( draw != root ) {
+        XserverRegion region = findRegion( draw );
+        // Also we use XRender because of this neato function here.
+        XFixesSetPictureClipRegion( display, picture, 0, 0, region );
+        XFixesDestroyRegion( display, region );
+    }
 
     Pixmap pixmap = XCreatePixmap(display, root, w, h, 32);
     XRenderPictureAttributes pa2;
@@ -216,7 +218,7 @@ bool X11::hasClipping( Window d ) {
     int bShaped, xbs, ybs, cShaped, xcs, ycs;
     unsigned int wbs, hbs, wcs, hcs;
     XShapeQueryExtents ( display, d, &bShaped, &xbs, &ybs, &wbs, &hbs, &cShaped, &xcs, &ycs, &wcs, &hcs );
-    return bShaped || cShaped;
+    return bShaped;
 }
 
 XserverRegion X11::findRegion( Window d ) {
