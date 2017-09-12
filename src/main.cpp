@@ -358,7 +358,7 @@ std::cout << "              tion on how to create your own shaders.\n";
 std::cout << "\n";
 std::cout << "       -n, --nodecorations=INT\n";
 std::cout << "              Sets  the  level  of  aggressiveness  when trying to remove window\n";
-std::cout << "              decroations. `0' is off, `1' will try lightly  to  remove  decora‐\n";
+std::cout << "              decorations. `0' is off, `1' will try lightly  to  remove  decora‐\n";
 std::cout << "              tions,  and  `2' will recursively descend into the root tree until\n";
 std::cout << "              it gets the deepest  available  visible  child  under  the  mouse.\n";
 std::cout << "              Defaults to `0'.\n";
