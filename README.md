@@ -80,5 +80,5 @@ $ maim | feh - -x & maim -s cropped.png
 
 * Finally with the [help your friendly neighborhood scripter](https://github.com/tremby/imgur.sh), pictures can automatically be uploaded and their URLs copied to the clipboard with this basic command.
 ```bash
-$ maim -s /tmp/screenshot.png; imgurbash.sh /tmp/screenshot.png
+$ maim -s /tmp/screenshot.png; imgur.sh /tmp/screenshot.png | xclip -selection clipboard
 ```
