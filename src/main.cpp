@@ -88,7 +88,7 @@ glm::vec4 parseColor( std::string value ) {
     std::string valuecopy = value;
     const auto check_char = [&] (char c) {
         if (c != ',') {
-            throw new std::invalid_argument("Unable to parse value `" + valuecopy + "` as a color. You need to use commas as seperators.");
+            throw new std::invalid_argument("Unable to parse value `" + valuecopy + "` as a color. You need to use commas as separators.");
         }
     };
     glm::vec4 found;
@@ -111,6 +111,8 @@ glm::vec4 parseColor( std::string value ) {
         } else {
             found[3] = 1;
         }
+    } catch (std::invalid_argument* const e) {
+       throw e; 
     } catch ( ... ) {
         throw new std::invalid_argument("Unable to parse value `" + valuecopy + "` as a color. Should be in the format r,g,b or r,g,b,a. Like 1,1,1,1.");
     }
