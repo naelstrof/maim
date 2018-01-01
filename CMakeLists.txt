@@ -12,14 +12,6 @@ endif()
 
 include(GNUInstallDirs)
 
-set( CMAKE_COMPRESS_MAN TRUE CACHE BOOL "Whether or not to compress the man pages for install." )
-
-if ( CMAKE_COMPRESS_MAN )
-    set( MANTARGET "maim.1.gz" )
-else()
-    set( MANTARGET "maim.1" )
-endif()
-
 add_definitions(-DMAIM_VERSION="v${PROJECT_VERSION}")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
@@ -88,4 +80,4 @@ else()
 endif()
 
 install( TARGETS ${BIN_TARGET} DESTINATION "${CMAKE_INSTALL_BINDIR}" )
-install( FILES "${CMAKE_SOURCE_DIR}/${MANTARGET}" DESTINATION  "${CMAKE_INSTALL_MANDIR}/man1" COMPONENT doc )
+install( FILES "${CMAKE_SOURCE_DIR}/maim.1" DESTINATION  "${CMAKE_INSTALL_MANDIR}/man1" COMPONENT doc )
