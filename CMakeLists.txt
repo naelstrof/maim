@@ -1,14 +1,16 @@
 cmake_minimum_required( VERSION 3.1.3 )
 
-project( "maim" )
+project(maim VERSION 5.4.68 LANGUAGES CXX)
 
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)")
-
-if ( NOT CMAKE_INSTALL_PREFIX )
-    set(CMAKE_INSTALL_PREFIX "/usr")
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-set( CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_PREFIX}/share/man" CACHE PATH "Directory where man pages reside. (/usr/share/man, /usr/local/share/man, etc.)" )
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "..." FORCE)
+endif()
+
+include(GNUInstallDirs)
 
 set( CMAKE_COMPRESS_MAN TRUE CACHE BOOL "Whether or not to compress the man pages for install." )
 
@@ -18,7 +20,7 @@ else()
     set( MANTARGET "maim.1" )
 endif()
 
-add_definitions(-DMAIM_VERSION="v5.4.68")
+add_definitions(-DMAIM_VERSION="v${PROJECT_VERSION}")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/")
 
@@ -47,6 +49,7 @@ find_package( Threads    REQUIRED )
 
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${BIN_TARGET} PROPERTY CXX_EXTENSIONS OFF)
 
 # Includes
 include_directories( ${XRANDR_INCLUDE_DIR}
@@ -71,7 +74,7 @@ target_link_libraries( ${BIN_TARGET}
                        ${XRENDER_LIBRARY}
                        ${SLOP_LIBRARIES} )
 
-if( CMAKE<3.7 )
+if( ${CMAKE_VERSION} VERSION_LESS 3.7 )
   message( WARNING "CMake version is below 3.7, CMake version >= 3.7 is required for unicode support." )
 else()
   find_package(ICU COMPONENTS uc)
@@ -84,7 +87,5 @@ else()
   endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-
-install( TARGETS ${BIN_TARGET} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" )
+install( TARGETS ${BIN_TARGET} DESTINATION "${CMAKE_INSTALL_BINDIR}" )
 install( FILES "${CMAKE_SOURCE_DIR}/${MANTARGET}" DESTINATION  "${CMAKE_INSTALL_MANDIR}/man1" COMPONENT doc )
