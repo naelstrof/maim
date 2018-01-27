@@ -10,21 +10,6 @@
 #include "x.hpp"
 #include "image.hpp"
 
-template<typename Out>
-static void split(const std::string &s, char delim, Out result) {
-    std::stringstream ss;
-    ss.str(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        *(result++) = item;
-    }
-}
-static std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
-}
-
 class MaimOptions {
 public:
     MaimOptions();
@@ -267,134 +252,133 @@ slop::SlopOptions* getSlopOptions( cxxopts::Options& options ) {
     return foo;
 }
 
-void help() {
-std::cout << "maim - make image\n";
-std::cout << "\n";
-std::cout << "SYNOPSIS\n";
-std::cout << "       maim [OPTIONS] [FILEPATH]\n";
-std::cout << "\n";
-std::cout << "DESCRIPTION\n";
-std::cout << "       maim  (make image) is an utility that takes a screenshot of your desktop,\n";
-std::cout << "       and encodes a png or jpg image of it. By default it outputs  the  encoded\n";
-std::cout << "       image data directly to standard output.\n";
-std::cout << "\n";
-std::cout << "OPTIONS\n";
-std::cout << "       -h, --help\n";
-std::cout << "              Print help and exit.\n";
-std::cout << "\n";
-std::cout << "       -v, --version\n";
-std::cout << "              Print version and exit.\n";
-std::cout << "\n";
-std::cout << "       -x, --xdisplay=hostname:number.screen_number\n";
-std::cout << "              Sets the xdisplay to use.\n";
-std::cout << "\n";
-std::cout << "       -f, --format=STRING\n";
-std::cout << "              Sets  the  desired  output format, by default maim will attempt to\n";
-std::cout << "              determine the desired output format automatically from the  output\n";
-std::cout << "              file.  If  that  fails  it defaults to a lossless png format. Cur‐\n";
-std::cout << "              rently only supports `png` or `jpg`.\n";
-std::cout << "\n";
-std::cout << "       -i, --window=INT\n";
-std::cout << "              Sets the desired window to capture, defaults to the root window.\n";
-std::cout << "\n";
-std::cout << "       -g, --geometry=GEOMETRY\n";
-std::cout << "              Sets the region to capture, uses local coordinates from the  given\n";
-std::cout << "              window. So -g10x30-5+0 would represent the rectangle wxh+x+y where\n";
-std::cout << "              w=10, h=30, x=-5, and y=0. x and y are the upper left location  of\n";
-std::cout << "              this rectangle.\n";
-std::cout << "\n";
-std::cout << "       -d, --delay=FLOAT\n";
-std::cout << "              Sets  the  time  in  seconds  to  wait before taking a screenshot.\n";
-std::cout << "              Prints a simple message to show how many seconds are left before a\n";
-std::cout << "              screenshot is taken. See --quiet for muting this message.\n";
-std::cout << "\n";
-std::cout << "       -u, --hidecursor\n";
-std::cout << "              By  default  maim super-imposes the cursor onto the image, you can\n";
-std::cout << "              disable that behavior with this flag.\n";
-std::cout << "\n";
-std::cout << "       -m, --quality\n";
-std::cout << "              An integer from 1 to 10 that determines the compression quality. 1\n";
-std::cout << "              is  the  highest (and lossiest) compression available for the pro‐\n";
-std::cout << "              vided format. For example a setting of `1` with  png  (a  lossless\n";
-std::cout << "              format)  would increase filesize and speed up encoding dramatical-\n";
-std::cout << "              ly. While a setting of `1` on a jpeg would create a pixel mush.\n";
-std::cout << "\n";
-std::cout << "       -s, --select\n";
-std::cout << "              Enables an interactive selection mode where  you  may  select  the\n";
-std::cout << "              desired region or window before a screenshot is captured. Uses the\n";
-std::cout << "              settings below to determine the visuals and settings of slop.\n";
-std::cout << "\n";
-std::cout << "       -w, --parent=WINDOW\n";
-std::cout << "              By  default, maim assumes the --geometry values are in respect to\n";
-std::cout << "              the provided --window (or root if not provided). This parameter\n";
-std::cout << "              overrides this behavior by making the  geometry  be  in  respect to\n";
-std::cout << "              whatever window you provide to --parent. Allows for an integer,\n";
-std::cout << "              hex, or `root` for input.\n";
-std::cout << "\n";
-std::cout << "SLOP OPTIONS\n";
-std::cout << "       -b, --bordersize=FLOAT\n";
-std::cout << "              Sets the selection rectangle's thickness.\n";
-std::cout << "\n";
-std::cout << "       -p, --padding=FLOAT\n";
-std::cout << "              Sets the padding size for the selection, this can be negative.\n";
-std::cout << "\n";
-std::cout << "       -t, --tolerance=FLOAT\n";
-std::cout << "              How far in pixels the mouse can move after clicking, and still  be\n";
-std::cout << "              detected  as  a  normal click instead of a click-and-drag. Setting\n";
-std::cout << "              this to 0 will disable window selections. Alternatively setting it\n";
-std::cout << "              to 9999999 would force a window selection.\n";
-std::cout << "\n";
-std::cout << "       -c, --color=FLOAT,FLOAT,FLOAT,FLOAT\n";
-std::cout << "              Sets  the selection rectangle's color. Supports RGB or RGBA input.\n";
-std::cout << "              Depending on the system's window manager/OpenGL support, the opac‐\n";
-std::cout << "              ity may be ignored.\n";
-std::cout << "\n";
-std::cout << "       -r, --shader=STRING\n";
-std::cout << "              This sets the vertex shader, and fragment shader combo to use when\n";
-std::cout << "              drawing the final framebuffer to the screen. This  obviously  only\n";
-std::cout << "              works  when OpenGL is enabled. The shaders are loaded from ~/.con‐\n";
-std::cout << "              fig/maim. See https://github.com/naelstrof/slop for more  informa‐\n";
-std::cout << "              tion on how to create your own shaders.\n";
-std::cout << "\n";
-std::cout << "       -n, --nodecorations=INT\n";
-std::cout << "              Sets  the  level  of  aggressiveness  when trying to remove window\n";
-std::cout << "              decorations. `0' is off, `1' will try lightly  to  remove  decora‐\n";
-std::cout << "              tions,  and  `2' will recursively descend into the root tree until\n";
-std::cout << "              it gets the deepest  available  visible  child  under  the  mouse.\n";
-std::cout << "              Defaults to `0'.\n";
-std::cout << "\n";
-std::cout << "       -l, --highlight\n";
-std::cout << "              Instead  of outlining a selection, maim will highlight it instead.\n";
-std::cout << "              This is particularly useful if the color  is  set  to  an  opacity\n";
-std::cout << "              lower than 1.\n";
-std::cout << "\n";
-std::cout << "       -q, --quiet\n";
-std::cout << "              Disable  any  unnecessary cerr output. Any warnings or info simply\n";
-std::cout << "              won't print.\n";
-std::cout << "\n";
-std::cout << "       -k, --nokeyboard\n";
-std::cout << "              Disables the ability to cancel selections with the keyboard.\n";
-std::cout << "\n";
-std::cout << "       -o, --noopengl\n";
-std::cout << "              Disables graphics hardware acceleration.\n";
-std::cout << "\n";
-std::cout << "EXAMPLES\n";
-std::cout << "       Screenshot the active window and save it to the clipboard for quick past‐\n";
-std::cout << "       ing.\n";
-std::cout << "\n";
-std::cout << "       maim -i $(xdotool getactivewindow) | xclip -selection clipboard -t image/png\n";
-std::cout << "\n";
-std::cout << "       Save a desktop screenshot with a unique ordered timestamp in the Pictures\n";
-std::cout << "       folder.\n";
-std::cout << "\n";
-std::cout << "       maim ~/Pictures/$(date +%s).png\n";
-std::cout << "\n";
-std::cout << "       Prompt for a region to screenshot. Add a fancy shadow to it, then save it\n";
-std::cout << "       to shadow.png.\n";
-std::cout << "\n";
-std::cout << "       maim -s | convert - \\( +clone -background black -shadow 80x3+5+5 \\) +swap \\\n";
-std::cout << "        -background none -layers merge +repage shadow.png\n";
-}
+const auto HELP_MESSAGE = R"MULTI_STRING(
+maim - make image
+
+SYNOPSIS
+       maim [OPTIONS] [FILEPATH]
+
+DESCRIPTION
+       maim  (make image) is an utility that takes a screenshot of your desktop,
+       and encodes a png or jpg image of it. By default it outputs  the  encoded
+       image data directly to standard output.
+
+OPTIONS
+       -h, --help
+              Print help and exit.
+
+       -v, --version
+              Print version and exit.
+
+       -x, --xdisplay=hostname:number.screen_number
+              Sets the xdisplay to use.
+
+       -f, --format=STRING
+              Sets  the  desired  output format, by default maim will attempt to
+              determine the desired output format automatically from the  output
+              file.  If  that  fails  it defaults to a lossless png format. Cur‐
+              rently only supports `png` or `jpg`.
+
+       -i, --window=INT
+              Sets the desired window to capture, defaults to the root window.
+
+       -g, --geometry=GEOMETRY
+              Sets the region to capture, uses local coordinates from the  given
+              window. So -g10x30-5+0 would represent the rectangle wxh+x+y where
+              w=10, h=30, x=-5, and y=0. x and y are the upper left location  of
+              this rectangle.
+
+       -d, --delay=FLOAT
+              Sets  the  time  in  seconds  to  wait before taking a screenshot.
+              Prints a simple message to show how many seconds are left before a
+              screenshot is taken. See --quiet for muting this message.
+
+       -u, --hidecursor
+              By  default  maim super-imposes the cursor onto the image, you can
+              disable that behavior with this flag.
+
+       -m, --quality
+              An integer from 1 to 10 that determines the compression quality. 1
+              is  the  highest (and lossiest) compression available for the pro‐
+              vided format. For example a setting of `1` with  png  (a  lossless
+              format)  would increase filesize and speed up encoding dramatical-
+              ly. While a setting of `1` on a jpeg would create a pixel mush.
+
+       -s, --select
+              Enables an interactive selection mode where  you  may  select  the
+              desired region or window before a screenshot is captured. Uses the
+              settings below to determine the visuals and settings of slop.
+
+       -w, --parent=WINDOW
+              By  default, maim assumes the --geometry values are in respect to
+              the provided --window (or root if not provided). This parameter
+              overrides this behavior by making the  geometry  be  in  respect to
+              whatever window you provide to --parent. Allows for an integer,
+              hex, or `root` for input.
+
+SLOP OPTIONS
+       -b, --bordersize=FLOAT
+              Sets the selection rectangle's thickness.
+
+       -p, --padding=FLOAT
+              Sets the padding size for the selection, this can be negative.
+
+       -t, --tolerance=FLOAT
+              How far in pixels the mouse can move after clicking, and still  be
+              detected  as  a  normal click instead of a click-and-drag. Setting
+              this to 0 will disable window selections. Alternatively setting it
+              to 9999999 would force a window selection.
+
+       -c, --color=FLOAT,FLOAT,FLOAT,FLOAT
+              Sets  the selection rectangle's color. Supports RGB or RGBA input.
+              Depending on the system's window manager/OpenGL support, the opac‐
+              ity may be ignored.
+
+       -r, --shader=STRING
+              This sets the vertex shader, and fragment shader combo to use when
+              drawing the final framebuffer to the screen. This  obviously  only
+              works  when OpenGL is enabled. The shaders are loaded from ~/.con‐
+              fig/maim. See https://github.com/naelstrof/slop for more  informa‐
+              tion on how to create your own shaders.
+
+       -n, --nodecorations=INT
+              Sets  the  level  of  aggressiveness  when trying to remove window
+              decorations. `0' is off, `1' will try lightly  to  remove  decora‐
+              tions,  and  `2' will recursively descend into the root tree until
+              it gets the deepest  available  visible  child  under  the  mouse.
+              Defaults to `0'.
+
+       -l, --highlight
+              Instead  of outlining a selection, maim will highlight it instead.
+              This is particularly useful if the color  is  set  to  an  opacity
+              lower than 1.
+
+       -q, --quiet
+              Disable  any  unnecessary cerr output. Any warnings or info simply
+              won't print.
+
+       -k, --nokeyboard
+              Disables the ability to cancel selections with the keyboard.
+
+       -o, --noopengl
+              Disables graphics hardware acceleration.
+
+EXAMPLES
+       Screenshot the active window and save it to the clipboard for quick past‐
+       ing.
+
+       maim -i $(xdotool getactivewindow) | xclip -selection clipboard -t image/png
+
+       Save a desktop screenshot with a unique ordered timestamp in the Pictures
+       folder.
+
+       maim ~/Pictures/$(date +%s).png
+
+       Prompt for a region to screenshot. Add a fancy shadow to it, then save it
+       to shadow.png.
+
+       maim -s | convert - \( +clone -background black -shadow 80x3+5+5 \) +swap \
+        -background none -layers merge +repage shadow.png)MULTI_STRING";
 
 int app( int argc, char** argv ) {
     // Use cxxopts to parse options, we pass them into a MaimOptions and SlopOptions object so we can swap out cxxopts if it's bad or whatever.
@@ -435,7 +419,7 @@ int app( int argc, char** argv ) {
         return 0;
     }
     if ( maimOptions->help ) {
-        help();
+        std::cout << HELP_MESSAGE << std::endl;
         return 0;
     }
     slop::SlopSelection selection(0,0,0,0,0,true);
