@@ -71,15 +71,23 @@ Window parseWindow( std::string win, X11* x11 ) {
 
 glm::vec4 parseColor( std::string value ) {
     std::string valuecopy = value;
+    const auto check_char = [&] (char c) {
+        if (c != ',') {
+            throw new std::invalid_argument("Unable to parse value `" + valuecopy + "` as a color. You need to use commas as separators.");
+        }
+    };
     glm::vec4 found;
     std::string::size_type sz;
     try {
         found[0] = std::stof(value,&sz);
+        check_char(value.at(sz));
         value = value.substr(sz+1);
         found[1] = std::stof(value,&sz);
+        check_char(value.at(sz));
         value = value.substr(sz+1);
         found[2] = std::stof(value,&sz);
         if ( value.size() != sz ) {
+            check_char(value.at(sz));
             value = value.substr(sz+1);
             found[3] = std::stof(value,&sz);
             if ( value.size() != sz ) {
@@ -88,6 +96,8 @@ glm::vec4 parseColor( std::string value ) {
         } else {
             found[3] = 1;
         }
+    } catch (std::invalid_argument* const e) {
+       throw e; 
     } catch ( ... ) {
         throw new std::invalid_argument("Unable to parse value `" + valuecopy + "` as a color. Should be in the format r,g,b or r,g,b,a. Like 1,1,1,1.");
     }
