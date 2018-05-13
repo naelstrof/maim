@@ -37,6 +37,7 @@ static inline unsigned char computeRGBPixel(unsigned char* data, XImage* image, 
     data[curpixel] = (unsigned char)((real & image->red_mask) >> roffset);
     data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
     data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
+    return *data;
 }
 
 static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int aoffset, int width, glm::ivec2 offset ) {
@@ -47,6 +48,7 @@ static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image,
     data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
     data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
     data[curpixel+3] = (unsigned char)(real >> aoffset);
+    return *data;
 }
 
 static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image, int x, int y, int roffset, int goffset, int boffset, int width, glm::ivec2 offset ) {
@@ -57,6 +59,7 @@ static inline unsigned char computeRGBAPixel(unsigned char* data, XImage* image,
     data[curpixel+1] = (unsigned char)((real & image->green_mask) >> goffset);
     data[curpixel+2] = (unsigned char)((real & image->blue_mask) >> boffset);
     data[curpixel+3] = 255;
+    return *data;
 }
 
 static inline int get_shift (int mask) {
