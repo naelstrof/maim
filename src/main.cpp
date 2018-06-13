@@ -40,8 +40,6 @@ MaimOptions::MaimOptions() {
     quiet = false;
     delay = 0;
     format = "png";
-    version = false;
-    help = false;
     select = false;
     parentGiven = false;
     hideCursor = false;
@@ -173,12 +171,6 @@ MaimOptions* getMaimOptions( cxxopts::Options& options, X11* x11 ) {
     }
     if ( options.count( "select" ) > 0 ) {
         foo->select = options["select"].as<bool>();
-    }
-    if ( options.count( "version" ) > 0 ) {
-        foo->version = options["version"].as<bool>();
-    }
-    if ( options.count( "help" ) > 0 ) {
-        foo->help = options["help"].as<bool>();
     }
     if ( options.count( "quiet" ) > 0 ) {
         foo->quiet = options["quiet"].as<bool>();
@@ -419,19 +411,23 @@ int app( int argc, char** argv ) {
     ;
     options.parse_positional("positional");
     options.parse(argc, argv);
+    
+    // Version checks and help menu don't require X11, and in fact will fail if running
+    // in a headless environment.
+    if ( options.count( "version" ) > 0 ) {
+        std::cout << MAIM_VERSION << "\n";
+        return 0;
+    }
+    
+    if ( options.count( "help" ) > 0 ) {
+        std::cout << HELP_MESSAGE << std::endl;
+        return 0;
+    }
 
     slop::SlopOptions* slopOptions = getSlopOptions( options );
     // Boot up x11
     X11* x11 = new X11(slopOptions->xdisplay);
     MaimOptions* maimOptions = getMaimOptions( options, x11 );
-    if ( maimOptions->version ) {
-        std::cout << MAIM_VERSION << "\n";
-        return 0;
-    }
-    if ( maimOptions->help ) {
-        std::cout << HELP_MESSAGE << std::endl;
-        return 0;
-    }
     slop::SlopSelection selection(0,0,0,0,0,true);
 
     if ( maimOptions->select ) {
