@@ -1,2 +1,11 @@
 # These files are ignored since cmake generates them from cmdline.in
 src/cmdline.h
+
+# Ignore Cmake generated files
+CMakeFiles/*
+Makefile
+cmake_install.cmake
+CMakeCache.txt
+
+# Ignore output artifacts
+bin/maim
