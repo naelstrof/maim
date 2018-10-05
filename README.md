@@ -31,6 +31,7 @@ maim (Make Image) is a utility that takes screenshots of your desktop. It's mean
 * [Gentoo: media-gfx/maim](https://packages.gentoo.org/packages/media-gfx/maim)
 * [NixOS: maim](https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/graphics/maim/default.nix)
 * [GNU Guix: maim](https://www.gnu.org/software/guix/packages/#maim)
+* [Ravenports: maim](http://www.ravenports.com/catalog/bucket_B4/maim/standard/)
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
 ### Install using CMake (Requires CMake, git, libXrander, libXfixes, libGLM)
