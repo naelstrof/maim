@@ -8,7 +8,7 @@
 #
 
 
-find_path( SLOP_INCLUDE_DIRS
+find_path( SLOP_INCLUDE_DIR
            NAMES slop.hpp
            PATH_SUFFIXES /usr/include /include
            DOC "The SLOP include directory" )
