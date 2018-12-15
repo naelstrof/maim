@@ -25,7 +25,7 @@ Sets the desired output format, by default maim will attempt to determine the de
 Sets the desired window to capture, defaults to the root window. Allows for an integer, hex, or `root` for input.
 .TP
 .BR \-g ", " \-\-geometry=\fIGEOMETRY\fR
-Sets the region to capture, uses local coordinates from the given window. So -g10x30-5+0 would represent the rectangle wxh+x+y where w=10, h=30, x=-5, and y=0. x and y are the upper left location of this rectangle.
+Sets the region to capture, uses local coordinates from the given window. So -g 10x30-5+0 would represent the rectangle wxh+x+y where w=10, h=30, x=-5, and y=0. x and y are the upper left location of this rectangle.
 .TP
 .BR \-w ", " \-\-parent=\fIWINDOW\fR
 By default, maim assumes the --geometry values are in respect to the provided --window (or root if not provided). This parameter overrides this behavior by making the geometry be in respect to whatever window you provide to --parent. Allows for an integer, hex, or `root` for input.
