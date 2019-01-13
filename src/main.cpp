@@ -1,3 +1,5 @@
+#include <cstdio>
+#include <unistd.h>
 #include <iostream>
 #include <slop.hpp>
 #include <glm/glm.hpp>
@@ -429,6 +431,12 @@ int app( int argc, char** argv ) {
     X11* x11 = new X11(slopOptions->xdisplay);
     MaimOptions* maimOptions = getMaimOptions( options, x11 );
     slop::SlopSelection selection(0,0,0,0,0,true);
+
+    // Check if output is a tty before dumping binary data to it
+    if ( isatty( fileno( stdout ) ) && !maimOptions->savepathGiven ) {
+        std::cout << HELP_MESSAGE << std::endl;
+        return 0;
+    }
 
     if ( maimOptions->select ) {
         if ( maimOptions->windowGiven || maimOptions->parentGiven || maimOptions->geometryGiven ) {
