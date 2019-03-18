@@ -32,6 +32,7 @@ public:
     bool version;
     bool help;
     bool savepathGiven;
+    bool captureBackground;
 };
 
 MaimOptions::MaimOptions() {
@@ -49,6 +50,7 @@ MaimOptions::MaimOptions() {
     savepathGiven = false;
     windowGiven = false;
     formatGiven = false;
+    captureBackground = false;
 }
 
 Window parseWindow( std::string win, X11* x11 ) {
@@ -193,6 +195,9 @@ MaimOptions* getMaimOptions( cxxopts::Options& options, X11* x11 ) {
             throw new std::invalid_argument("Quality argument must be between 1 and 10");
         }
     }
+    if ( options.count( "capturebackground" ) > 0 ) {
+        foo->captureBackground = options["capturebackground"].as<bool>();
+    }
     auto& positional = options["positional"].as<std::vector<std::string>>();
     foo->savepathGiven = positional.size() > 0;
     //std::cerr << positional[0] << "\n";
@@ -320,6 +325,11 @@ OPTIONS
               whatever window you provide to --parent. Allows for an integer,
               hex, or `root` for input.
 
+       -B, --capturebackground
+              By default, when capturing a window, maim will ignore anything
+              beneath the specified window. This parameter overrides this and
+              also captures elements underneath the window.
+
 SLOP OPTIONS
        -b, --bordersize=FLOAT
               Sets the selection rectangle's thickness.
@@ -395,6 +405,7 @@ int app( int argc, char** argv ) {
     ("i,window", "Sets the desired window to capture, defaults to the root window. Allows for an integer, hex, or `root` for input.", cxxopts::value<std::string>())
     ("g,geometry", "Sets the region to capture, uses local coordinates from the given window. So -g10x30-5+0 would represent the rectangle wxh+x+y where w=10, h=30, x=-5, and y=0. x and y are the upper left location of this rectangle.", cxxopts::value<std::string>())
     ("w,parent", "By default, maim assumes the --geometry values are in respect to the provided --window (or root if not provided). This parameter overrides this behavior by making the geometry be in respect to whatever window you provide to --parent. Allows for an integer, hex, or `root` for input.", cxxopts::value<std::string>())
+    ("B,capturebackground", "By default, when capturing a window, maim will ignore anything beneath the specified window. This parameter overrides this and also captures elements underneath the window.")
     ("d,delay", "Sets the time in seconds to wait  before taking a screenshot. Prints a simple message to show how many seconds are left before a screenshot is taken. See --quiet for muting this message.", cxxopts::value<float>()->implicit_value("5"))
     ("u,hidecursor", "By default maim super-imposes the cursor onto the image, you can disable that behavior with this flag.")
     ("m,quality", "An integer from 1 to 10 that determines the compression quality. 1 is the highest (and lossiest) compression  available for the provided format. For example a setting of `1` with png (a loss‐ less format) would increase filesize and decrease decoding time. While a setting of `1` on a jpeg would create a pixel mush.", cxxopts::value<int>())
@@ -493,6 +504,11 @@ int app( int argc, char** argv ) {
         selection.h = maimOptions->geometry.w;
         selection.id = maimOptions->window;
     }
+
+    if ( maimOptions->captureBackground ) {
+        selection.id = x11->root;
+    }
+
     std::ostream* out;
     if ( maimOptions->savepathGiven ) {
         std::ofstream* file = new std::ofstream();
