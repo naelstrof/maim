@@ -30,6 +30,9 @@ Sets the region to capture, uses local coordinates from the given window. So -g 
 .BR \-w ", " \-\-parent=\fIWINDOW\fR
 By default, maim assumes the --geometry values are in respect to the provided --window (or root if not provided). This parameter overrides this behavior by making the geometry be in respect to whatever window you provide to --parent. Allows for an integer, hex, or `root` for input.
 .TP
+.BR \-B ", " \-\-capturebackground
+By default, when capturing a window, maim will ignore anything beneath the specified window. This parameter overrides this and also captures elements underneath the window.
+.TP
 .BR \-d ", " \-\-delay=\fIFLOAT\fR
 Sets the time in seconds to wait before taking a screenshot. Prints a simple message to show how many seconds are left before a screenshot is taken. See \-\-quiet for muting this message.
 .TP
