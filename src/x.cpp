@@ -22,7 +22,7 @@ glm::ivec4 getWindowGeometry( X11* x11, Window win ) {
     int format_return;
     bool window_frame = false;
     Window actualWindow = win;
-    if ( num_children > 0 && XGetWindowProperty( x11->display, children[num_children-1],
+    if ( win != x11->root && num_children > 0 && XGetWindowProperty( x11->display, children[num_children-1],
                         XInternAtom( x11->display, "_NET_FRAME_EXTENTS", False),
                         0, LONG_MAX, False, XA_CARDINAL, &type_return,
                         &format_return, &nitems_return, &bytes_after_return,
