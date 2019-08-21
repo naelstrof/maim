@@ -92,6 +92,14 @@ maim ~/Pictures/$(date +%s).png
 .RE
 .fi
 .PP
+Save screenshot to the Pictures folder and add it to the clipboard at the same time.
+.PP
+.nf
+.RS
+maim | tee ~/Pictures/$(date +%s).png | xclip -selection clipboard -t image/png
+.RE
+.fi
+.PP
 Prompt for a region to screenshot. Add a fancy shadow to it, then save it to shadow.png.
 .PP
 .nf
