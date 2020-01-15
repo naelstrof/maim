@@ -293,7 +293,7 @@ OPTIONS
 
        -g, --geometry=GEOMETRY
               Sets the region to capture, uses local coordinates from the  given
-              window. So -g10x30-5+0 would represent the rectangle wxh+x+y where
+              window. So -g 10x30-5+0 would represent the rectangle wxh+x+y where
               w=10, h=30, x=-5, and y=0. x and y are the upper left location  of
               this rectangle.
 
