@@ -32,7 +32,7 @@ maim (Make Image) is a utility that takes screenshots of your desktop. It's mean
 * [NixOS: maim](https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/graphics/maim/default.nix)
 * [GNU Guix: maim](https://www.gnu.org/software/guix/packages/#maim)
 * [Ravenports: maim](http://www.ravenports.com/catalog/bucket_B4/maim/standard/)
-* [Fedora: maim-copr](https://copr.fedorainfracloud.org/coprs/shymega/maim-copr/)
+* [Fedora: maim](https://src.fedoraproject.org/rpms/maim)
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
 ### Install using CMake (Requires CMake, git, libXrender, libXfixes, libGLM, libxcomposite, libxrandr)
