@@ -24,7 +24,7 @@ maim (Make Image) is a utility that takes screenshots of your desktop. It's mean
 * [Arch Linux: community/maim](https://www.archlinux.org/packages/community/x86_64/maim/)
 * [Debian: maim](https://tracker.debian.org/pkg/maim)
 * [Ubuntu: maim](https://packages.ubuntu.com/search?keywords=maim)
-* [Void Linux: maim](https://github.com/voidlinux/void-packages/blob/24ac22af44018e2598047e5ef7fd3522efa79db5/srcpkgs/maim/template)
+* [Void Linux: maim](https://github.com/void-linux/void-packages/tree/master/srcpkgs/maim/template)
 * [FreeBSD: graphics/maim](http://www.freshports.org/graphics/maim/)
 * [NetBSD: x11/maim](http://pkgsrc.se/x11/maim)
 * [OpenBSD: graphics/maim](http://openports.se/graphics/maim)
@@ -33,9 +33,10 @@ maim (Make Image) is a utility that takes screenshots of your desktop. It's mean
 * [NixOS: maim](https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/graphics/maim/default.nix)
 * [GNU Guix: maim](https://www.gnu.org/software/guix/packages/#maim)
 * [Ravenports: maim](http://www.ravenports.com/catalog/bucket_B4/maim/standard/)
+* [Fedora: maim](https://src.fedoraproject.org/rpms/maim)
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
-### Install using CMake (Requires CMake, git, libXrander, libXfixes, libGLM)
+### Install using CMake (Requires CMake, git, libXrender, libXfixes, libGLM, libxcomposite, libxrandr)
 ```bash
 git clone https://github.com/naelstrof/slop.git
 cd slop

@@ -25,10 +25,13 @@ Sets the desired output format, by default maim will attempt to determine the de
 Sets the desired window to capture, defaults to the root window. Allows for an integer, hex, or `root` for input.
 .TP
 .BR \-g ", " \-\-geometry=\fIGEOMETRY\fR
-Sets the region to capture, uses local coordinates from the given window. So -g10x30-5+0 would represent the rectangle wxh+x+y where w=10, h=30, x=-5, and y=0. x and y are the upper left location of this rectangle.
+Sets the region to capture, uses local coordinates from the given window. So -g 10x30-5+0 would represent the rectangle wxh+x+y where w=10, h=30, x=-5, and y=0. x and y are the upper left location of this rectangle.
 .TP
 .BR \-w ", " \-\-parent=\fIWINDOW\fR
 By default, maim assumes the --geometry values are in respect to the provided --window (or root if not provided). This parameter overrides this behavior by making the geometry be in respect to whatever window you provide to --parent. Allows for an integer, hex, or `root` for input.
+.TP
+.BR \-B ", " \-\-capturebackground
+By default, when capturing a window, maim will ignore anything beneath the specified window. This parameter overrides this and also captures elements underneath the window.
 .TP
 .BR \-d ", " \-\-delay=\fIFLOAT\fR
 Sets the time in seconds to wait before taking a screenshot. Prints a simple message to show how many seconds are left before a screenshot is taken. See \-\-quiet for muting this message.
@@ -89,6 +92,14 @@ maim ~/Pictures/$(date +%s).png
 .RE
 .fi
 .PP
+Save screenshot to the Pictures folder and add it to the clipboard at the same time.
+.PP
+.nf
+.RS
+maim | tee ~/Pictures/$(date +%s).png | xclip -selection clipboard -t image/png
+.RE
+.fi
+.PP
 Prompt for a region to screenshot. Add a fancy shadow to it, then save it to shadow.png.
 .PP
 .nf
@@ -98,7 +109,7 @@ maim -s | convert - \\( +clone -background black -shadow 80x3+5+5 \\) +swap -bac
 .fi
 .PP
 .SH SEE ALSO
-.BR slop(1) 
+.BR slop(1)
 .SH BUGS
 No known bugs.
 .SH AUTHOR
