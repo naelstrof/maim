@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.1.3 )
 
-project(maim VERSION 5.5.3 LANGUAGES CXX)
+project(maim VERSION 5.6.3 LANGUAGES CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
