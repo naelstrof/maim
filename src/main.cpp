@@ -453,7 +453,7 @@ int app( int argc, char** argv ) {
 
     // Check if output is a tty before dumping binary data to it
     if ( isatty( fileno( stdout ) ) && !maimOptions->savepathGiven ) {
-        std::cout << HELP_MESSAGE << std::endl;
+        std::cout << "Please provide an output path or redirect stdout to a file" << std::endl;
         return 0;
     }
 
