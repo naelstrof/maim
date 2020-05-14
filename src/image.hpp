@@ -21,6 +21,7 @@
 #ifndef N_IMAGE_H_
 #define N_IMAGE_H_
 
+#include <cstring>
 #include <iostream>
 #include <png.h>
 #include <jpeglib.h>

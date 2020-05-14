@@ -239,13 +239,8 @@ void ARGBImage::mask(X11* x11) {
     }
     unsigned char* copy = new unsigned char[width*height*channels];
     // Zero out our copy
-    for ( int y = 0; y < height;y++ ) {
-        for ( int x = 0; x < width;x++ ) {
-            for ( int c = 0; c < channels;c++ ) {
-                copy[(y*width+x)*channels+c] = 0;
-            }
-        }
-    }
+    memset( copy, 0, width*height*channels );
+
     for ( int i=0;i<physicalMonitors.size();i++ ) {
         // Make sure we're intersecting
         XRRCrtcInfo* m = physicalMonitors[i];
@@ -254,11 +249,9 @@ void ARGBImage::mask(X11* x11) {
         }
         // Copy over data within the intersecting areas.
         for ( int y = glm::max(0,m->y-imagey); y<glm::min(height,m->y+m->height-imagey);y++ ) {
-            for ( int x = glm::max(0,m->x-imagex); x < glm::min(width,m->x+m->width-imagex);x++ ) {
-                for ( int c = 0; c < channels;c++ ) {
-                    copy[(y*width+x)*channels+c] = data[(y*width+x)*channels+c];
-                }
-            }
+            int start = (y*width + glm::max(0, m->x-imagex))*channels;
+            int end = (y*width + glm::min(width,m->x+m->width-imagex))*channels;
+            memcpy( copy+start, data+start, end-start );
         }
     }
     x11->freeCRTCS(physicalMonitors);
