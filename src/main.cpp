@@ -185,8 +185,8 @@ MaimOptions* getMaimOptions( cxxopts::Options& options, X11* x11 ) {
     foo->formatGiven = options.count("format") > 0;
     if ( foo->formatGiven ) {
         foo->format = options["format"].as<std::string>();
-        if ( foo->format != "png" && foo->format != "jpg" && foo->format != "jpeg" ) {
-            throw new std::invalid_argument("Unknown format type: `" + foo->format + "`, only `png` or `jpg` is allowed." );
+        if ( foo->format != "png" && foo->format != "jpg" && foo->format != "jpeg" && foo->format != "bmp") {
+            throw new std::invalid_argument("Unknown format type: `" + foo->format + "`, only `png`, `jpg`, or `bmp` is allowed." );
         }
     }
     if ( options.count( "quality" ) > 0 ) {
@@ -408,14 +408,14 @@ int app( int argc, char** argv ) {
     ("h,help", "Print help and exit.")
     ("v,version", "Print version and exit.")
     ("x,xdisplay", "Sets the xdisplay to use", cxxopts::value<std::string>())
-    ("f,format", "Sets  the desired output format, by default maim will attempt to determine the desired output format automatically from the output file. If that fails it defaults to a lossless png format. Currently only supports `png` or `jpg`.", cxxopts::value<std::string>())
+    ("f,format", "Sets  the desired output format, by default maim will attempt to determine the desired output format automatically from the output file. If that fails it defaults to a lossless png format. Supports `png`, `jpg`, and `bmp`.", cxxopts::value<std::string>())
     ("i,window", "Sets the desired window to capture, defaults to the root window. Allows for an integer, hex, or `root` for input.", cxxopts::value<std::string>())
     ("g,geometry", "Sets the region to capture, uses local coordinates from the given window. So -g10x30-5+0 would represent the rectangle wxh+x+y where w=10, h=30, x=-5, and y=0. x and y are the upper left location of this rectangle.", cxxopts::value<std::string>())
     ("w,parent", "By default, maim assumes the --geometry values are in respect to the provided --window (or root if not provided). This parameter overrides this behavior by making the geometry be in respect to whatever window you provide to --parent. Allows for an integer, hex, or `root` for input.", cxxopts::value<std::string>())
     ("B,capturebackground", "By default, when capturing a window, maim will ignore anything beneath the specified window. This parameter overrides this and also captures elements underneath the window.")
     ("d,delay", "Sets the time in seconds to wait  before taking a screenshot. Prints a simple message to show how many seconds are left before a screenshot is taken. See --quiet for muting this message.", cxxopts::value<float>()->implicit_value("5"))
     ("u,hidecursor", "By default maim super-imposes the cursor onto the image, you can disable that behavior with this flag.")
-    ("m,quality", "An integer from 1 to 10 that determines the compression quality. 1 is the highest (and lossiest) compression  available for the provided format. For example a setting of `1` with png (a loss‐ less format) would increase filesize and decrease decoding time. While a setting of `1` on a jpeg would create a pixel mush.", cxxopts::value<int>())
+    ("m,quality", "An integer from 1 to 10 that determines the compression quality. 1 is the highest (and lossiest) compression  available for the provided format. For example a setting of `1` with png (a loss‐ less format) would increase filesize and decrease decoding time. While a setting of `1` on a jpeg would create a pixel mush. No effect on bmp images.", cxxopts::value<int>())
     ("s,select", "Enables an interactive selection mode where you may select the desired region or window before a screenshot is captured. Uses the  settings below to determine the visuals and settings of slop.")
     ("b,bordersize", "Sets the selection rectangle's thickness.", cxxopts::value<float>())
     ("p,padding", "Sets the padding size for the selection, this can be negative.", cxxopts::value<float>())
@@ -473,8 +473,8 @@ int app( int argc, char** argv ) {
 
     if ( !maimOptions->formatGiven && maimOptions->savepathGiven && maimOptions->savepath.find_last_of(".") != std::string::npos ) {
         maimOptions->format = maimOptions->savepath.substr(maimOptions->savepath.find_last_of(".")+1);
-        if ( maimOptions->format != "png" && maimOptions->format != "jpg" && maimOptions->format != "jpeg" ) {
-            throw new std::invalid_argument("Unknown format type: `" + maimOptions->format + "`, only `png` or `jpg` is allowed." );
+        if ( maimOptions->format != "png" && maimOptions->format != "jpg" && maimOptions->format != "jpeg" && maimOptions->format != "bmp") {
+            throw new std::invalid_argument("Unknown format type: `" + maimOptions->format + "`, only `png`, `jpg`, or `bmp` is allowed." );
         }
     }
     if ( !maimOptions->windowGiven ) {
@@ -581,6 +581,19 @@ int app( int argc, char** argv ) {
         }
         // Then output it in the desired format.
         convert.writeJPEG(*out, maimOptions->quality );
+    } else if (maimOptions->format == "bmp") {
+        // Convert it to a RGB format, clipping it to the selection.
+        ARGBImage convert(image, imageloc, glm::vec4(px, py, selection.w, selection.h), 3, x11 );
+        if ( !maimOptions->hideCursor ) {
+            convert.blendCursor( x11 );
+        }
+        // Mask it if we're taking a picture of root
+        if ( selection.id == x11->root ) {
+            convert.mask(x11);
+        }
+        // Then output it in the desired format.
+        convert.writeBMP(*out);
+
     }
     XDestroyImage( image );
 
