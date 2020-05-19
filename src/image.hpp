@@ -90,6 +90,7 @@ public:
     ~ARGBImage();
     void writePNG( std::ostream& streamout, int quality );
     void writeJPEG( std::ostream& streamout, int quality );
+    void writeBMP( std::ostream& streamout );
 };
 
 #endif

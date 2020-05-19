@@ -204,6 +204,73 @@ void ARGBImage::writeJPEG( std::ostream& streamout, int quality ) {
     delete[] out_buffer;
 }
 
+void ARGBImage::writeBMP( std::ostream& streamout ) {
+    int padding = (4 - (width * channels % 4)) % 4;
+    int rowSize = width * channels + padding;
+    int imageSize = height * rowSize;
+    int fileSize = 54 + imageSize;
+
+    unsigned char header [14] = {
+        'B', 'M',
+        (unsigned char)fileSize, (unsigned char)(fileSize >> 8),
+        (unsigned char)(fileSize >> 16), (unsigned char)(fileSize >> 24),
+        // Reserved
+        0, 0, 0, 0,
+        // Offset to start of image data
+        54, 0, 0, 0,
+    };
+
+    unsigned char infoHeader [40] = {
+        // Size of header
+        40, 0, 0, 0,
+        (unsigned char)width, (unsigned char)(width >> 8),
+        (unsigned char)(width >> 16), (unsigned char)(width >> 24),
+        (unsigned char)height, (unsigned char)(height >> 8),
+        (unsigned char)(height >> 16), (unsigned char)(height >> 24),
+        // 1 Colour plane
+        1, 0,
+        // 8 bits per channel
+        (unsigned char)(8 * channels), 0,
+        // No compression
+        0, 0, 0, 0,
+        // Size of image including padding
+        (unsigned char)imageSize, (unsigned char)(imageSize >> 8),
+        (unsigned char)(imageSize >> 16), (unsigned char)(imageSize >> 24),
+        // 72 DPI for printing as pixels/metre
+        0x13, 0x0B, 0, 0,
+        0x13, 0x0B, 0, 0,
+        // 0 Palette colours, 0 important colours
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+    };
+
+    streamout.write( (const char*)header, 14 );
+    streamout.write( (const char*)infoHeader, 40 );
+
+    unsigned char* imageData = new unsigned char[imageSize];
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            // BMP is bottom to top and uses BGR/BGRA
+            int outOffset = y*rowSize + x*channels;
+            int inOffset = ((height-y-1)*width + x)*channels;
+            imageData[outOffset] = data[inOffset + 2];
+            imageData[outOffset + 1] = data[inOffset + 1];
+            imageData[outOffset + 2] = data[inOffset];
+            if (channels == 4) {
+              imageData[outOffset + 3] = data[inOffset+3];
+            }
+        }
+
+        for (int p = 0; p < padding; p++) {
+            imageData[y*rowSize + width*channels + p] = 0;
+        }
+    }
+
+    streamout.write( (const char*)imageData, imageSize );
+    delete[] imageData;
+}
+
 bool ARGBImage::intersect( XRRCrtcInfo* a, glm::vec4 b ) {
     if (a->x < b.x + b.z &&
         a->x + a->width > b.x &&
