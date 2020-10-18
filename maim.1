@@ -22,7 +22,7 @@ Sets the xdisplay to use.
 Sets the desired output format, by default maim will attempt to determine the desired output format automatically from the output file. If that fails it defaults to a lossless png format. Currently only supports `png`, `jpg`, and `bmp`.
 .TP
 .BR \-i ", " \-\-window=\fIWINDOW\fR
-Sets the desired window to capture, defaults to the root window. Allows for an integer, hex, or `root` for input.
+By default, maim captures the root window. This parameter overrides this and sets the desired window to capture. Allows for an integer, hex, or `root` for input.
 .TP
 .BR \-g ", " \-\-geometry=\fIGEOMETRY\fR
 Sets the region to capture, uses local coordinates from the given window. So -g 10x30-5+0 would represent the rectangle wxh+x+y where w=10, h=30, x=-5, and y=0. x and y are the upper left location of this rectangle.
