@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <unistd.h>
 #include <iostream>
+#include <exception>
+#include <stdexcept>
 #include <slop.hpp>
 #include <glm/glm.hpp>
 #include <fstream>
@@ -615,12 +617,24 @@ int app( int argc, char** argv ) {
     return 0;
 }
 
+static void handle_exception(std::exception_ptr eptr) {
+    try {
+        if (eptr) {
+            std::rethrow_exception(eptr);
+        }
+    } catch( const std::exception& e) {
+        std::cerr << "Maim encountered an error:\n" << e.what() << "\n";
+        exit(1);
+    }
+}
+
 int main( int argc, char** argv ) {
+    std::exception_ptr e;
     try {
         return app( argc, argv );
-    } catch( std::exception* e ) {
-        std::cerr << "Maim encountered an error:\n" << e->what() << "\n";
-        return 1;
-    } // let the operating system handle any other kind of exception.
+    } catch( ... ) {
+        e = std::current_exception();
+    }
+    handle_exception(e);
     return 1;
 }
