@@ -1,5 +1,4 @@
 #include <cstdio>
-#include <cstdlib>
 #include <unistd.h>
 #include <iostream>
 #include <exception>
@@ -625,7 +624,6 @@ static void handle_exception(std::exception_ptr eptr) {
         }
     } catch( const std::exception& e) {
         std::cerr << "Maim encountered an error:\n" << e.what() << "\n";
-        std::exit(1);
     }
 }
 
