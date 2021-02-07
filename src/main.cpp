@@ -618,6 +618,10 @@ int app( int argc, char** argv ) {
 int main( int argc, char** argv ) {
     try {
         return app( argc, argv );
+    } catch ( const cxxopts::OptionException& e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << "Try \"maim --help\" for more information." << std::endl;
+        return 1;
     } catch( std::exception* e ) {
         std::cerr << "Maim encountered an error:\n" << e->what() << "\n";
         return 1;
