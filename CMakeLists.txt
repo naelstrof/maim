@@ -38,6 +38,7 @@ find_package( XComposite REQUIRED )
 find_package( X11        REQUIRED )
 find_package( SLOP       REQUIRED )
 find_package( Threads    REQUIRED )
+find_package( GLM        REQUIRED )
 
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
@@ -47,6 +48,7 @@ set_property(TARGET ${BIN_TARGET} PROPERTY CXX_EXTENSIONS OFF)
 include_directories( ${XRANDR_INCLUDE_DIR}
                      ${X11_INCLUDE_DIR}
                      ${SLOP_INCLUDE_DIR}
+                     ${GLM_INCLUDE_DIR}
                      ${XFIXES_INCLUDE_DIR}
                      ${XCOMPOSITE_INCLUDE_DIR}
                      ${JPEG_INCLUDE_DIR}
