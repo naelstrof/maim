@@ -25,6 +25,7 @@
 #include <iostream>
 #include <png.h>
 #include <jpeglib.h>
+#include <webp/encode.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <stdexcept>
@@ -91,6 +92,7 @@ public:
     void writePNG( std::ostream& streamout, int quality );
     void writeJPEG( std::ostream& streamout, int quality );
     void writeBMP( std::ostream& streamout );
+    void writeWEBP( std::ostream& streamout, int quality );
 };
 
 #endif
