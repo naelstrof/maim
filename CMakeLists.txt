@@ -45,9 +45,6 @@ set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${BIN_TARGET} PROPERTY CXX_EXTENSIONS OFF)
 
-message(STATUS "webp include dir = ${WEBP_INCLUDE_DIR}")
-message(STATUS "webp lib = ${WEBP_LIBRARY}")
-
 # Includes
 include_directories( ${XRANDR_INCLUDE_DIR}
                      ${X11_INCLUDE_DIR}
