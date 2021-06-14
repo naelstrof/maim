@@ -310,13 +310,14 @@ OPTIONS
               disable that behavior with this flag.
 
        -m, --quality
-              An integer from 1 to 10 that determines the compression quality. 1
-              is  the  highest (and lossiest) compression available for the pro‐
-              vided format. For example a setting of `1` with  png  (a  lossless
-              format)  would increase filesize and speed up encoding dramatical-
-              ly. While a setting of `1` on a jpeg would create a pixel mush.
-              No effect on bmp images.  0-9 set the quality of lossy webp, while
-              while 10 will encode as lossless.
+              An integer  from 1 to 10 that determines  the compression quality.
+              For  lossy formats  (jpg and webp), lower  settings  will  produce
+              smaller files with lower quality,  while higher settings will inc-
+              rease quality at the cost of higher file size.  A quality of 10 is
+              lossless for webp.
+              For  png, lower settings will  compress faster  and produce larger
+              files,  while higher  settings will  compress slower,  but produce
+              smaller files. No effect on bmp images.
 
        -s, --select
               Enables an interactive selection mode where  you  may  select  the
@@ -417,7 +418,7 @@ int app( int argc, char** argv ) {
     ("B,capturebackground", "By default, when capturing a window, maim will ignore anything beneath the specified window. This parameter overrides this and also captures elements underneath the window.")
     ("d,delay", "Sets the time in seconds to wait  before taking a screenshot. Prints a simple message to show how many seconds are left before a screenshot is taken. See --quiet for muting this message.", cxxopts::value<float>()->implicit_value("5"))
     ("u,hidecursor", "By default maim super-imposes the cursor onto the image, you can disable that behavior with this flag.")
-    ("m,quality", "An integer from 1 to 10 that determines the compression quality. 1 is the highest (and lossiest) compression  available for the provided format. For example a setting of `1` with png (a loss‐ less format) would increase filesize and decrease decoding time. While a setting of `1` on a jpeg would create a pixel mush. No effect on bmp images. 0-9 set the quality of lossy webp, while 10 will encode as lossless.", cxxopts::value<int>())
+    ("m,quality", "An integer from 1 to 10 that determines the compression quality. For lossy formats (jpg and webp), lower settings will produce smaller files with lower quality, while higher settings will increase quality at the cost of higher file size. A quality of 10 is lossless for webp. For png, lower settings will compress faster and produce larger files, while higher settings will compress slower, but produce smaller files. No effect on bmp images.", cxxopts::value<int>())
     ("s,select", "Enables an interactive selection mode where you may select the desired region or window before a screenshot is captured. Uses the  settings below to determine the visuals and settings of slop.")
     ("b,bordersize", "Sets the selection rectangle's thickness.", cxxopts::value<float>())
     ("p,padding", "Sets the padding size for the selection, this can be negative.", cxxopts::value<float>())
