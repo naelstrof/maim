@@ -31,6 +31,7 @@ add_executable( "${BIN_TARGET}" ${source} )
 set( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/modules" )
 find_package( PNG        REQUIRED )
 find_package( JPEG       REQUIRED )
+find_package( WebP       REQUIRED )
 find_package( XRandr     REQUIRED )
 find_package( XRender    REQUIRED )
 find_package( XFixes     REQUIRED )
@@ -54,7 +55,8 @@ include_directories( ${XRANDR_INCLUDE_DIR}
                      ${JPEG_INCLUDE_DIR}
                      ${XRANDR_INCLUDE_DIR}
                      ${XRENDER_INCLUDE_DIR}
-                     ${PNG_INCLUDE_DIRS} )
+                     ${PNG_INCLUDE_DIRS}
+                     ${WEBP_INCLUDE_DIR} )
 
 # Libraries
 target_link_libraries( ${BIN_TARGET}
@@ -66,7 +68,8 @@ target_link_libraries( ${BIN_TARGET}
                        ${XRANDR_LIBRARY}
                        ${JPEG_LIBRARIES}
                        ${XRENDER_LIBRARY}
-                       ${SLOP_LIBRARIES} )
+                       ${SLOP_LIBRARIES}
+                       ${WEBP_LIBRARY} )
 
 if( ${CMAKE_VERSION} VERSION_LESS 3.7 )
   message( WARNING "CMake version is below 3.7, CMake version >= 3.7 is required for unicode support." )

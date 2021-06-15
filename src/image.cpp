@@ -271,6 +271,32 @@ void ARGBImage::writeBMP( std::ostream& streamout ) {
     delete[] imageData;
 }
 
+void ARGBImage::writeWEBP( std::ostream& streamout, int quality ) {
+    // assume 4 channels
+    if (channels != 4) {
+        throw new std::runtime_error("WebP tried to save image with more than 4 channels");
+    }
+
+    size_t size;
+    uint8_t* out;
+    if (quality == 10) {
+        // encode lossless at highest quality
+        size = WebPEncodeLosslessRGBA(data, width, height, width * 4, &out);
+    }
+    else {
+        // otherwise, encode lossy
+        size = WebPEncodeRGBA(data, width, height, width * 4, quality * 10.0f, &out);
+    }
+
+    if (size == 0) {
+        throw new std::runtime_error("Failed to encode webp image");
+    }
+    else {
+        streamout.write((const char*)out, size);
+        WebPFree(out);
+    }
+}
+
 bool ARGBImage::intersect( XRRCrtcInfo* a, glm::vec4 b ) {
     if (a->x < b.x + b.z &&
         a->x + a->width > b.x &&
