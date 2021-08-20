@@ -60,7 +60,7 @@ Window parseWindow( std::string win, X11* x11 ) {
     Window retwin;
     std::string::size_type sz;
     try {
-        retwin = std::stoi(win,&sz);
+        retwin = std::stoi(win,&sz,0);
     } catch ( ... ) {
         try {
             retwin = std::stoul(win,&sz,16);
