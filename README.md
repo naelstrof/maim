@@ -37,7 +37,7 @@ maim (Make Image) is a utility that takes screenshots of your desktop. It's mean
 * [Fedora: maim](https://src.fedoraproject.org/rpms/maim)
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
-### Install using CMake (Requires CMake, git, libXrender, libXfixes, libGLM, libxcomposite, libxrandr)
+### Install using CMake (Requires CMake, git, libXrender, libXfixes, libGLM, libxcomposite, libxrandr, libxext, GLEW)
 ```bash
 git clone https://github.com/naelstrof/slop.git
 cd slop
