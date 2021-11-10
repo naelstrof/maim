@@ -41,12 +41,12 @@ maim (Make Image) is a utility that takes screenshots of your desktop. It's mean
 ```bash
 git clone https://github.com/naelstrof/slop.git
 cd slop
-cmake -DCMAKE_INSTALL_PREFIX="/usr" ./
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="/usr" ./
 make && sudo make install
 cd ..
 git clone https://github.com/naelstrof/maim.git
 cd maim
-cmake -DCMAKE_INSTALL_PREFIX="/usr" ./
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="/usr" ./
 make && sudo make install
 ```
 
