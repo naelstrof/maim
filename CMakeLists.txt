@@ -2,10 +2,6 @@ cmake_minimum_required( VERSION 3.1.3 )
 
 project(maim VERSION 5.7.4 LANGUAGES CXX)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug")
-endif()
-
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "..." FORCE)
 endif()
