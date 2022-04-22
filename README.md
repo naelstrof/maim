@@ -87,3 +87,11 @@ $ maim | feh - -x & maim -s cropped.png
 ```bash
 $ maim -s /tmp/screenshot.png; imgur.sh /tmp/screenshot.png | xclip -selection clipboard
 ```
+
+* The following command can be used to select a QR code (or click into a window
+  where a QR code is present), decode it, print the text to the console and
+  copy the text into the clipboard for further usage. 
+
+```bash
+$ maim -qs | zbarimg -q --raw - | xclip -selection clipboard -f
+```
