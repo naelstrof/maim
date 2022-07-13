@@ -1,10 +1,10 @@
 # maim
-maim (Make Image) is a utility that takes screenshots of your desktop. It's meant to overcome shortcomings of scrot and performs better in several ways.
+maim (Make Image) is an utility that takes screenshots of your desktop. It's meant to overcome shortcomings of scrot and performs better in several ways.
 
 ## Features
 * Takes screenshots of your desktop, and saves it in png, jpg, or bmp format.
-* Takes screenshots predetermined regions or windows, useful for automation.
-* Allows a users to select a region, or window, before taking a screenshot on the fly.
+* Takes screenshots of predetermined regions or windows, useful for automation.
+* Allows a user to select a region, or window, before taking a screenshot on the fly.
 
 ![screenshot with selection](http://i.imgur.com/ILZKJCT.png)
 * Blends the system cursor to the screenshot.
@@ -12,7 +12,7 @@ maim (Make Image) is a utility that takes screenshots of your desktop. It's mean
 * Masks off-screen pixels to be transparent or black.
 
 ![screenshot with masked pixels](http://i.imgur.com/kMkcHlZ.png)
-* Maim cleanly pipes screenshots directly to standard output (unless otherwise specified). Allowing for command chaining.
+* Maim cleanly pipes screenshots directly to standard output (unless otherwise specified), allowing for command chaining.
 * Maim supports anything slop does, even selection [shaders](https://github.com/naelstrof/slop#shaders)!
 
 ![slop animation](http://i.giphy.com/kfBLafeJfLs2Y.gif)
