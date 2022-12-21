@@ -95,3 +95,21 @@ $ maim -s /tmp/screenshot.png; imgur.sh /tmp/screenshot.png | xclip -selection c
 ```bash
 $ maim -qs | zbarimg -q --raw - | xclip -selection clipboard -f
 ```
+
+* Shortcut for [i3 window manager](https://github.com/i3/i3):
+  * Enable light on the Thinkpad T430 laptop
+  * Wait 5 seconds
+  * Screenshot all displays
+  * Save file like **~/screenshots/2022-dec-21--12-56-08_maim.png**
+  * Disable light
+  * Show i3 notification for 3 seconds:
+
+```bash
+bindsym $mod+Shift+x exec "\
+    echo 1 > /sys/class/leds/platform\:\:micmute/brightness; \
+    sleep 5; \
+    maim --hidecursor ~/screenshots/$(date +%Y-%b-%d--%H-%M-%S_maim | tr A-Z a-z).png; \
+    echo 0 > /sys/class/leds/platform\:\:micmute/brightness; \
+    i3-nagbar --message 'Screenshot created' --type warning & \
+    sleep 3; pkill i3-nagbar"
+```
