@@ -1,6 +1,8 @@
 # maim
 maim (Make Image) is an utility that takes screenshots of your desktop. It's meant to overcome shortcomings of scrot and performs better in several ways.
 
+[Wikidata item](https://www.wikidata.org/wiki/Q115792652).
+
 ## Features
 * Takes screenshots of your desktop, and saves it in png, jpg, or bmp format.
 * Takes screenshots of predetermined regions or windows, useful for automation.
