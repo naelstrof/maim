@@ -22,7 +22,7 @@ maim (Make Image) is an utility that takes screenshots of your desktop. It's mea
 
 ### Install using your Package Manager (Preferred)
 * [ALT Linux: maim](https://packages.altlinux.org/ru/sisyphus/srpms/maim)
-* [Arch Linux: community/maim](https://www.archlinux.org/packages/community/x86_64/maim/)
+* [Arch Linux: extra/maim](https://www.archlinux.org/packages/extra/x86_64/maim/)
 * [Debian: maim](https://tracker.debian.org/pkg/maim)
 * [Ubuntu: maim](https://packages.ubuntu.com/search?keywords=maim)
 * [Void Linux: maim](https://github.com/void-linux/void-packages/tree/master/srcpkgs/maim/template)
