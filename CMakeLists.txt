@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.1.3 )
 
-project(maim VERSION 5.7.4 LANGUAGES CXX)
+project(maim VERSION 5.8.0 LANGUAGES CXX)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "..." FORCE)
