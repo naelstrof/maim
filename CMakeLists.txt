@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.1.3 )
+cmake_minimum_required( VERSION 3.5.0 )
 
 project(maim VERSION 5.8.0 LANGUAGES CXX)
 
