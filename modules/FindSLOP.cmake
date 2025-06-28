@@ -13,7 +13,7 @@ find_path( SLOP_INCLUDE_DIR
            PATH_SUFFIXES /usr/include /include
            DOC "The SLOP include directory" )
 
-find_library( SLOP_LIBRARIES
+find_library( SLOP_LIBRARY
               NAMES slopy slopy.so slop slop.so
               PATHS /usr/lib /lib
               DOC "The SLOP library" )
