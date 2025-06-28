@@ -64,7 +64,7 @@ target_link_libraries( ${BIN_TARGET}
                        ${XRANDR_LIBRARY}
                        ${JPEG_LIBRARIES}
                        ${XRENDER_LIBRARY}
-                       ${SLOP_LIBRARIES}
+                       ${SLOP_LIBRARY}
                        ${WEBP_LIBRARY} )
 
 if( ${CMAKE_VERSION} VERSION_LESS 3.7 )

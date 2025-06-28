@@ -39,7 +39,12 @@ maim (Make Image) is an utility that takes screenshots of your desktop. It's mea
 * [Alpine Linux: maim](https://pkgs.alpinelinux.org/packages?name=maim&branch=edge&repo=&arch=&maintainer=)
 * Please make a package for maim on your favorite system, and make a pull request to add it to this list.
 
-### Install using CMake (Requires CMake, git, libXrender, libXfixes, libGLM, libxcomposite, libxrandr, libxext, GLEW)
+### Install using CMake
+#### Requires these at build-time:
+CMake, glm, x11proto
+
+#### Requires these at build- and runtime:
+libjpeg-turbo, libpng, libwebp, libX11, libXcomposite, libXext, libXfixes, libXrandr, libXrender
 ```bash
 git clone https://github.com/naelstrof/slop.git
 cd slop

@@ -13,17 +13,10 @@ find_path( SLOP_INCLUDE_DIR
            PATH_SUFFIXES /usr/include /include
            DOC "The SLOP include directory" )
 
-find_library( SLOP_LIBRARIES
+find_library( SLOP_LIBRARY
               NAMES slopy slopy.so slop slop.so
               PATHS /usr/lib /lib
               DOC "The SLOP library" )
-
-FIND_PACKAGE(X11 REQUIRED)
-FIND_PACKAGE(GLX REQUIRED)
-list(APPEND SLOP_LIBRARIES
-    ${X11_LIBRARIES}
-    ${GLX_LIBRARY}
-)
 
 if( SLOP_INCLUDE_DIR AND SLOP_LIBRARY )
     set( SLOP_FOUND 1 )
