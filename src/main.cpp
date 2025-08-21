@@ -522,7 +522,7 @@ int app( int argc, char** argv ) {
     }
 
     std::ostream* out;
-    if ( maimOptions->savepathGiven ) {
+    if ( maimOptions->savepathGiven && maimOptions->savepath != "-" ) {
         std::ofstream* file = new std::ofstream();
         file->open(maimOptions->savepath.c_str());
         if ( !file->is_open() ) {
@@ -593,7 +593,7 @@ int app( int argc, char** argv ) {
 
     XDestroyImage( image );
 
-    if ( maimOptions->savepathGiven ) {
+    if ( maimOptions->savepathGiven && maimOptions->savepath != "-" ) {
         std::ofstream* file = (std::ofstream*)out;
         file->close();
         delete (std::ofstream*)out;
