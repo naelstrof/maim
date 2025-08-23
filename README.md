@@ -120,3 +120,11 @@ bindsym $mod+Shift+x exec "\
     i3-nagbar --message 'Screenshot created' --type warning & \
     sleep 3; pkill i3-nagbar"
 ```
+* Shortcut for I3 to take a cropped screenshot and save it with current date in ISO 8601 date followed by a custom filename.
+
+```bash
+bindsym $mod+Shift+s exec --no-startup-id \
+  "outfilePrefix=$(dmenu -p 'Enter output filename without prefix or spaces' < /dev/null) && \
+   maim -s --hidecursor ~/screenshots/$(date +%Y-%m-%d_)$outfilePrefix.png || \
+   i3-nagbar --type warning --message 'Error: Maim exited with non-zero exit code'"
+```
