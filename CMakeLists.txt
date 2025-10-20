@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.5.0 )
+cmake_minimum_required( VERSION 3.10 )
 
 project(maim VERSION 5.8.1 LANGUAGES CXX)
 
@@ -67,17 +67,13 @@ target_link_libraries( ${BIN_TARGET}
                        ${SLOP_LIBRARY}
                        ${WEBP_LIBRARY} )
 
-if( ${CMAKE_VERSION} VERSION_LESS 3.7 )
-  message( WARNING "CMake version is below 3.7, CMake version >= 3.7 is required for unicode support." )
-else()
-  find_package(ICU COMPONENTS uc)
-  set( MAIM_UNICODE TRUE CACHE BOOL "To enable or disable unicode support." )
-  if ( MAIM_UNICODE AND ICU_FOUND )
-      # ICU is required for old nvidia drivers to work for whatever reason.
-      add_definitions(-DCXXOPTS_USE_UNICODE)
-      include_directories( ${ICU_INCLUDE_DIR} )
-      target_link_libraries( ${BIN_TARGET} ${ICU_UC_LIBRARIES} )
-  endif()
+find_package(ICU COMPONENTS uc)
+set( MAIM_UNICODE TRUE CACHE BOOL "To enable or disable unicode support." )
+if ( MAIM_UNICODE AND ICU_FOUND )
+# ICU is required for old nvidia drivers to work for whatever reason.
+  add_definitions(-DCXXOPTS_USE_UNICODE)
+  include_directories( ${ICU_INCLUDE_DIR} )
+  target_link_libraries( ${BIN_TARGET} ${ICU_UC_LIBRARIES} )
 endif()
 
 install( TARGETS ${BIN_TARGET} DESTINATION "${CMAKE_INSTALL_BINDIR}" )
