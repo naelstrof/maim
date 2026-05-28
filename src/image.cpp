@@ -144,41 +144,19 @@ void ARGBImage::writePNG( std::ostream& streamout, int quality ) {
     png_destroy_write_struct(&png, &info);
 }
 
-void init_buffer(jpeg_compress_struct* cinfo) {}
- 
-/* what to do when the buffer is full; this should almost never
- * happen since we allocated our buffer to be big to start with
- */
-boolean empty_buffer(jpeg_compress_struct* cinfo) {
-    return TRUE;
-}
- 
-/* finalize the buffer and do any cleanup stuff */
-void term_buffer(jpeg_compress_struct* cinfo) {}
-
 void ARGBImage::writeJPEG( std::ostream& streamout, int quality ) {
     if ( channels != 3 ) {
         throw new std::runtime_error( "JPEG tried to save image with more than 3 channels." );
     }
     struct jpeg_compress_struct cinfo;
     struct jpeg_error_mgr       jerr;
-    struct jpeg_destination_mgr dmgr;
- 
-    /* create our in-memory output buffer to hold the jpeg */
-    JOCTET * out_buffer   = new JOCTET[width * height *3];
- 
-    /* here is the magic */
-    dmgr.init_destination    = init_buffer;
-    dmgr.empty_output_buffer = empty_buffer;
-    dmgr.term_destination    = term_buffer;
-    dmgr.next_output_byte    = out_buffer;
-    dmgr.free_in_buffer      = width * height *3;
  
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_compress(&cinfo);
  
-    /* make sure we tell it about our manager */
-    cinfo.dest = &dmgr;
+    unsigned char* out_buffer = NULL;
+    unsigned long  out_size   = 0;
+    jpeg_mem_dest(&cinfo, &out_buffer, &out_size);
  
     cinfo.image_width      = width;
     cinfo.image_height     = height;
@@ -200,8 +178,9 @@ void ARGBImage::writeJPEG( std::ostream& streamout, int quality ) {
     }
     jpeg_finish_compress(&cinfo);
  
-    streamout.write( (const char*)out_buffer, cinfo.dest->next_output_byte - out_buffer );
-    delete[] out_buffer;
+    streamout.write( (const char*)out_buffer, out_size );
+    free( out_buffer );
+    jpeg_destroy_compress( &cinfo );
 }
 
 void ARGBImage::writeBMP( std::ostream& streamout ) {
